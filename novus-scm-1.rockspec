@@ -6,11 +6,14 @@ source  = {
 }
 
 description = {
-     summary = 'A completely modular discord library powered by lua-http.'
+     summary = 'A Discord API library written in lua 5.3, for lua 5.3.'
     ,homepage = source.url
     ,license = 'MIT'
     ,maintainer = 'm4gicks@gmail.com'
-    ,detailed = ''
+    ,detailed = 
+"Novus is a wrapper for the official Discord API.\
+It uses [cqueues](cqueues) and [lua-http](lua_http) to provide a minimal, yet featureful,\
+interface for developing lightweight discord bot applications."
 }
 
 dependencies = {
@@ -22,5 +25,6 @@ dependencies = {
 }
 
 build = {
-    type = "builtin"
+     type = "builtin"
+    ,modules = {}
 }

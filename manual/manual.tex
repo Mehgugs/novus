@@ -1,0 +1,106 @@
+\documentclass[12pt, oneside]{memoir}
+\usepackage[sfdefault]{FiraSans}
+
+\usepackage{xcolor}
+\usepackage{pagecolor}
+\usepackage{xspace}
+\usepackage{makeidx}
+\usepackage{listings}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pifont}
+
+\definecolor{novus-accent}{HTML}{3C92AA}
+\definecolor{novus-link}{HTML}{89C4AC}
+\definecolor{novus-highlight}{HTML}{476FB3}
+\definecolor{novus-bright}{HTML}{00D27D}
+\definecolor{novus-bg}{HTML}{212121}
+
+\usepackage[colorlinks=true, linkcolor=novus-link, urlcolor=novus-highlight]{hyperref}
+
+\setlength{\parindent}{0pt}
+
+
+\lstdefinestyle{Lua53}
+{
+  language         = {[5.2]Lua},
+  basicstyle       = \ttfamily,
+  showstringspaces = false,
+  upquote          = true,
+  morekeywords={break,goto,do,end,while,repeat,until,if,then,elseif,else,for,in,function,local,nil,false,true,and,or,not},
+  sensitive = true,
+  morestring=[b]"
+}
+
+\lstnewenvironment{code}[0]{
+	\lstset{language=lua}
+}{}
+
+\newcommand*{\novus}[0]{\nbright{\texttt{novus}}\xspace}
+
+\newcommand*{\nbg}[0]{
+    \pagecolor{novus-bg}
+    \color{white}
+}
+
+\newcommand*{\naccent}[1]{
+    {\color{novus-accent} #1}
+}
+
+\newcommand*{\nbright}[1]{
+    {\color{novus-bright} #1}
+}
+
+\newcommand*{\nhighlight}[1]{
+    {\color{novus-highlight} #1}
+}
+
+\newlength{\drop}
+\newcommand*{\novustitle}[0]{
+\begingroup
+    \drop = 0.1\textheight
+    \hbox{%
+        \hspace*{0.01\textwidth}%
+        \naccent{\rule{2pt}{\textheight}}
+        \hspace*{0.05\textwidth}%
+        \parbox[b]{0.75\textwidth}{
+        \vbox{%
+            \vspace{\drop}
+            {\noindent\Huge\bfseries The\\[0.5\baselineskip]
+                \novus User Manual}\\[2\baselineskip]
+            {\Large\itshape For creating lightweight discord  bots in lua.}\\[4\baselineskip]
+            {\Large Magicks}\par
+            \vspace{0.4\textheight}
+            {\noindent\url{https://github.com/Mehgugs/novus.git}}\\[\baselineskip]
+        }
+        }
+    }
+    \vfill
+    \null
+\endgroup}
+
+\copypagestyle{chapter}{plain}
+
+\makeevenfoot{chapter}{}{}{\textcolor{white}{\thepage}}
+\makeoddfoot{chapter}{}{}{\textcolor{white}{\thepage}}
+
+\begin{document}
+    \nbg
+    \begin{titlingpage}
+        \thispagestyle{empty}
+        \novustitle
+    \end{titlingpage}
+    % \maxtocdepth{subsubsection}
+    % \setsecnumdepth{subsection}
+    \tableofcontents
+
+    \chapter{Dependencies}
+    Some preamble about why I chose the lua-http over something like copas.
+    \pagebreak
+    \chapter{Installation}
+    Either point to README.md or restate it here
+    \pagebreak
+    \chapter{Modules}
+    Document it...
+\end{document}
