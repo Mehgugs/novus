@@ -1,7 +1,16 @@
 \documentclass[12pt, oneside]{memoir}
-\usepackage[sfdefault]{FiraSans}
 
-\usepackage{xcolor}
+\usepackage{fontspec}
+\setmonofont[
+  Contextuals={Alternate}
+]{Fira Code}
+
+\makeatletter
+\def\verbatim@nolig@list{}
+\makeatother
+
+\usepackage[sfdefault]{FiraSans}
+\usepackage[rgb, x11names]{xcolor}
 \usepackage{pagecolor}
 \usepackage{xspace}
 \usepackage{makeidx}
@@ -21,20 +30,21 @@
 
 \setlength{\parindent}{0pt}
 
-
-\lstdefinestyle{Lua53}
-{
-  language         = {[5.2]Lua},
-  basicstyle       = \ttfamily,
-  showstringspaces = false,
-  upquote          = true,
-  morekeywords={break,goto,do,end,while,repeat,until,if,then,elseif,else,for,in,function,local,nil,false,true,and,or,not},
-  sensitive = true,
-  morestring=[b]"
+\lstdefinestyle{Lua}{%
+language=[5.3]Lua,
+basicstyle=\ttfamily,
+columns=spaceflexible,
+showstringspaces=false,
+keywordstyle=\color{novus-accent},% language keywords
+keywordstyle=[2]\color{novus-highlight},% std. library identifiers
+keywordstyle=[3]\color{novus-highlight},% labels
+stringstyle=\color{novus-bright},% strings
+commentstyle=\itshape\color{black!30},% comments
 }
 
+
 \lstnewenvironment{code}[0]{
-	\lstset{language=lua}
+	\lstset{language=[5.3]lua,style=Lua}
 }{}
 
 \newcommand*{\novus}[0]{\nbright{\texttt{novus}}\xspace}

@@ -45,14 +45,16 @@ local with_payload = {
     POST = true,
 }
 
-local mutex_cache = setmetatable({}, 
-{
-    __mode = "v",
-    __index = function (self, k)
-        self[k] = util.mutex(k)
-        return self[k]
-    end
-})
+function mutex_cache() 
+	return setmetatable({}, 
+	{
+		__mode = "v",
+		__index = function (self, k)
+			self[k] = util.mutex(k)
+			return self[k]
+		end
+	})
+end
 
 
 local check_anywhere = util.compose(lpeg.check , lpeg.anywhere)
@@ -93,23 +95,21 @@ local function attachFiles(payload, files)
 	return concat(ret, "\r\n")
 end
 
+local token_check = lpeg.check(lpeg.patterns.token * -1)
 
-local token_check = lpeg.check(
-	lpeg.S"MN" * lpeg.exactly(58, lpeg.R("09", "az", "AZ") + "-" + "_" + ".") * -1
-)
-
-local sample_token = ("X"):rep(59)
-
-function init(t)
-    if not (t and t:sub(1,4) == "Bot " and token_check:match(t:sub(5,-1))) then 
-        return util.fatal("Please supply a bot token! It should look like \"Bot %s\"",sample_token)
+function init(options)
+	local state = {}
+    if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then 
+        return util.fatal("Please supply a bot token!")
     end
-	_ENV.TOKEN  = t
-	_ENV.APIID = util.rid()
-	util.info("Initialized Api-%s TOKEN-%x", APIID, util.hash(t))
+	state.token = options.token
+	state.id = util.rid()
+	state.routex = mutex_cache()
+	util.info("Initialized API-%s with TOKEN-%x", state.id, util.hash(state.token))
+	return state
 end
 
-function request(method, endpoint, payload, query, files)
+function request(state, method, endpoint, payload, query, files)
     if not cqueues.running() then 
         return util.fatal("Please call REST methods asynchronously.")
     end
@@ -120,7 +120,7 @@ function request(method, endpoint, payload, query, files)
 	local req = newreq.new_from_uri(url)
     req.headers:append(":method", method)
     req.headers:upsert("user-agent", USER_AGENT)
-    req.headers:append("authorization", TOKEN)
+    req.headers:append("authorization", state.token)
     if with_payload[method] then 
         payload = payload and json.encode(payload) or '{}'
         if files and next(files) then
@@ -133,7 +133,7 @@ function request(method, endpoint, payload, query, files)
         req:set_body(payload)
     end
 	local route = route_of(endpoint, method)
-    local routex = mutex_cache[route]
+    local routex = state.routex[route]
 	
     routex:lock()
     local success, data, err, delay = pcall(push, req, ("%s:%s"):format(method,route), 0)
@@ -142,7 +142,7 @@ function request(method, endpoint, payload, query, files)
     end
     routex:unlockAfter(delay)
 
-    return not err, data, err
+    return state, not err, data, err
 end
 
 function push(req, name, retries)
@@ -245,469 +245,469 @@ local endpoints = {
 	WEBHOOK_TOKEN_SLACK           = "/webhooks/%s/%s/slack",
 }
 
-function getGuildAuditLog(guild_id)
+function getGuildAuditLog(state, guild_id)
 	local endpoint = endpoints.GUILD_AUDIT_LOGS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getChannel(channel_id)
+function getChannel(state, channel_id)
 	local endpoint = endpoints.CHANNEL:format(channel_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function modifyChannel(channel_id, payload)
+function modifyChannel(state, channel_id, payload)
 	local endpoint = endpoints.CHANNEL:format(channel_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function deleteChannel(channel_id)
+function deleteChannel(state, channel_id)
 	local endpoint = endpoints.CHANNEL:format(channel_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getChannelMessages(channel_id)
+function getChannelMessages(state, channel_id)
 	local endpoint = endpoints.CHANNEL_MESSAGES:format(channel_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getChannelMessage(channel_id, message_id)
+function getChannelMessage(state, channel_id, message_id)
 	local endpoint = endpoints.CHANNEL_MESSAGE:format(channel_id, message_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createMessage(channel_id, payload)
+function createMessage(state, channel_id, payload)
 	local endpoint = endpoints.CHANNEL_MESSAGES:format(channel_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function createReaction(channel_id, message_id, emoji, payload)
+function createReaction(state, channel_id, message_id, emoji, payload)
 	local endpoint = endpoints.CHANNEL_MESSAGE_REACTION_ME:format(channel_id, message_id, emoji)
-	return request("PUT", endpoint, payload)
+	return request(state, "PUT", endpoint, payload)
 end
 
-function deleteOwnReaction(channel_id, message_id, emoji)
+function deleteOwnReaction(state, channel_id, message_id, emoji)
 	local endpoint = endpoints.CHANNEL_MESSAGE_REACTION_ME:format(channel_id, message_id, emoji)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function deleteUserReaction(channel_id, message_id, emoji, user_id)
+function deleteUserReaction(state, channel_id, message_id, emoji, user_id)
 	local endpoint = endpoints.CHANNEL_MESSAGE_REACTION_USER:format(channel_id, message_id, emoji, user_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getReactions(channel_id, message_id, emoji)
+function getReactions(state, channel_id, message_id, emoji)
 	local endpoint = endpoints.CHANNEL_MESSAGE_REACTION:format(channel_id, message_id, emoji)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function deleteAllReactions(channel_id, message_id)
+function deleteAllReactions(state, channel_id, message_id)
 	local endpoint = endpoints.CHANNEL_MESSAGE_REACTIONS:format(channel_id, message_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function editMessage(channel_id, message_id, payload)
+function editMessage(state, channel_id, message_id, payload)
 	local endpoint = endpoints.CHANNEL_MESSAGE:format(channel_id, message_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function deleteMessage(channel_id, message_id)
+function deleteMessage(state, channel_id, message_id)
 	local endpoint = endpoints.CHANNEL_MESSAGE:format(channel_id, message_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function bulkDeleteMessages(channel_id, payload)
+function bulkDeleteMessages(state, channel_id, payload)
 	local endpoint = endpoints.CHANNEL_MESSAGES_BULK_DELETE:format(channel_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function editChannelPermissions(channel_id, overwrite_id, payload)
+function editChannelPermissions(state, channel_id, overwrite_id, payload)
 	local endpoint = endpoints.CHANNEL_PERMISSION:format(channel_id, overwrite_id)
-	return request("PUT", endpoint, payload)
+	return request(state, "PUT", endpoint, payload)
 end
 
-function getChannelInvites(channel_id)
+function getChannelInvites(state, channel_id)
 	local endpoint = endpoints.CHANNEL_INVITES:format(channel_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createChannelInvite(channel_id, payload)
+function createChannelInvite(state, channel_id, payload)
 	local endpoint = endpoints.CHANNEL_INVITES:format(channel_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function deleteChannelPermission(channel_id, overwrite_id)
+function deleteChannelPermission(state, channel_id, overwrite_id)
 	local endpoint = endpoints.CHANNEL_PERMISSION:format(channel_id, overwrite_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function triggerTypingIndicator(channel_id, payload)
+function triggerTypingIndicator(state, channel_id, payload)
 	local endpoint = endpoints.CHANNEL_TYPING:format(channel_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function getPinnedMessages(channel_id)
+function getPinnedMessages(state, channel_id)
 	local endpoint = endpoints.CHANNEL_PINS:format(channel_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function addPinnedChannelMessage(channel_id, message_id, payload)
+function addPinnedChannelMessage(state, channel_id, message_id, payload)
 	local endpoint = endpoints.CHANNEL_PIN:format(channel_id, message_id)
-	return request("PUT", endpoint, payload)
+	return request(state, "PUT", endpoint, payload)
 end
 
-function deletePinnedChannelMessage(channel_id, message_id)
+function deletePinnedChannelMessage(state, channel_id, message_id)
 	local endpoint = endpoints.CHANNEL_PIN:format(channel_id, message_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function groupDMAddRecipient(channel_id, user_id, payload)
+function groupDMAddRecipient(state, channel_id, user_id, payload)
 	local endpoint = endpoints.CHANNEL_RECIPIENT:format(channel_id, user_id)
-	return request("PUT", endpoint, payload)
+	return request(state, "PUT", endpoint, payload)
 end
 
-function groupDMRemoveRecipient(channel_id, user_id)
+function groupDMRemoveRecipient(state, channel_id, user_id)
 	local endpoint = endpoints.CHANNEL_RECIPIENT:format(channel_id, user_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function listGuildEmojis(guild_id)
+function listGuildEmojis(state, guild_id)
 	local endpoint = endpoints.GUILD_EMOJIS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getGuildEmoji(guild_id, emoji_id)
+function getGuildEmoji(state, guild_id, emoji_id)
 	local endpoint = endpoints.GUILD_EMOJI:format(guild_id, emoji_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createGuildEmoji(guild_id, payload)
+function createGuildEmoji(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_EMOJIS:format(guild_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function modifyGuildEmoji(guild_id, emoji_id, payload)
+function modifyGuildEmoji(state, guild_id, emoji_id, payload)
 	local endpoint = endpoints.GUILD_EMOJI:format(guild_id, emoji_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function deleteGuildEmoji(guild_id, emoji_id)
+function deleteGuildEmoji(state, guild_id, emoji_id)
 	local endpoint = endpoints.GUILD_EMOJI:format(guild_id, emoji_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function createGuild(payload)
+function createGuild(state, payload)
 	local endpoint = endpoints.GUILDS
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function getGuild(guild_id)
+function getGuild(state, guild_id)
 	local endpoint = endpoints.GUILD:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function modifyGuild(guild_id, payload)
+function modifyGuild(state, guild_id, payload)
 	local endpoint = endpoints.GUILD:format(guild_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function deleteGuild(guild_id)
+function deleteGuild(state, guild_id)
 	local endpoint = endpoints.GUILD:format(guild_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getGuildChannels(guild_id)
+function getGuildChannels(state, guild_id)
 	local endpoint = endpoints.GUILD_CHANNELS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createGuildChannel(guild_id, payload)
+function createGuildChannel(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_CHANNELS:format(guild_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function modifyGuildChannelPositions(guild_id, payload)
+function modifyGuildChannelPositions(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_CHANNELS:format(guild_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function getGuildMember(guild_id, user_id)
+function getGuildMember(state, guild_id, user_id)
 	local endpoint = endpoints.GUILD_MEMBER:format(guild_id, user_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function listGuildMembers(guild_id)
+function listGuildMembers(state, guild_id)
 	local endpoint = endpoints.GUILD_MEMBERS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function addGuildMember(guild_id, user_id, payload)
+function addGuildMember(state, guild_id, user_id, payload)
 	local endpoint = endpoints.GUILD_MEMBER:format(guild_id, user_id)
-	return request("PUT", endpoint, payload)
+	return request(state, "PUT", endpoint, payload)
 end
 
-function modifyGuildMember(guild_id, user_id, payload)
+function modifyGuildMember(state, guild_id, user_id, payload)
 	local endpoint = endpoints.GUILD_MEMBER:format(guild_id, user_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function modifyCurrentUserNick(guild_id, payload)
+function modifyCurrentUserNick(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_MEMBERS_ME_NICK:format(guild_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function addGuildMemberRole(guild_id, user_id, role_id, payload)
+function addGuildMemberRole(state, guild_id, user_id, role_id, payload)
 	local endpoint = endpoints.GUILD_MEMBER_ROLE:format(guild_id, user_id, role_id)
-	return request("PUT", endpoint, payload)
+	return request(state, "PUT", endpoint, payload)
 end
 
-function removeGuildMemberRole(guild_id, user_id, role_id)
+function removeGuildMemberRole(state, guild_id, user_id, role_id)
 	local endpoint = endpoints.GUILD_MEMBER_ROLE:format(guild_id, user_id, role_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function removeGuildMember(guild_id, user_id)
+function removeGuildMember(state, guild_id, user_id)
 	local endpoint = endpoints.GUILD_MEMBER:format(guild_id, user_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getGuildBans(guild_id)
+function getGuildBans(state, guild_id)
 	local endpoint = endpoints.GUILD_BANS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getGuildBan(guild_id, user_id)
+function getGuildBan(state, guild_id, user_id)
 	local endpoint = endpoints.GUILD_BAN:format(guild_id, user_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createGuildBan(guild_id, user_id, payload)
+function createGuildBan(state, guild_id, user_id, payload)
 	local endpoint = endpoints.GUILD_BAN:format(guild_id, user_id)
-	return request("PUT", endpoint, payload)
+	return request(state, "PUT", endpoint, payload)
 end
 
-function removeGuildBan(guild_id, user_id)
+function removeGuildBan(state, guild_id, user_id)
 	local endpoint = endpoints.GUILD_BAN:format(guild_id, user_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getGuildRoles(guild_id)
+function getGuildRoles(state, guild_id)
 	local endpoint = endpoints.GUILD_ROLES:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createGuildRole(guild_id, payload)
+function createGuildRole(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_ROLES:format(guild_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function modifyGuildRolePositions(guild_id, payload)
+function modifyGuildRolePositions(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_ROLES:format(guild_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function modifyGuildRole(guild_id, role_id, payload)
+function modifyGuildRole(state, guild_id, role_id, payload)
 	local endpoint = endpoints.GUILD_ROLE:format(guild_id, role_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function deleteGuildRole(guild_id, role_id)
+function deleteGuildRole(state, guild_id, role_id)
 	local endpoint = endpoints.GUILD_ROLE:format(guild_id, role_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getGuildPruneCount(guild_id)
+function getGuildPruneCount(state, guild_id)
 	local endpoint = endpoints.GUILD_PRUNE:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function beginGuildPrune(guild_id, payload)
+function beginGuildPrune(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_PRUNE:format(guild_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function getGuildVoiceRegions(guild_id)
+function getGuildVoiceRegions(state, guild_id)
 	local endpoint = endpoints.GUILD_REGIONS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getGuildInvites(guild_id)
+function getGuildInvites(state, guild_id)
 	local endpoint = endpoints.GUILD_INVITES:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getGuildIntegrations(guild_id)
+function getGuildIntegrations(state, guild_id)
 	local endpoint = endpoints.GUILD_INTEGRATIONS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createGuildIntegration(guild_id, payload)
+function createGuildIntegration(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_INTEGRATIONS:format(guild_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function modifyGuildIntegration(guild_id, integration_id, payload)
+function modifyGuildIntegration(state, guild_id, integration_id, payload)
 	local endpoint = endpoints.GUILD_INTEGRATION:format(guild_id, integration_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function deleteGuildIntegration(guild_id, integration_id)
+function deleteGuildIntegration(state, guild_id, integration_id)
 	local endpoint = endpoints.GUILD_INTEGRATION:format(guild_id, integration_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function syncGuildIntegration(guild_id, integration_id, payload)
+function syncGuildIntegration(state, guild_id, integration_id, payload)
 	local endpoint = endpoints.GUILD_INTEGRATION_SYNC:format(guild_id, integration_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function getGuildEmbed(guild_id)
+function getGuildEmbed(state, guild_id)
 	local endpoint = endpoints.GUILD_EMBED:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function modifyGuildEmbed(guild_id, payload)
+function modifyGuildEmbed(state, guild_id, payload)
 	local endpoint = endpoints.GUILD_EMBED:format(guild_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function getGuildVanityURL(guild_id)
+function getGuildVanityURL(state, guild_id)
 	local endpoint = endpoints.GUILD_VANITY_URL:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getInvite(invite_code)
+function getInvite(state, invite_code)
 	local endpoint = endpoints.INVITE:format(invite_code)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function deleteInvite(invite_code)
+function deleteInvite(state, invite_code)
 	local endpoint = endpoints.INVITE:format(invite_code)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getCurrentUser()
+function getCurrentUser(state)
 	local endpoint = endpoints.USERS_ME
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getUser(user_id)
+function getUser(state, user_id)
 	local endpoint = endpoints.USER:format(user_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function modifyCurrentUser(payload)
+function modifyCurrentUser(state, payload)
 	local endpoint = endpoints.USERS_ME
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function getCurrentUserGuilds()
+function getCurrentUserGuilds(state)
 	local endpoint = endpoints.USERS_ME_GUILDS
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function leaveGuild(guild_id)
+function leaveGuild(state, guild_id)
 	local endpoint = endpoints.USERS_ME_GUILD:format(guild_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function getUserDMs()
+function getUserDMs(state)
 	local endpoint = endpoints.USERS_ME_CHANNELS
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createDM(payload)
+function createDM(state, payload)
 	local endpoint = endpoints.USERS_ME_CHANNELS
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function createGroupDM(payload)
+function createGroupDM(state, payload)
 	local endpoint = endpoints.USERS_ME_CHANNELS
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function getUserConnections()
+function getUserConnections(state)
 	local endpoint = endpoints.USERS_ME_CONNECTIONS
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function listVoiceRegions()
+function listVoiceRegions(state)
 	local endpoint = endpoints.VOICE_REGIONS
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function createWebhook(channel_id, payload)
+function createWebhook(state, channel_id, payload)
 	local endpoint = endpoints.CHANNEL_WEBHOOKS:format(channel_id)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function getChannelWebhooks(channel_id)
+function getChannelWebhooks(state, channel_id)
 	local endpoint = endpoints.CHANNEL_WEBHOOKS:format(channel_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getGuildWebhooks(guild_id)
+function getGuildWebhooks(state, guild_id)
 	local endpoint = endpoints.GUILD_WEBHOOKS:format(guild_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getWebhook(webhook_id)
+function getWebhook(state, webhook_id)
 	local endpoint = endpoints.WEBHOOK:format(webhook_id)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getWebhookWithToken(webhook_id, webhook_token)
+function getWebhookWithToken(state, webhook_id, webhook_token)
 	local endpoint = endpoints.WEBHOOK_TOKEN:format(webhook_id, webhook_token)
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function modifyWebhook(webhook_id, payload)
+function modifyWebhook(state, webhook_id, payload)
 	local endpoint = endpoints.WEBHOOK:format(webhook_id)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function modifyWebhookWithToken(webhook_id, webhook_token, payload)
+function modifyWebhookWithToken(state, webhook_id, webhook_token, payload)
 	local endpoint = endpoints.WEBHOOK_TOKEN:format(webhook_id, webhook_token)
-	return request("PATCH", endpoint, payload)
+	return request(state, "PATCH", endpoint, payload)
 end
 
-function deleteWebhook(webhook_id)
+function deleteWebhook(state, webhook_id)
 	local endpoint = endpoints.WEBHOOK:format(webhook_id)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function deleteWebhookWithToken(webhook_id, webhook_token)
+function deleteWebhookWithToken(state, webhook_id, webhook_token)
 	local endpoint = endpoints.WEBHOOK_TOKEN:format(webhook_id, webhook_token)
-	return request("DELETE", endpoint)
+	return request(state, "DELETE", endpoint)
 end
 
-function executeWebhook(webhook_id, webhook_token, payload)
+function executeWebhook(state, webhook_id, webhook_token, payload)
 	local endpoint = endpoints.WEBHOOK_TOKEN:format(webhook_id, webhook_token)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function executeSlackCompatibleWebhook(webhook_id, webhook_token, payload)
+function executeSlackCompatibleWebhook(state, webhook_id, webhook_token, payload)
 	local endpoint = endpoints.WEBHOOK_TOKEN_SLACK:format(webhook_id, webhook_token)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function executeGitHubCompatibleWebhook(webhook_id, webhook_token, payload)
+function executeGitHubCompatibleWebhook(state, webhook_id, webhook_token, payload)
 	local endpoint = endpoints.WEBHOOK_TOKEN_GITHUB:format(webhook_id, webhook_token)
-	return request("POST", endpoint, payload)
+	return request(state, "POST", endpoint, payload)
 end
 
-function getGateway()
+function getGateway(state)
 	local endpoint = endpoints.GATEWAY
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getGatewayBot()
+function getGatewayBot(state)
 	local endpoint = endpoints.GATEWAY_BOT
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
-function getCurrentApplicationInformation()
+function getCurrentApplicationInformation(state)
 	local endpoint = endpoints.OAUTH2_APPLICATIONS_ME
-	return request("GET", endpoint)
+	return request(state, "GET", endpoint)
 end
 
 --end-module--
