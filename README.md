@@ -8,6 +8,10 @@
 # Novus #
 **A [Discord API](discord) library written in lua 5.3, for lua 5.3.**
 
+### WIP ###
+This project is currently a work in progress. Do not expect a fully working 
+library with `version < 1.0.0`. 
+
 ### About ###
 Novus is a wrapper for the official Discord API.
 It uses [cqueues](cqueues) and [lua-http](lua_http) to provide a minimal, yet featureful,
@@ -24,48 +28,27 @@ interface for developing lightweight discord bot applications.
 
 ### Examples ###
 
-#### I: Using `novus.environ` ####
-
+Currently the client and top-level have not been finished,
+you can test current functionality with the following:
 ```lua
-local novus = require"novus"
-local _ENV = require"novus.environ"
+local util = require"novus.util"
+local client = require"novus.client"
+local cqueues = require"cqueues"
+local json = require"rapidjson"
 
-token = os.getenv"TOKEN"
+local myclient = client.create{
+     token = "Bot "..os.getenv"TOKEN"
+    ,compress = false
+    ,large_threshold = 100 
+    ,driver = "default" 
+}
 
-function ready(ctx)
-    novus.util.info("Bot %s online", ctx.me.tag)
-end
-
-function message_create(ctx)
-    novus.util.info("%s> %q", ctx.author.tag, ctx.message.content)
-end 
-
-novus.run()
-```
-
-#### II: More conventional ####
-
-```lua
-local novus = require"novus"
-
-local client = novus.new()
-
-client.token = os.getenv"TOKEN"
-
-client.events.ready = function(ctx) 
-    novus.util.info("Bot %s online", ctx.me.tag)
-end
-
-client.events.message_create = function(ctx)
-    novus.util.info("%s> %q", ctx.author.tag, ctx.message.content)
-end 
-
-novus.run(client)
+client.run(myclient)
 ```
 
 ### Documentation ###
 
-Documentation and more involved can be found in the [User Manual](). 
+Documentation and more involved examples can be found in the [User Manual](). 
 
 ### Contributing ###
 
