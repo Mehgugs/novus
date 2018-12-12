@@ -4,6 +4,7 @@ local f = string.format
 local date, exit = os.date, os.exit
 local tonumber = tonumber
 local stdout, stderr = io.stdout, io.stderr
+local err = error
 --start-module--
 local _ENV = {}
 
@@ -76,6 +77,11 @@ end
 
 function error(...)
     return writef24(stderr, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
+end
+
+function throw(...)
+    error(...)
+    return err(f(...))
 end
 
 function fatal(...)

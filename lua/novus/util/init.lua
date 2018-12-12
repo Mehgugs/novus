@@ -8,7 +8,7 @@ local select = select
 local insert, unpack = table.insert, table.unpack
 local ipairs, pairs = ipairs, pairs
 local random, randomseed, log = math.random, math.randomseed function math.randomseed() end
-local floor, log = math.floor, math.log
+local floor, log, min = math.floor, math.log, math.min
 local maxinteger = math.maxinteger
 local string = string
 local tostring, tonumber = tostring, tonumber
@@ -54,6 +54,9 @@ function bindmany(f, ...)
 end
 
 call = bind(bind, bindmany)
+
+function eq(A, B) return A == B end 
+function not_eq(A, B) return A ~= B end
 
 --list utilities
 
@@ -252,14 +255,10 @@ end
 
 function weak() return setmetatable({}, {__mode = "k"}) end
 
+function cache() return setmetatable({}, {__mode = "v"}) end
+
 function rid()
     return ("%x"):format(hash(tostring(seed())))
-end
-
-getmetatable"".__mod = function(s, v)
-    if type(v) == 'table' then return s:format(unpack(v))
-    else return s:format(v)
-    end
 end
 
 function _platform()
@@ -287,6 +286,45 @@ end
 
 function overwrite(...) return vfold(mergewith, ...) end
 
+local function lazilymerge(A, B)
+    return setmetatable(A, {
+        __index = function(self, key)
+            self[key] = B[key]
+            return get(self, key)
+        end
+    })
+end
+
+function makelazy(a) 
+    return lazilymerge({}, a)
+end
+
+local function compile_inherit(a, ...)
+    if ... then return lazilymerge(a, lazilymerge(...))
+    else return a end
+end
+
+function inherit(...)
+    return compile_inherit({}, ...)
+end
+
+function shallowcopy(t) return mergewith({}, t) end
+
+local function deeplycopy(A, B)
+    for k, v in pairs(B) do 
+        if type(v) == 'table' then 
+            A[k] = deepcopy(A[k] or {}, v)
+        else A[k] = v end 
+    end
+    return A 
+end
+
+function deepcopy(...)
+    return vfold(deeplycopy, {}, ...)
+end
+
+inherit_this = compile_inherit
+
 function default(v) return setmetatable({}, {__index = function() return v end}) end
 
 function reflect(t)
@@ -298,7 +336,76 @@ function reflect(t)
     return new
 end
 
-function module(s) return (loader(s)) end 
+function isint(n) 
+    return n == (n - n%1)
+end
+
+function module(s) return (loader(s)) end
+
+--string utils 
+
+getmetatable"".__mod = function(s, v)
+    if type(v) == 'table' then return s:format(unpack(v))
+    else return s:format(v)
+    end
+end
+
+function string:startswith( s )
+    return self:sub(1, #s) == s
+end
+
+function string:endswith( s )
+    return self:sub(-#s) == s
+end
+
+function string:suffix (pre)
+    return self:startswith(pre) and self:sub(#pre+1) or self
+end
+
+function string:prefix (pre)
+    return self:endswith(pre) and self:sub(1,-(#pre+1)) or self
+end
+
+string.levenshtein_cache = setmetatable({},{__mode = "k"})
+
+local cache_key = ("%s\0%s")
+
+function string.levenshtein(str1, str2)
+    if str1 == str2 then return 0 end
+    
+	local len1 = #str1
+	local len2 = #str2
+	if len1 == 0 then
+		return len2
+	elseif len2 == 0 then
+		return len1
+    end
+
+    local key = cache_key:format(str1,str2)
+    local cached = string.levenshtein_cache[key]
+    if cached then 
+        return cached
+    end
+
+	local matrix = {}
+	for i = 0, len1 do
+		matrix[i] = {[0] = i}
+	end
+	for j = 0, len2 do
+		matrix[0][j] = j
+	end
+	for i = 1, len1 do
+		for j = 1, len2 do
+            local char1 =  str1:byte(i)
+            local char2 =  str2:byte(j) 
+            local cost = char1 == char2 and 0 or 1
+  			matrix[i][j] = min(matrix[i-1][j] + 1, matrix[i][j-1] + 1, matrix[i-1][j-1] + cost)
+		end
+    end
+    local result= matrix[len1][len2]
+    string.levenshtein_cache[key] = result
+	return result
+end
 
 -- merge in special cases
 overwrite(
