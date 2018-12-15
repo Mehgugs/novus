@@ -8,7 +8,7 @@ local select = select
 local insert, unpack = table.insert, table.unpack
 local ipairs, pairs = ipairs, pairs
 local random, randomseed, log = math.random, math.randomseed function math.randomseed() end
-local floor, log, min = math.floor, math.log, math.min
+local floor, log, min, ult = math.floor, math.log, math.min, math.ult
 local maxinteger = math.maxinteger
 local string = string
 local tostring, tonumber = tostring, tonumber
@@ -300,7 +300,7 @@ function makelazy(a)
 end
 
 local function compile_inherit(a, ...)
-    if ... then return lazilymerge(a, lazilymerge(...))
+    if ... then return lazilymerge(a, compile_inherit(...))
     else return a end
 end
 
@@ -311,6 +311,7 @@ end
 function shallowcopy(t) return mergewith({}, t) end
 
 local function deeplycopy(A, B)
+    setmetatable(A, getmetatable(B))
     for k, v in pairs(B) do 
         if type(v) == 'table' then 
             A[k] = deepcopy(A[k] or {}, v)

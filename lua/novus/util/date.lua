@@ -1,6 +1,7 @@
 --imports--
 local const = require"novus.const"
 local printers = require"novus.util.printf"
+local uint = require"novus.util.uint"
 local date, time, difftime = os.date, os.time, os.difftime
 local tostring, tonumber = tostring, tonumber
 local floor = math.floor
@@ -26,11 +27,8 @@ local function pow(base, exp) -- +ve integer power mapping into [0,2^63-1]
     return result;
 end
 
-local offset = 1 << 22
-local epoch = const.discord_epoch * 1000
 function Date.fromSnowflake(id)
-    local sec=(id / offset + epoch) / 1000
-    return Date(floor(sec), true)
+    return Date(uint.timestamp(id), true)
 end
 
 function Date:toISO()
