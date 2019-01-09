@@ -29,7 +29,8 @@ end
 setmetatable(_ENV, _ENV)
 
 function __index(self, key)
-    local enum, err = enum_loader(("novus.enums.%s"):format(key))
+    local lookup = key:lower() 
+    local enum, err = enum_loader(("novus.enums.%s"):format(lookup))
     if enum then 
         self[key] = enum 
         return enum 
