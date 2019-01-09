@@ -2,6 +2,7 @@
 local ult, mtoint, mntype, max_int = math.ult, math.tointeger, math.type, math.maxinteger
 local setmetatable = setmetatable
 local type = type
+local time = os.time
 local lpeg = require"novus.util.lpeg"
 local const = require"novus.const"
 --start-module--
@@ -72,10 +73,16 @@ function timestamp(s)
 end
 
 function fromtime(s) 
-    s = by10(s, 3)
+    s = by10(s or time(), 3)
     return (s - epoch) << 22
 end
-
+local inc = -1
+function synthesize(s, worker, pid)
+    inc = (inc + 1) &  0xFFF 
+    worker = ((worker or 0) & 63) << 17 
+    pid = ((pid or 0) & 63) << 12
+    return fromtime(s) | worker | pid | inc
+end
 --sort two snowflake objects
 function snowflake_sort(i,j) return ult(touint(i.id) , touint(j.id)) end
 
