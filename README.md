@@ -16,7 +16,7 @@ interface for developing lightweight discord bot applications.
 - To install from github:
     - `$ git clone https://github.com/Mehgugs/novus.git`
     - `$ cd novus && luarocks make`
-- To install the luarocks release directly:
+- To install the luarocks release directly (not published yet):
     - `$ luarocks install novus`
 
 ### Examples ###
