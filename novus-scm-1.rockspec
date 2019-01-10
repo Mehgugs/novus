@@ -21,7 +21,6 @@ dependencies = {
     ,'cqueues'
     ,'http'
     ,'lua-zlib'
-    ,'penlight'
 }
 
 build = {
