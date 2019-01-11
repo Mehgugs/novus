@@ -362,11 +362,31 @@ function Date.fromSnowflake(id)
     return Date(uint.timestamp(id), true)
 end
 
---- converts a Date object to an ISO format timestamp.
+--- converts a Date object to an ISO (8601) format timestamp.
 -- @treturn string The timestamp  
 function Date:toISO()
 	return os_date('!%FT%T', self.time) .. '+00:00'
 end 
+
+--- parsers an ISO (8601) format timestamp into a numerical timestamp.
+-- @tparam string str the ISO string. 
+-- @treturn number The timestamp.
+function Date.parseISO(str)
+	local year, month, day, hour, min, sec, other = str:match(
+		'(%d+)-(%d+)-(%d+).(%d+):(%d+):(%d+)(.*)'
+	)
+	return Date.parseTableUTC {
+		day = day, month = month, year = year,
+		hour = hour, min = min, sec = sec, isdst = false,
+	}
+end
+
+--- parses an ISO (8601) format timestamp into a date object.
+-- @tparam string str the ISO string. 
+-- @treturn Date object
+function Date.fromDateTableUTC(str)
+    return Date(Date.parseISO(str), true)
+end
 
 --- alias for Date(tbl, true) which constructs a UTC date object
 -- @param tbl A date table in the same format as the constructor.
