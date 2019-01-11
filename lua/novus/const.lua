@@ -22,7 +22,7 @@ default_avatars = 5
 
 lifetimes = setmetatable({}, {__index = function(l) return l.default end})
 
-lifetimes.default = 1.0
+lifetimes.default = 60 * 60
 
 --end-module--
 return _ENV
