@@ -161,14 +161,15 @@ function push(state, req, method,route, retries)
     local delay = 1 -- seconds
     local global = false -- whether the delay incurred is on the global limit
 
-    local headers , stream , errno = req:go(10)
+    local headers , stream , eno = req:go(10)
     
     if not headers and retries < const.max_retries then 
-        util.warn("%s failed with (%s:%s, %q) retrying", method,route, errno[errno], errno.strerror(errno))
-        cqueues.sleep(util.rand(1, 2))
+        local rsec = util.rand(1, 2)
+        util.warn("api-%s failed to %s:%s because (%s, %q) retrying after %.3fsec", state.id, method,route, errno[eno], errno.strerror(eno), rsec)
+        cqueues.sleep(rsec)
         return push(state, req, method,route, retries+1)
     elseif not headers and retries >= const.max_retries then 
-        return nil, errno.strerror(errno), delay, global
+        return nil, errno.strerror(eno), delay, global
     end
     
     local code, rawcode = headers:get":status"

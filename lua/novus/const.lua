@@ -8,10 +8,11 @@ time_unit = "seconds"
 discord_epoch = 1420070400
 gateway_delay = .5
 identify_delay = 5
+max_retries = 6
 
 api = {
      base_endpoint = "https://discordapp.com/api"
-    ,avatar_endpoint = "https://cdn.discordapp.com/avatars/%s/%s.%s"
+    ,avatar_endpoint = "https://cdn.discordapp.com/avatars/%u/%s.%s"
     ,default_avatar_endpoint = "https://cdn.discordapp.com/embed/avatars/%s.png"
     ,emoji_endpoint = "https://cdn.discordapp.com/emojis/%s.%s"
     ,version = 6
