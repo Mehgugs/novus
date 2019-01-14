@@ -117,7 +117,7 @@ function request(state, method, endpoint, payload, query, files)
     end
     local url = URL .. endpoint
     if query and next(query) then
-        url = ("%s?%s"):format(url, httputil.dict_query(query)) 
+        url = ("%s?%s"):format(url, httputil.dict_to_query(query)) 
     end
     local req = newreq.new_from_uri(url)
     req.headers:append(":method", method)
@@ -163,12 +163,12 @@ function push(state, req, method,route, retries)
 
     local headers , stream , eno = req:go(10)
     
-    if not headers and retries < const.max_retries then 
+    if not headers and retries < const.api.max_retries then 
         local rsec = util.rand(1, 2)
         util.warn("api-%s failed to %s:%s because (%s, %q) retrying after %.3fsec", state.id, method,route, errno[eno], errno.strerror(eno), rsec)
         cqueues.sleep(rsec)
         return push(state, req, method,route, retries+1)
-    elseif not headers and retries >= const.max_retries then 
+    elseif not headers and retries >= const.api.max_retries then 
         return nil, errno.strerror(eno), delay, global
     end
     
@@ -293,9 +293,9 @@ function delete_channel(state, channel_id)
     return request(state, "DELETE", endpoint)
 end
 
-function get_channel_messages(state, channel_id)
+function get_channel_messages(state, channel_id, query)
     local endpoint = endpoints.CHANNEL_MESSAGES:format(channel_id)
-    return request(state, "GET", endpoint)
+    return request(state, "GET", endpoint, nil, query)
 end
 
 function get_channel_message(state, channel_id, message_id)

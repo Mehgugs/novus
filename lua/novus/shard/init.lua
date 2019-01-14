@@ -4,6 +4,7 @@ local cond = require"cqueues.condition"
 local errno = require"cqueues.errno"
 local websocket = require"http.websocket"
 local zlib = require"http.zlib"
+local httputil = require"http.util"
 local json = require"rapidjson"
 local util = require"novus.util"
 local const = require"novus.const"
@@ -13,79 +14,105 @@ local me = cqueues.running
 local poll = cqueues.poll 
 local cond_type = cond.type
 local encode,decode = json.encode, json.decode
-local identify_delay = const.identify_delay
+local identify_delay = const.gateway.identify_delay
 local sleep = cqueues.sleep
+local insert = table.insert
 local concat = table.concat
-
+local floor = math.floor
+local pairs = pairs
+local assert = assert
+local traceback = debug.traceback 
+local pcall = pcall
+local toquery = httputil.dict_to_query
+local tostring = tostring
 --start-module--
 local _ENV = {}
 
 
-
-local GATEWAY_DELAY = const.gateway_delay
+local ZLIB_SUFFIX = '\x00\x00\xff\xff'
+local GATEWAY_DELAY = const.gateway.delay
 local ops = util.reflect{
-  DISPATCH              = 0 -- ✅
-, HEARTBEAT             = 1 -- ✅
-, IDENTIFY              = 2 -- ✅
+  DISPATCH              = 0  -- ✅
+, HEARTBEAT             = 1  -- ✅
+, IDENTIFY              = 2  -- ✅
 , STATUS_UPDATE         = 3
 , VOICE_STATE_UPDATE    = 4
 , VOICE_SERVER_PING     = 5
-, RESUME                = 6
-, RECONNECT             = 7
+, RESUME                = 6    
+, RECONNECT             = 7  -- ✅
 , REQUEST_GUILD_MEMBERS = 8
-, INVALID_SESSION       = 9
+, INVALID_SESSION       = 9  -- ✅
 , HELLO                 = 10 -- ✅
 , HEARTBEAT_ACK         = 11 -- ✅
-, GUILD_SYNC            = 12
 }
 
 local token_check = lpeg.check(lpeg.patterns.token * -1)
 
 
-function init(options)
+function init(options, mutex)
     local state = {options = {}}
     if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then 
         return util.fatal("Please supply a bot token! It should look like \"Bot %s\"",sample_token)
     end
     util.mergewith(state.options, options)
 
-    state.shard_mutex = util.mutex()
-    state.identify_mutex = util.mutex()
+    state.shard_mutex = util.mutex() --+
+    state.identify_mutex = mutex
     state.heart_acknowledged  = cond.new()
     state.stop_heart = cond.new()
     state.identify_wait = cond.new()
-
+    state.beats = 0
+    state.acked = 0
+    if state.options.transport_compression then 
+        state.transport_infl = zlib.inflate()
+        state.transport_buffer = {}
+    end
     util.info("Initialized Shard-%s with TOKEN-%x", state.options.id, util.hash(state.options.token))
+    state.url_options = toquery({
+        v = tostring(const.gateway.version), 
+        encoding = const.gateway.encoding, 
+        compress = state.options.transport_compression and const.gateway.compress or nil
+    })
     return state
 end
 
 function connect(state)
     util.info("Shard-%s is connecting to %s...", state.options.id, state.options.gateway)
-    state.socket = websocket.new_from_uri(state.options.gateway)
+    state.socket = websocket.new_from_uri("%s?%s" % {state.options.gateway, state.url_options}) --++
     local success, _, err = state.socket:connect()
     if not success then 
-        util.error("%s - %s", errno[err], errno.strerror(err))
+        util.error("Shard-%s had an error while connecting %s - %s", state.options.id, errno[err], errno.strerror(err))
         return state, false
     else
         util.info("Shard-%s has connected.", state.options.id)
-        state.connected = true
-        me():wrap(frames, state)
+        state.connected = true --+
+        me():wrap(run_frames, state)
         return state, true
     end
 end
 
 function disconnect(state, why)
-    state.session_id = nil 
+    state.session_id = nil ---
     state.socket:close(1000, why or 'requested')
     return state
 end
 
-local function read_frame(frame, op)
+local function read_frame(state, frame, op)
     if op == "text" then 
         return decode(frame)
     elseif op == "binary" then 
-        local infl = zlib.inflate()
-        return  decode(infl(frame, true)) 
+        if state.options.transport_compression then 
+            insert(state.transport_buffer, frame)
+            if #frame < 4 or frame:sub(-4) ~= ZLIB_SUFFIX then 
+                return nil, true 
+            end 
+            local msg =  state.transport_infl(concat(state.transport_buffer))
+            state.transport_buffer = {}
+            return decode(msg)
+        else 
+            local infl = zlib.inflate()
+            return  decode(infl(frame, true)) 
+        end
     elseif op == "close" then 
         local code, i = ('>H'):unpack(payload)
         local msg = #payload > i and payload:sub(i) or 'Connection closed'
@@ -112,7 +139,8 @@ end
 
 function frames(state)
     for frame, op in state.socket:each() do 
-        local payload = read_frame(frame, op)
+        local payload, cont = read_frame(state, frame, op)
+        if cont then goto continue end 
         if payload then 
             local s = payload.s
             local t = payload.t
@@ -123,21 +151,37 @@ function frames(state)
                 _ENV[op](state, opcode, d, t, s)
             end
         else break end
+        ::continue:: 
     end
+    if state.reconnect then 
+        state.reconnect = nil
+        sleep(util.rand(1, 5))
+        return connect(state)
+    elseif state.options.auto_reconnect then 
+        local time = util.rand(0, 30)
+        util.info("Shard-%s will automatically reconnect in %.2fsec", state.options.id, time)
+        sleep(time)
+        return connect(state)
+    end
+end
+
+function run_frames(state)
+    local s, e = pcall(frames ,state)
+    assert(s, traceback(e))
+end
+
+local function includes(t, val)
+    for _, v in pairs(t) do if v == val then return true end end 
+    return false
 end
 
 local function beat_loop(state, interval)
     while 1 do
-        send(state, ops.HEARTBEAT, state._seq or json.null)
-        local r1,r2 = poll(state.stop_heart, interval)
-        if state.stop_heart == r1 or state.stop_heart == r2 then 
-            break 
-        else -- interval has elapsed
-            local acked = poll(state.heart_acknowledged)
-            if acked ~= state.heart_acknowledged then 
-                util.error("Previous heartbeat not ackowledged!")
-                return disconnect(state)                
-            end
+        state.beats = state.beats + 1
+        send(state, ops.HEARTBEAT, state._seq or json.null, true)
+        local r = {poll(state.stop_heart, interval)}
+        if includes(r, state.stop_heart) then 
+            break
         end
     end
 end
@@ -152,6 +196,7 @@ end
 
 function HELLO(state, code, d)
     util.info("discord said hello to Shard-%s trace=%q", state.options.id, concat(d._trace, ', '))
+    util.info("Shard-%s has a heartrate of %s.", state.options.id, util.Date.Interval(floor(d.heartbeat_interval/1e3)))
     start_heartbeat(state, d.heartbeat_interval/1e3)
 
     if state.session_id then 
@@ -161,24 +206,43 @@ function HELLO(state, code, d)
     end
 end
 
+function HEARTBEAT(state)
+    send(state, ops.HEARTBEAT, state._seq or json.null)
+end
+
+function INVALID_SESSION(state, _, d)
+    util.warn("Shard-%s has an invalid session, resumable=%q.", state.options.id, d and "true" or "false")
+    if not d then state.session_id = nil end 
+    return reconnect(state, not not d)
+end
+
 function HEARTBEAT_ACK(state)
-    util.info'HEARTBEAT_ACK'
-    state.heart_acknowledged:signal(1)
+    state.acked = state.acked + 1
+    if state.acked < state.beats then 
+        util.warn("Shard-%s is missing heartbeat acknowledgement!", state.options.id)
+    end
     return state
 end
 
-function DISCONNECT(state)
-    util.warn("Disconnect requested by discord.")
+function RECONNECT(state)
+    util.warn("Shard-%s has received a reconnect request.", state.options.id)
+    return reconnect(state)
+end
+
+function reconnect(state, resumable)
     stop_heartbeat(state)
-    state.socket:close(1000, "requested")
+    state.reconnect = true
+    if resumable == nil then resumable = true end
+    state.socket:close(resumable and 4000 or 1000)
     return state
 end
 
 function DISPATCH(state, op, d, t, s)
-    state._seq = s 
-    if state.dispatch[t] then 
-        return state.dispatch[t] (state, t, d)
+    state._seq = s --+
+    if t == 'READY' then 
+        t = 'SHARD_READY'
     end
+    return me():dispatch(state.options.id, t, d)
 end
 
 local function await_ready(state)
@@ -194,7 +258,7 @@ function identify(state)
 
     me():wrap(await_ready, state)
 
-    state._seq = nil
+    state._seq = nil ---
     state.session_id = nil
 
     return send(state, ops.IDENTIFY, {
@@ -242,8 +306,5 @@ function update_voice(state, guild_id, channel_id, self_mute, self_deaf)
 	})
 end
 
-function sync_guilds(state, ids)
-	return send(state, GUILD_SYNC, ids)
-end
 --end-module--
 return _ENV
