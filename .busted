@@ -10,4 +10,7 @@ return {
     ,permission = {
         tags = "permission"
     }
+    ,uint = {
+        tags = "uint"
+    }
 }

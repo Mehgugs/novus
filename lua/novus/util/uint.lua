@@ -49,6 +49,8 @@ function touint(s)
     if type(s) == 'number' then return lnum_to_uint(s)
     elseif type(s) == 'string' and numeral:match(s) then
         return to_integer_cache[s] or to_integer_worker(s) 
+    else
+        return error("Cannot make a "..type(s).." into a uint.")
     end
 end
 
