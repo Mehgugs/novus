@@ -9,6 +9,7 @@ local json = require"rapidjson"
 local util = require"novus.util"
 local const = require"novus.const"
 local lpeg = util.lpeg
+local patterns = util.patterns
 local Date = util.Date
 local JSON = "application/json"
 local gettime = cqueues.monotime
@@ -96,7 +97,7 @@ local function attachFiles(payload, files)
     return concat(ret, "\r\n")
 end
 
-local token_check = lpeg.check(lpeg.patterns.token * -1)
+local token_check = lpeg.check(patterns.token * -1)
 
 function init(options)
     local state = {}

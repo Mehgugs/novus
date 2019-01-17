@@ -8,6 +8,9 @@ local pcall = pcall
 local require = require
 local unpack = table.unpack 
 local tonumber = tonumber
+local debug = debug
+local pairs = pairs
+local insert, concat = table.insert, table.concat
 --start-module--
 local _ENV = {}
 
@@ -30,13 +33,16 @@ end)
 
 local old_wrap 
 old_wrap = cqueues.interpose('wrap', function(self, ...)
+    local trace = debug.traceback()
     return old_wrap(self, function(fn, ...) 
         local s, e = pcall(fn, ...)
         if not s then 
             local id = util.rid()
+            local info = debug.getinfo(fn)
             util.error("Had error-%s: %s", id, e)
-            util.error("Traceback-%s: %s", id, debug.traceback())
-            util.throw("Throwing error-%s", id)
+            util.error("Traceback-%s: %s", id, trace)
+            util.error("Function info: name=%q source=%q", info.name, info.source)
+            util.throw("error-%s", id)
         end
     end, ...)
 end)
@@ -49,11 +55,16 @@ function create(options)
     client.shards = {}
     client.loop = cqueues.new()
     client.id_mutex = util.mutex()
+    client._readies = 0
     client.dispatch = util.default(function(self, _, t) 
         util.info("Got %q", t)
     end)
-    function client.dispatch.READY(self, s,t)
-        util.info("Client-%s Shard-%s (%s) online.", self.id, s, self.app.id)
+    function client.dispatch.SHARD_READY(self, s,t)
+        util.info("Client-%s Shard-%s online.", self.id, s)
+        self._readies = self._readies + 1
+        if self._readies == self.total_shards then 
+            return client.dispatch.READY(self)
+        end
     end
     client.mutex = util.mutex()
     client.loop:associate( client )
@@ -87,7 +98,7 @@ local function runner(client)
     local success, data, err = api.get_gateway_bot(client.api)
     local success2, app, err = api.get_current_application_information(client.api)
     if success and success2 then 
-        client.app = app
+        client.app = app or {}
         local limit = data.session_start_limit
         util.info("TOKEN-%s has used %d/%d sessions.", token_nonce, limit.total - limit.remaining, limit.total)
         if limit.remaining > 0 then 
@@ -95,14 +106,17 @@ local function runner(client)
             client.gateway = data.url
             local first, last, total = resolve_shards(client, total_shards)
             util.info("Client-%s is launching %d shards", client.id, total)
+            client.total_shards = total
             for id = first, last do 
                 client.shards[id] = shard.init({
                      token = client.options.token
                     ,id = id 
                     ,gateway = data.url 
                     ,compress = client.options.compress 
+                    ,transport_compression = client.options.transport_compression
                     ,total_shard_count = total
                     ,large_threshold = client.options.large_threshold
+                    ,auto_reconnect = client.options.auto_reconnect
                 }, client.id_mutex)
                 client.shards[id].dispatch = client.dispatch
                 shard.connect(client.shards[id])

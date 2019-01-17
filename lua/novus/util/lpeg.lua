@@ -1,7 +1,8 @@
 --imports--
-local _lpeg = require"lpeg"
+local _lpeg = require"lpeglabel"
+local re = require"novus.util.relabel+"
 local setmetatable = setmetatable
-local P, Cc, V = _lpeg.P, _lpeg.Cc, _lpeg.V
+local P, C, Cc, Cg, V = _lpeg.P, _lpeg.C, _lpeg.Cc, _lpeg.Cg, _lpeg.V
 local ipairs, next = ipairs, next
 local select = select
 --start-module--
@@ -68,11 +69,6 @@ function callable(p)
         return p:match(...)
     end 
 end
-
--- some useful patterns
-patterns = {}
-
-patterns.token = S"MN" * exactly(58, R("09", "az", "AZ") + "-" + "_" + ".") 
 	
 --end-module--
 return _ENV

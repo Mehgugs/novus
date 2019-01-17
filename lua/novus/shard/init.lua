@@ -10,6 +10,7 @@ local util = require"novus.util"
 local const = require"novus.const"
 
 local lpeg = util.lpeg
+local patterns = util.patterns
 local me = cqueues.running
 local poll = cqueues.poll 
 local cond_type = cond.type
@@ -46,7 +47,7 @@ local ops = util.reflect{
 , HEARTBEAT_ACK         = 11 -- ✅
 }
 
-local token_check = lpeg.check(lpeg.patterns.token * -1)
+local token_check = lpeg.check(patterns.token * -1)
 
 
 function init(options, mutex)

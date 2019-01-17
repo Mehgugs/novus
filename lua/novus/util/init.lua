@@ -337,6 +337,31 @@ function reflect(t)
     return new
 end
 
+function subtable(U, w)
+    for  k,v in pairs(w) do 
+        if type(v) == 'table' and not subtable(U[k], v) then 
+            return false
+        elseif type(v) ~= "table" and U[k] ~= v then 
+            return false
+        end
+    end
+    return true
+end
+
+function keys(t) 
+    local out = {}
+    for k in pairs(t) do 
+        insert(out, k)
+    end 
+    return out 
+end 
+
+function tcount(t)
+    local count = 0
+    for _ in pairs(t) do count = count + 1 end 
+    return count 
+end
+
 function isint(n) 
     return n == (n - n%1)
 end

@@ -32,6 +32,7 @@ permissions = util.reflect{
     deafenMembers       = 0x00800000,
     moveMembers         = 0x01000000,
     useVoiceActivity    = 0x02000000,
+    prioritySpeaker     = 0x00000100,
     changeNickname      = 0x04000000,
     manageNicknames     = 0x08000000,
     manageRoles         = 0x10000000,
@@ -50,9 +51,12 @@ end
 NONE = 0
 ALL = 0 for value in pairs(permissions) do ALL = ALL | to_permission(value) end
 
+local function to_permission_fuzzy(s)
+    return to_permission(s) or NONE 
+end
 
 function ctor(...)
-    return util.vmap(to_permission, ...)
+    return util.vmap(to_permission_fuzzy, ...)
 end
 
 local function bor(a,b) return a | b end
