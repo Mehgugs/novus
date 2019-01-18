@@ -121,7 +121,7 @@ function request(state, method, endpoint, payload, query, files)
         url = ("%s?%s"):format(url, httputil.dict_to_query(query)) 
     end
     local req = newreq.new_from_uri(url)
-    req.headers:append(":method", method)
+    req.headers:upsert(":method", method)
     req.headers:upsert("user-agent", USER_AGENT)
     req.headers:append("authorization", state.token)
     if with_payload[method] then 
