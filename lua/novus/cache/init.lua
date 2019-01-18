@@ -9,7 +9,6 @@ local cachable_entities = {
     ,"guild"
     ,"member"
     ,"channel"
-    ,"message"
     ,"emoji"
     ,"role" 
     ,"reaction"
@@ -33,6 +32,9 @@ function new()
         cache[v] = new 
         cache.methods[v] = inserter(new)
     end
+    -- special case for messages
+    cache.message = {}
+    cache.methods.message = {}
     return cache
 end
 --end-module--

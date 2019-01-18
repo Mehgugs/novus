@@ -27,19 +27,19 @@ mentions.emoji = re.compile([[
 ]], defs)
 
 mentions.user = re.compile([[
-    {|'<@' %id '>' `type{\user\}|}
+    user <- {|'<@' %id '>' `type{\user\}|}
 ]], defs)
 
 mentions.nick = re.compile([[
-    {|'<@!' %id '>' `type{\nick\}|}
+    nick <- {|'<@!' %id '>' `type{\nick\}|}
 ]], defs)
 
 mentions.channel = re.compile([[
-    {|'<#' %id '>' `type{\channel\}|}
+    channel <- {|'<#' %id '>' `type{\channel\}|}
 ]], defs)
 
 mentions.role = re.compile([[
-    {|'<&' %id '>' `type{\role\}|}
+    role <- {|'<&' %id '>' `type{\role\}|}
 ]], defs)
 
 local mention_patt
@@ -51,12 +51,12 @@ end
 
 mention = mention_patt
 
-local iter_patt = mention_patt * Cp()
+local iter_patt = lpeg.anywhere(Cp() * mention_patt * Cp())
 
 local function mention_iter(invariant, state)
-    local next, pos = match(iter_patt, invariant, state)
-    if next then 
-        return pos, next 
+    local pos,next, after = iter_patt:match(invariant, state)
+    if pos then 
+        return after, next, pos 
     end
 end
 

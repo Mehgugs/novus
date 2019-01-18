@@ -1,6 +1,7 @@
 --imports--
 local cqueues = require"cqueues"
 local cond = require"cqueues.condition"
+local promise = require"cqueues.promise"
 local errno = require"cqueues.errno"
 local websocket = require"http.websocket"
 local zlib = require"http.zlib"
@@ -62,8 +63,9 @@ function init(options, mutex)
     state.heart_acknowledged  = cond.new()
     state.stop_heart = cond.new()
     state.identify_wait = cond.new()
+    state.is_ready = promise.new()
+    state.ready_metadata = {}
     state.beats = 0
-    state.acked = 0
     if state.options.transport_compression then 
         state.transport_infl = zlib.inflate()
         state.transport_buffer = {}
@@ -92,9 +94,9 @@ function connect(state)
     end
 end
 
-function disconnect(state, why)
+function disconnect(state, why, code)
     state.session_id = nil ---
-    state.socket:close(1000, why or 'requested')
+    state.socket:close(code or 1000, why or 'requested')
     return state
 end
 
@@ -118,47 +120,72 @@ local function read_frame(state, frame, op)
         local code, i = ('>H'):unpack(payload)
         local msg = #payload > i and payload:sub(i) or 'Connection closed'
         util.warn("%i - %q", code, msg)
-        return nil
+        return {close = code, msg}
     end
 end 
 
 function send(state, op, d, identify)
     state.shard_mutex:lock()
     local success, err
-	if identify or state.session_id then
-		if state.connected then
-			success, err = state.socket:send(encode {op = op, d = d}, 0x1)
-		else
-			success, err = false, 'Not connected to gateway'
-		end
-	else
-		success, err = false, 'Invalid session'
-	end
-	state.shard_mutex:unlockAfter(GATEWAY_DELAY)
-	return state, success, err
+    if identify or state.session_id then
+        if state.connected then
+            success, err = state.socket:send(encode {op = op, d = d}, 0x1)
+        else
+            success, err = false, 'Not connected to gateway'
+        end
+    else
+        success, err = false, 'Invalid session'
+    end
+    state.shard_mutex:unlockAfter(GATEWAY_DELAY)
+    return state, success, err
+end
+
+local never_reconnect = {
+     [4001] = 'You sent an invalid Gateway opcode or an invalid payload for an opcode. Don\'t do that!'
+    ,[4002] = 'You sent an invalid payload to us. Don\'t do that!'
+    ,[4004] = 'The account token sent with your identify payload is incorrect.'
+    ,[4010] = 'You sent us an invalid shard when identifying.'
+    ,[4011] = 'The session would have handled too many guilds - you are required to shard your connection in order to connect.'
+}
+
+local function should_reconnect(state, code)
+    if never_reconnect[code] then 
+        util.error("Shard-%s received irrecoverable error(%d): %q",code, never_reconnect[code])
+        return false 
+    end
+    if code == 4004 then 
+        return util.fatal("Token is invalid, shutting down.")
+    end
+    return state.reconnect or state.auto_reconnect
 end
 
 function frames(state)
-    for frame, op in state.socket:each() do 
-        local payload, cont = read_frame(state, frame, op)
-        if cont then goto continue end 
-        if payload then 
-            local s = payload.s
-            local t = payload.t
-            local d = payload.d
-            
-            local op, opcode = ops[payload.op], payload.op 
-            if _ENV[op] then 
-                _ENV[op](state, opcode, d, t, s)
-            end
-        else break end
+    repeat 
+        local frame, op, code = state.socket:receive()
+        if frame ~= nil then 
+            local payload, cont = read_frame(state, frame, op)
+            if cont then goto continue end 
+            if payload and not payload.close then 
+                local s = payload.s
+                local t = payload.t
+                local d = payload.d
+                
+                local op, opcode = ops[payload.op], payload.op 
+                if _ENV[op] then 
+                    _ENV[op](state, opcode, d, t, s)
+                end
+            else 
+                disconnect(state, 4000, 'could not decode payload')
+            break end
+        end
         ::continue:: 
-    end
-    if state.reconnect then 
+    until code
+    local reconnect = should_reconnect(state, code) 
+    if reconnect and state.reconnect then 
         state.reconnect = nil
         sleep(util.rand(1, 5))
         return connect(state)
-    elseif state.options.auto_reconnect then 
+    elseif reconnect and state.options.auto_reconnect then 
         local time = util.rand(0, 30)
         util.info("Shard-%s will automatically reconnect in %.2fsec", state.options.id, time)
         sleep(time)
@@ -218,9 +245,9 @@ function INVALID_SESSION(state, _, d)
 end
 
 function HEARTBEAT_ACK(state)
-    state.acked = state.acked + 1
-    if state.acked < state.beats then 
-        util.warn("Shard-%s is missing heartbeat acknowledgement!", state.options.id)
+    state.beats = state.beats -1
+    if state.beats < 0 then 
+        util.warn("Shard-%s is missing heartbeat acknowledgement! (deficit=%s)", state.options.id, -state.beats)
     end
     return state
 end
@@ -243,7 +270,7 @@ function DISPATCH(state, op, d, t, s)
     if t == 'READY' then 
         t = 'SHARD_READY'
     end
-    return me():dispatch(state.options.id, t, d)
+    return me():dispatch(state, t, d)
 end
 
 local function await_ready(state)
@@ -280,31 +307,31 @@ end
 
 function resume(state)
     return send(state, ops.RESUME, {
-		token = state.options.token,
-		session_id = state.options.session_id,
-		seq = state.options._seq
+        token = state.options.token,
+        session_id = state.options.session_id,
+        seq = state.options._seq
     })
 end
 
 function request_guild_members(state, id)
-	return send(state, ops.REQUEST_GUILD_MEMBERS, {
-		guild_id = id,
-		query = '',
-		limit = 0,
-	})
+    return send(state, ops.REQUEST_GUILD_MEMBERS, {
+        guild_id = id,
+        query = '',
+        limit = 0,
+    })
 end
 
 function update_status(state, presence)
-	return send(state, STATUS_UPDATE, presence)
+    return send(state, STATUS_UPDATE, presence)
 end
 
 function update_voice(state, guild_id, channel_id, self_mute, self_deaf)
-	return send(state, VOICE_STATE_UPDATE, {
-		guild_id = guild_id,
-		channel_id = channel_id or null,
-		self_mute = self_mute or false,
-		self_deaf = self_deaf or false,
-	})
+    return send(state, VOICE_STATE_UPDATE, {
+        guild_id = guild_id,
+        channel_id = channel_id or null,
+        self_mute = self_mute or false,
+        self_deaf = self_deaf or false,
+    })
 end
 
 --end-module--

@@ -4,6 +4,7 @@ local util = require"novus.util"
 local api = require"novus.api"
 local shard = require"novus.shard"
 local cache = require"novus.cache"
+local user = require"novus.snowflakes.user"
 local pcall = pcall
 local require = require
 local unpack = table.unpack 
@@ -41,7 +42,7 @@ old_wrap = cqueues.interpose('wrap', function(self, ...)
             local info = debug.getinfo(fn)
             util.error("Had error-%s: %s", id, e)
             util.error("Traceback-%s: %s", id, trace)
-            util.error("Function info: name=%q source=%q", info.name, info.source)
+            util.error("Function info: name=%q source=%q:%s", info.name, info.source, info.linedefined or "?")
             util.throw("error-%s", id)
         end
     end, ...)
@@ -91,6 +92,17 @@ local function resolve_shards(client, recommended)
     end
 end
 
+local function await_ready(client)
+    repeat 
+        local ready = true
+        for id, shard in pairs(client.shards) do 
+            ready = ready and shard.is_ready:get() 
+        end
+        sleep()
+    until ready == true
+    client.dispatch.READY(client, _, 'READY')
+end
+
 local function runner(client)
     client.mutex:lock()
     local token_nonce = util.hash(client.options.token)
@@ -99,6 +111,13 @@ local function runner(client)
     local success2, app, err = api.get_current_application_information(client.api)
     if success and success2 then 
         client.app = app or {}
+        if client.app.owner then 
+            client.owner = user.new_from(
+                client, 
+                client.app.owner, 
+                client.cache.methods.user
+            )
+        end
         local limit = data.session_start_limit
         util.info("TOKEN-%s has used %d/%d sessions.", token_nonce, limit.total - limit.remaining, limit.total)
         if limit.remaining > 0 then 
@@ -121,6 +140,7 @@ local function runner(client)
                 client.shards[id].dispatch = client.dispatch
                 shard.connect(client.shards[id])
             end
+            client.loop:wrap(await_ready, client)
         else 
             util.warn("TOKEN-%s can no longer identify for %s.",token_nonce, util.Date.Interval(limit.reset_after / 1000))
         end 
