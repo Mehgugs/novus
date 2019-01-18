@@ -61,7 +61,7 @@ function create(options)
         util.info("Got %q", t)
     end)
     function client.dispatch.SHARD_READY(self, s,t)
-        util.info("Client-%s Shard-%s online.", self.id, s)
+        util.info("Client-%s Shard-%s online.", self.id, s.options.id)
         self._readies = self._readies + 1
         if self._readies == self.total_shards then 
             return client.dispatch.READY(self)

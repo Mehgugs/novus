@@ -13,7 +13,6 @@ local function by10(n, i) i = i or 1
     return n
 end
 
-local to_integer_cache = setmetatable({}, {__mode = "k"})
 
 local function to_integer_worker(s) -- string -> uint64
     local n = 0
@@ -21,7 +20,6 @@ local function to_integer_worker(s) -- string -> uint64
     for i = l -1,0, -1  do
         n = n + by10(s:sub(i+1,i+1)|0, l-i-1)
     end
-    to_integer_cache[s] = n
     return n
 end
 
@@ -48,9 +46,7 @@ local numeral = lpeg.digit^1 * -1
 function touint(s) 
     if type(s) == 'number' then return lnum_to_uint(s)
     elseif type(s) == 'string' and numeral:match(s) then
-        return to_integer_cache[s] or to_integer_worker(s) 
-    else
-        return error("Cannot make a "..type(s).." into a uint.")
+        return to_integer_worker(s) 
     end
 end
 

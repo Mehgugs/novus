@@ -42,7 +42,9 @@ function highlight_code_to_seq(body)
     return rb and gb and bb and rf and gf and bf and ('\27[0m\27[48;2;%s;%s;%sm\27[38;2;%s;%s;%sm'):format(rb,gb,bb,rf,gf,bf) or ''
 end
 
-colors = {
+colors = {}
+
+colors[24] = {
     info  = color_code_to_seq"#1a6"
    ,warn  = color_code_to_seq"#ef5"
    ,error = color_code_to_seq"#f14"
@@ -52,15 +54,37 @@ colors = {
    ,error_highlight = highlight_code_to_seq"highlight:#f14:#000"
 }
 
-local function writef24(fd,...)
+colors[3] = {
+     info  = "\27[0m\27[32m" 
+    ,warn  = "\27[0m\27[33m" 
+    ,error = "\27[0m\27[31m"
+    ,white = "\27[0m\27[1;37m"
+    ,info_highlight  = "\27[0m\27[1;32m" 
+    ,warn_highlight  = "\27[0m\27[1;33m" 
+    ,error_highlight = "\27[0m\27[1;31m"
+}
+
+colors[8] = {
+     info  = "\27[0m\27[38;5;36m" 
+    ,warn  = "\27[0m\27[38;5;220m" 
+    ,error = "\27[0m\27[38;5;196m"
+    ,white = "\27[0m\27[38;5;231m"
+    ,info_highlight  = "\27[0m\27[38;5;48m" 
+    ,warn_highlight  = "\27[0m\27[38;5;11m" 
+    ,error_highlight = "\27[0m\27[38;5;9m" 
+}
+
+_mode = 3
+
+local function writef(fd,...)
     local str,n = f(...):gsub("($([^;]+);)", function(_, body) 
         if body == 'reset' then 
             return '\27[0m'
-        elseif colors[body] then 
-            return colors[body]
-        elseif body:sub(1,9) == "highlight" then 
+        elseif colors[_mode][body] then 
+            return colors[_mode][body]
+        elseif _mode == 24 and body:sub(1,9) == "highlight" then 
             return highlight_code_to_seq(body)
-        else
+        elseif _mode == 24 then
             return color_code_to_seq(body)
         end
     end)
@@ -68,15 +92,15 @@ local function writef24(fd,...)
 end
 
 function info(...)
-    return writef24(stdout, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
+    return writef(stdout, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
 end
 
 function warn(...)
-    return writef24(stdout, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
+    return writef(stdout, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
 end
 
 function error(...)
-    return writef24(stderr, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
+    return writef(stderr, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
 end
 
 function throw(...)
@@ -90,7 +114,11 @@ function fatal(...)
     return exit(1)
 end
 
-function printf(...) return writef24(stdout, ...) end
+function printf(...) return writef(stdout, ...) end
+
+function mode(m)
+    _mode = m == 24 and 24 or m == 8 and 8 or 3 
+end
 
 
 --end-module--
