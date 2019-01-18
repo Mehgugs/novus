@@ -11,8 +11,7 @@ function alias(key)
     return function(obj) return obj[key] end 
 end 
 
-function makenewindex(env)
-    local _ENV = env 
+function makenewindex(_ENV)
     return function(obj, key, val)
         if schema[key] and obj[schema[key]] then 
             util.throw("%s-%s cannot have property %s overwritten!", __name, obj.id, key)
@@ -21,24 +20,21 @@ function makenewindex(env)
     end
 end
 
-function makeindex(env)
-    local _ENV = env 
+function makeindex(_ENV)
     return function(snowflake, key)
         if methods[key] then return methods[key] 
-        elseif schema[key] then return snowflake[schema[key]]
+        elseif schema[key] and snowflake[schema[key]] ~= nil then return snowflake[schema[key]]
         elseif properties[key] then return properties[key](snowflake)
         elseif constants[key] then return constants[key]
         end
     end
 end
 
-function makeget(env)
-    local _ENV = env 
+function makeget(_ENV)
     return function(...) return get_from(running():novus(), ...) end 
 end
 
-function makenew(env)
-    local _ENV = env 
+function makenew(_ENV)
     return function (...) return new_from(running():novus(), ...) end 
 end
 
@@ -50,21 +46,26 @@ function new_schema ()
             s[v] = s[len]
         end 
         return s[len]
-    end})
+    end}), len
+end
+
+function snowflake_inherit(self, base, name)
+    local next = deepcopy(base)
+    next.__name = name 
+    next.__index = makeindex(next)
+    next.__newindex = makenewindex(next)
+    next.constants.__schema = next.schema 
+    next.get = makeget(next)
+    next.new = makenew(next)
+    self.snowflakes[name] = next
+    return setmetatable(next, {__name = "%s-behaviour" % name, __call = function(...) return snowflake_inherit(self, ...) end})
 end
 
 
 function snowflake_root()
     return setmetatable({snowflakes = {}}, {
     __call = function(self, name) 
-        local next = deepcopy(self)
-        next.__name = name 
-        next.__index = makeindex(next)
-        next.__newindex = makenewindex(next)
-        next.get = makeget(next)
-        next.new = makenew(next)
-        self.snowflakes[name] = next
-        return setmetatable(next, {__name = "%s-behaviour" % name})
+        return snowflake_inherit(self, self, name)
     end})
 end
 

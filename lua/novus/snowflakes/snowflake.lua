@@ -3,12 +3,16 @@ local util = require"novus.snowflakes.helpers"
 local const = require"novus.const"
 local gettime = require"cqueues".monotime
 local lifetimes = const.lifetimes
+local next = next
+local type = type
 --start-module--
 local _ENV = util.snowflake_root()
 
 __name = "snowflake"
 
-schema = util.new_schema()
+local _schema, sc_len = util.new_schema()
+
+schema = _schema
 
 schema {
      "id"
@@ -18,7 +22,15 @@ schema {
 
 function __eq(A, B)
     return A[1] == B[1] 
-end 
+end
+
+function id(v)
+    if v and type(v) == 'table' and v[_ENV] then 
+        return v[1]
+    else
+        return util.uint(v)
+    end 
+end
 
 methods, properties, constants = {}, {}, {}
 
@@ -40,6 +52,18 @@ function __gc(snowflake)
         return snowflake[3](snowflake)
     end
 end
+local function snowflake_iter(invar, state)
+    local key, idx = next(invar.__schema, state)
+    if key ~= sc_len then 
+        return key, invar[idx]
+    else
+        return snowflake_iter(invar, key)
+    end
+end
+
+function __pairs(snowflake)
+    return snowflake_iter, snowflake
+end
 
 function destroy_from(state, snowflake)
     local cache = state.cache[snowflake.__name]
@@ -52,7 +76,8 @@ function destroy(snowflake)
 end
 
 constants.cachable = true
-constants.virtual = false 
+constants.virtual = false
+constants[_ENV] = true
 
 --end-module--
 return _ENV
