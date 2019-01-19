@@ -16,4 +16,4 @@ install:
                   
 
 script:
-  - busted --run=cli
+  - busted --run=ci
