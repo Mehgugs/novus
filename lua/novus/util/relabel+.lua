@@ -168,7 +168,7 @@ local num = m.C(m.R"09"^1) * S / tonumber
 
 local String = "'" * m.C((any - "'" - m.P"\n")^0) * expect("'", "MisTerm1")
              + '"' * m.C((any - '"' - m.P"\n")^0) * expect('"', "MisTerm2")
-local Quote =  "\\" * m.C((any - "\\" - m.P"\n")^0) * expect("\\", "MisQuote")
+local Quote =  "`" * m.C((any - "`" - m.P"\n")^0) * expect("`", "MisQuote")
 
 local CallArg = m.V'Exp' + Quote 
 
@@ -243,7 +243,7 @@ local exp = m.P{ "Exp",
           + "%" * expect(m.P"{", "ExpNameOrLab")
             * expect(S * m.V"Label", "ExpLab1")
             * expect(S * "}", "MisClose7") / mm.T
-          + "`" * expect(Def / getdef, "ExpName4") * "{" * expect(CallArg * (S * "," * CallArg)^0, "ExpPatt9") * S * "}"
+          + "\\" * expect(Def / getdef, "ExpName4") * "{" * expect(CallArg * (S * "," * CallArg)^0, "ExpPatt9") * S * "}"
             /function(f, p,...)  return f(p,...) end 
           + "{:" * (name * ":" + m.Cc(nil)) * expect(m.V"Exp", "ExpPatt5")
             * expect(S * ":}", "MisClose2")
