@@ -58,7 +58,7 @@ describe('tests #patterns', function()
         end)
         it('mentions iterates over mentions', function() 
             local msg = {}
-            for i = 1, 10 do msg[i] = rand_mention('a:') end msg = table.concat(msg)
+            for i = 1, 10 do msg[i] = rand_mention() end msg = table.concat(msg)
             local count = 0
             for position, m in patterns.mentions(msg) do 
                 count = count + 1
