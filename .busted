@@ -16,6 +16,9 @@ return {
 	,patterns = {
         tags = "patterns"
     }
+    ,view = {
+        tags = "view"
+    }
 	,ci = {
 	  	 coverage = false
 		,output = "TAP"
