@@ -1,0 +1,20 @@
+language: python
+                 
+sudo: false     
+
+
+
+before_install:
+  - pip install hererocks
+  - hererocks env -l5.3 -rlatest    # Use latest LuaRocks, install into 'env' directory.
+  - source env/bin/activate          # Add directory with all installed binaries to PATH.
+  - apt-get update
+  - apt-get install build-essential libssl-dev libz-dev m4 gawk
+  - luarocks install busted && luarocks install penlight 
+
+install:
+  - luarocks make
+                  
+
+script:
+  - busted --run=cli
