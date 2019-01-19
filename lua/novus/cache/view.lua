@@ -7,7 +7,7 @@ local _ENV = {}
 
 function new(t, f, a, m)
     return setmetatable({}, {
-         __made = v
+         __mode = v
         ,__index = util.bind(__index, t,f,a,m)
         ,__pairs = __pairs
     })
