@@ -6,7 +6,15 @@ local next = next
 local _ENV = {}
 
 function new(t, f, a)
-    return setmetatable({__t = t, __f = f, __a = a}, _ENV)
+    local d = 1
+    if getmetatable(t) == _ENV then
+        d = t.__d + 1
+        if d > _ENV.limit then
+            t = flatten(t)
+            d = 0
+        end
+    end
+    return setmetatable({__t = t, __f = f, __a = a, __d =d}, _ENV)
 end
 
 function __index(view, key)
@@ -55,6 +63,8 @@ function flatten(view)
     for k,v in __pairs(view) do out[k] = v end
     return out
 end
+
+limit = 32
 
 identity = function(_, x) return x end
 
