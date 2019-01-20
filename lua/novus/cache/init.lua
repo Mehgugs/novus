@@ -5,12 +5,12 @@ local ipairs = ipairs
 local _ENV = {}
 
 local cachable_entities = {
-     "user" 
+     "user"
     ,"guild"
     ,"member"
     ,"channel"
     ,"emoji"
-    ,"role" 
+    ,"role"
     ,"reaction"
 }
 
@@ -18,8 +18,8 @@ function inserter(cache)
     return function(object)
         local id = object.id
         local old = cache[id]
-        if old then 
-            old.cache = nil 
+        if old then
+            old.cache = nil
         end
         cache[id] = object
     end
@@ -27,9 +27,9 @@ end
 
 function new()
     local cache = {methods = {}}
-    for _, v in ipairs(cachable_entities) do 
+    for _, v in ipairs(cachable_entities) do
         local new = util.cache()
-        cache[v] = new 
+        cache[v] = new
         cache.methods[v] = inserter(new)
     end
     -- special case for messages

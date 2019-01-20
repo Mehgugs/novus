@@ -13,8 +13,7 @@ local const = require"novus.const"
 local lpeg = util.lpeg
 local patterns = util.patterns
 local me = cqueues.running
-local poll = cqueues.poll 
-local cond_type = cond.type
+local poll = cqueues.poll
 local encode,decode = json.encode, json.decode
 local identify_delay = const.gateway.identify_delay
 local sleep = cqueues.sleep
@@ -23,7 +22,7 @@ local concat = table.concat
 local floor = math.floor
 local pairs = pairs
 local assert = assert
-local traceback = debug.traceback 
+local traceback = debug.traceback
 local pcall = pcall
 local toquery = httputil.dict_to_query
 local tostring = tostring
@@ -40,7 +39,7 @@ local ops = util.reflect{
 , STATUS_UPDATE         = 3
 , VOICE_STATE_UPDATE    = 4
 , VOICE_SERVER_PING     = 5
-, RESUME                = 6    
+, RESUME                = 6
 , RECONNECT             = 7  -- ✅
 , REQUEST_GUILD_MEMBERS = 8
 , INVALID_SESSION       = 9  -- ✅
@@ -53,7 +52,7 @@ local token_check = lpeg.check(patterns.token * -1)
 
 function init(options, mutex)
     local state = {options = {}}
-    if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then 
+    if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then
         return util.fatal("Please supply a bot token! It should look like \"Bot %s\"",sample_token)
     end
     util.mergewith(state.options, options)
@@ -66,14 +65,14 @@ function init(options, mutex)
     state.is_ready = promise.new()
     state.ready_metadata = {}
     state.beats = 0
-    if state.options.transport_compression then 
+    if state.options.transport_compression then
         state.transport_infl = zlib.inflate()
         state.transport_buffer = {}
     end
     util.info("Initialized Shard-%s with TOKEN-%x", state.options.id, util.hash(state.options.token))
     state.url_options = toquery({
-        v = tostring(const.gateway.version), 
-        encoding = const.gateway.encoding, 
+        v = tostring(const.gateway.version),
+        encoding = const.gateway.encoding,
         compress = state.options.transport_compression and const.gateway.compress or nil
     })
     return state
@@ -83,7 +82,7 @@ function connect(state)
     util.info("Shard-%s is connecting to %s...", state.options.id, state.options.gateway)
     state.socket = websocket.new_from_uri("%s?%s" % {state.options.gateway, state.url_options}) --++
     local success, _, err = state.socket:connect()
-    if not success then 
+    if not success then
         util.error("Shard-%s had an error while connecting %s - %s", state.options.id, errno[err], errno.strerror(err))
         return state, false
     else
@@ -101,28 +100,28 @@ function disconnect(state, why, code)
 end
 
 local function read_frame(state, frame, op)
-    if op == "text" then 
+    if op == "text" then
         return decode(frame)
-    elseif op == "binary" then 
-        if state.options.transport_compression then 
+    elseif op == "binary" then
+        if state.options.transport_compression then
             insert(state.transport_buffer, frame)
-            if #frame < 4 or frame:sub(-4) ~= ZLIB_SUFFIX then 
-                return nil, true 
-            end 
+            if #frame < 4 or frame:sub(-4) ~= ZLIB_SUFFIX then
+                return nil, true
+            end
             local msg =  state.transport_infl(concat(state.transport_buffer))
             state.transport_buffer = {}
             return decode(msg)
-        else 
+        else
             local infl = zlib.inflate()
-            return  decode(infl(frame, true)) 
+            return  decode(infl(frame, true))
         end
-    elseif op == "close" then 
+    elseif op == "close" then
         local code, i = ('>H'):unpack(payload)
         local msg = #payload > i and payload:sub(i) or 'Connection closed'
         util.warn("%i - %q", code, msg)
         return {close = code, msg}
     end
-end 
+end
 
 function send(state, op, d, identify)
     state.shard_mutex:lock()
@@ -145,47 +144,48 @@ local never_reconnect = {
     ,[4002] = 'You sent an invalid payload to us. Don\'t do that!'
     ,[4004] = 'The account token sent with your identify payload is incorrect.'
     ,[4010] = 'You sent us an invalid shard when identifying.'
-    ,[4011] = 'The session would have handled too many guilds - you are required to shard your connection in order to connect.'
+    ,[4011] =
+    'The session would have handled too many guilds - you are required to shard your connection in order to connect.'
 }
 
 local function should_reconnect(state, code)
-    if never_reconnect[code] then 
+    if never_reconnect[code] then
         util.error("Shard-%s received irrecoverable error(%d): %q",code, never_reconnect[code])
-        return false 
+        return false
     end
-    if code == 4004 then 
+    if code == 4004 then
         return util.fatal("Token is invalid, shutting down.")
     end
     return state.reconnect or state.auto_reconnect
 end
 
 function frames(state)
-    repeat 
+    repeat
         local frame, op, code = state.socket:receive()
-        if frame ~= nil then 
+        if frame ~= nil then
             local payload, cont = read_frame(state, frame, op)
-            if cont then goto continue end 
-            if payload and not payload.close then 
+            if cont then goto continue end
+            if payload and not payload.close then
                 local s = payload.s
                 local t = payload.t
                 local d = payload.d
-                
-                local op, opcode = ops[payload.op], payload.op 
-                if _ENV[op] then 
-                    _ENV[op](state, opcode, d, t, s)
+
+                local dop, opcode = ops[payload.op], payload.op
+                if _ENV[dop] then
+                    _ENV[dop](state, opcode, d, t, s)
                 end
-            else 
+            else
                 disconnect(state, 4000, 'could not decode payload')
             break end
         end
-        ::continue:: 
+        ::continue::
     until code
-    local reconnect = should_reconnect(state, code) 
-    if reconnect and state.reconnect then 
+    local reconnect = should_reconnect(state, code)
+    if reconnect and state.reconnect then
         state.reconnect = nil
         sleep(util.rand(1, 5))
         return connect(state)
-    elseif reconnect and state.options.auto_reconnect then 
+    elseif reconnect and state.options.auto_reconnect then
         local time = util.rand(0, 30)
         util.info("Shard-%s will automatically reconnect in %.2fsec", state.options.id, time)
         sleep(time)
@@ -199,7 +199,7 @@ function run_frames(state)
 end
 
 local function includes(t, val)
-    for _, v in pairs(t) do if v == val then return true end end 
+    for _, v in pairs(t) do if v == val then return true end end
     return false
 end
 
@@ -208,7 +208,7 @@ local function beat_loop(state, interval)
         state.beats = state.beats + 1
         send(state, ops.HEARTBEAT, state._seq or json.null, true)
         local r = {poll(state.stop_heart, interval)}
-        if includes(r, state.stop_heart) then 
+        if includes(r, state.stop_heart) then
             break
         end
     end
@@ -222,14 +222,14 @@ local function start_heartbeat(state, interval)
     me():wrap(beat_loop, state, interval)
 end
 
-function HELLO(state, code, d)
+function HELLO(state, _, d)
     util.info("discord said hello to Shard-%s trace=%q", state.options.id, concat(d._trace, ', '))
     util.info("Shard-%s has a heartrate of %s.", state.options.id, util.Date.Interval(floor(d.heartbeat_interval/1e3)))
     start_heartbeat(state, d.heartbeat_interval/1e3)
 
-    if state.session_id then 
-        return resume(state) 
-    else 
+    if state.session_id then
+        return resume(state)
+    else
         return identify(state)
     end
 end
@@ -240,13 +240,13 @@ end
 
 function INVALID_SESSION(state, _, d)
     util.warn("Shard-%s has an invalid session, resumable=%q.", state.options.id, d and "true" or "false")
-    if not d then state.session_id = nil end 
+    if not d then state.session_id = nil end
     return reconnect(state, not not d)
 end
 
 function HEARTBEAT_ACK(state)
     state.beats = state.beats -1
-    if state.beats < 0 then 
+    if state.beats < 0 then
         util.warn("Shard-%s is missing heartbeat acknowledgement! (deficit=%s)", state.options.id, -state.beats)
     end
     return state
@@ -265,9 +265,9 @@ function reconnect(state, resumable)
     return state
 end
 
-function DISPATCH(state, op, d, t, s)
+function DISPATCH(state, _, d, t, s)
     state._seq = s --+
-    if t == 'READY' then 
+    if t == 'READY' then
         t = 'SHARD_READY'
     end
     return me():dispatch(state, t, d)
@@ -282,7 +282,7 @@ end
 
 function identify(state)
     state.identify_mutex:lock()
-    
+
 
     me():wrap(await_ready, state)
 

@@ -2,7 +2,6 @@
 local cqueues = require"cqueues"
 local errno = require"cqueues.errno"
 local newreq = require "http.request"
-local headers = require"http.headers"
 local reason = require"http.h1_reason_phrases"
 local httputil = require "http.util"
 local json = require"rapidjson"
@@ -12,13 +11,11 @@ local lpeg = util.lpeg
 local patterns = util.patterns
 local Date = util.Date
 local JSON = "application/json"
-local gettime = cqueues.monotime
-local time, difftime, date = os.time, os.difftime, os.date
+local difftime = os.difftime
 local insert, concat = table.insert, table.concat
 local next, tonumber = next, tonumber
 local setmetatable = setmetatable
 local max = math.max
-local print = print
 local pcall = pcall
 local type = type
 local tostring = tostring
@@ -35,20 +32,14 @@ local BOUNDARY3 = BOUNDARY2 .. "--"
 
 local MULTIPART = ("multipart/form-data;boundary=%s"):format(BOUNDARY1)
 
-local majorRoutes = {
-    guilds = true, 
-    channels = true, 
-    webhooks = true
-}
-
 local with_payload = {
     PUT = true,
     PATCH = true,
     POST = true,
 }
 
-function mutex_cache() 
-    return setmetatable({}, 
+function mutex_cache()
+    return setmetatable({},
     {
         __mode = "v",
         __index = function (self, k)
@@ -67,20 +58,20 @@ local ends_in_id = check_anywhere("/" * digits * -1)
 local trailing_id = lpeg.anywhere(lpeg.C(lpeg.lazy(1,"/")) * digits * -1)
 
 local function route_of(endpoint, method)
-    if method == "DELETE" and message_endpoint:match(endpoint) then 
-        return ("%s %s"):format(trailing_id:match(endpoint), method) 
-    elseif endpoint:sub(1,9) == "/invites/" then 
+    if method == "DELETE" and message_endpoint:match(endpoint) then
+        return ("%s %s"):format(trailing_id:match(endpoint), method)
+    elseif endpoint:sub(1,9) == "/invites/" then
         return "/invites/"
-    elseif is_major_route:match(endpoint) then 
+    elseif is_major_route:match(endpoint) then
         return endpoint
-    elseif ends_in_id:match(endpoint) then 
+    elseif ends_in_id:match(endpoint) then
         return trailing_id:match(endpoint)
-    else 
-        return endpoint 
+    else
+        return endpoint
     end
 end
 
-local function attachFiles(payload, files) 
+local function attachFiles(payload, files)
     local ret = {
         BOUNDARY2,
         "Content-Disposition:form-data;name=\"payload_json\"",
@@ -101,7 +92,7 @@ local token_check = lpeg.check(patterns.token * -1)
 
 function init(options)
     local state = {}
-    if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then 
+    if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then
         return util.fatal("Please supply a bot token!")
     end
     state.token = options.token
@@ -113,18 +104,18 @@ function init(options)
 end
 
 function request(state, method, endpoint, payload, query, files)
-    if not cqueues.running() then 
+    if not cqueues.running() then
         return util.fatal("Please call REST methods asynchronously.")
     end
     local url = URL .. endpoint
     if query and next(query) then
-        url = ("%s?%s"):format(url, httputil.dict_to_query(query)) 
+        url = ("%s?%s"):format(url, httputil.dict_to_query(query))
     end
     local req = newreq.new_from_uri(url)
     req.headers:upsert(":method", method)
     req.headers:upsert("user-agent", USER_AGENT)
     req.headers:append("authorization", state.token)
-    if with_payload[method] then 
+    if with_payload[method] then
         payload = payload and json.encode(payload) or '{}'
         if files and next(files) then
             payload = attachFiles(payload, files)
@@ -135,19 +126,19 @@ function request(state, method, endpoint, payload, query, files)
         req.headers:append("content-length", #payload)
         req:set_body(payload)
     end
-    
+
     local route = route_of(endpoint, method)
     local routex = state.routex[route]
-    
+
     state.global_lock:lock()
     if routex then routex:lock() end
-    
+
     local success, data, err, delay, global = pcall(push, state, req, method, route, 0)
-    if not success then 
+    if not success then
         return util.fatal("api.push failed %q", tostring(data))
     end
 
-    if global then 
+    if global then
         state.global_lock:unlockAfter(delay)
         if routex then routex:unlock() end
     else
@@ -163,47 +154,50 @@ function push(state, req, method,route, retries)
     local global = false -- whether the delay incurred is on the global limit
 
     local headers , stream , eno = req:go(10)
-    
-    if not headers and retries < const.api.max_retries then 
+
+    if not headers and retries < const.api.max_retries then
         local rsec = util.rand(1, 2)
-        util.warn("api-%s failed to %s:%s because (%s, %q) retrying after %.3fsec", state.id, method,route, errno[eno], errno.strerror(eno), rsec)
+        util.warn("api-%s failed to %s:%s because (%s, %q) retrying after %.3fsec",
+            state.id, method,route, errno[eno], errno.strerror(eno), rsec
+        )
         cqueues.sleep(rsec)
         return push(state, req, method,route, retries+1)
-    elseif not headers and retries >= const.api.max_retries then 
+    elseif not headers and retries >= const.api.max_retries then
         return nil, errno.strerror(eno), delay, global
     end
-    
-    local code, rawcode = headers:get":status"
-          rawcode, code = code, tonumber(code)
+    local code, rawcode,stat
+
+    stat = headers:get":status"
+    rawcode, code = stat, tonumber(stat)
 
     local date = headers:get"date"
     local reset , remaining = headers:get"x-ratelimit-reset" , headers:get"x-ratelimit-remaining"
-    if reset and remaining == '0' then 
+    if reset and remaining == '0' then
         local dt = difftime(reset, Date.parseHeader(date))
         delay = max(dt, delay)
     end
 
-    if headers:get"x-ratelimit-global" then 
+    if headers:get"x-ratelimit-global" then
         util.info("Route %s:%s has been downgraded to global limiting.", method, name)
-        global = true 
+        global = true
         state.routex[route] = false -- downgrade the route
     end
 
     local raw = stream:get_body_as_string()
     local data = headers:get"content-type" == JSON and json.decode(raw) or raw
-    if code < 300 then 
+    if code < 300 then
         return data, nil, delay, global
-    else 
-        if type(data) == 'table' then 
+    else
+        if type(data) == 'table' then
             local retry;
-            if code == 429 then 
+            if code == 429 then
                 delay = data.retry_after / 1000
                 global = data.global
-            elseif code == 502 then 
+            elseif code == 502 then
                 delay = delay + util.rand(0 , 2)
             end
-            retry = retries < 5 
-            if retry then 
+            retry = retries < 5
+            if retry then
                 util.warn("(%i, %q) :  retrying after %fsec : %s", code, reason[rawcode], delay, name)
                 cqueues.sleep(delay)
                 if global then state.global_lock:unlock() end
