@@ -1,17 +1,18 @@
 # Novus #
 [![Build Status](https://travis-ci.org/Mehgugs/novus.svg?branch=master)](https://travis-ci.org/Mehgugs/novus)
+[![CircleCI](https://circleci.com/gh/Mehgugs/novus/tree/master.svg?style=svg)](https://circleci.com/gh/Mehgugs/novus/tree/master)
 
 
 **A [Discord API][discord] library written in lua 5.3, for lua 5.3.**
 
 ### WIP ###
-This project is currently a work in progress. Do not expect a fully working 
-library with `version < 1.0.0`. 
+This project is currently a work in progress. Do not expect a fully working
+library with `version < 1.0.0`.
 
 ### About ###
 Novus is a wrapper for the official Discord API.
 It uses [cqueues] and [lua-http][lua_http] to provide a minimal, yet featureful,
-interface for developing lightweight discord bot applications. 
+interface for developing lightweight discord bot applications.
 
 ### Installation ###
 - You need a [lua 5.3 distribution installed][lua],
@@ -41,8 +42,8 @@ local json = require"rapidjson"
 local myclient = client.create{
      token = "Bot "..os.getenv"TOKEN"
     ,compress = false
-    ,large_threshold = 100 
-    ,driver = "default" 
+    ,large_threshold = 100
+    ,driver = "default"
 }
 
 client.run(myclient)
@@ -50,7 +51,7 @@ client.run(myclient)
 
 ### Documentation ###
 
-Documentation and more involved examples can be found in the [User Manual](). 
+Documentation and more involved examples can be found in the [User Manual]().
 
 ### Contributing ###
 
@@ -61,4 +62,4 @@ TODO
 
 [luarocks]: https://github.com/luarocks/luarocks/wiki/Download
 [cqueues]: https://github.com/wahern/cqueues
-[lua_http]: https://github.com/daurnimator/lua-http 
+[lua_http]: https://github.com/daurnimator/lua-http

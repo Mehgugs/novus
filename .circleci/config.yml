@@ -5,8 +5,8 @@ jobs:
       - image: alpine:latest
     steps:
       - checkout
-      - run: apk add build-base luarocks5.3 lua5.3http
-      - run: alias lua=lua5.3 luarocks=luarocks5.3
-      - run: luarocks install busted && luarocks install penlight
-      - run: luarocks make
+      - run: apk add build-base bsd-compat-headers lua5.3-dev luarocks
+      - run: apk add openssl-dev zlib-dev m4 gawk musl
+      - run: luarocks-5.3 install busted
+      - run: luarocks-5.3 make
       - run: busted --run=ci
