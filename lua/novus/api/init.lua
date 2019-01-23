@@ -38,7 +38,7 @@ local with_payload = {
     POST = true,
 }
 
-function mutex_cache()
+local function mutex_cache()
     return setmetatable({},
     {
         __mode = "v",
@@ -157,8 +157,8 @@ function push(state, req, method,route, retries)
 
     if not headers and retries < const.api.max_retries then
         local rsec = util.rand(1, 2)
-        util.warn("api-%s failed to %s:%s because (%s, %q) retrying after %.3fsec",
-            state.id, method,route, errno[eno], errno.strerror(eno), rsec
+        util.warn("api-%s failed to %s:%s because %q (%s, %q) retrying after %.3fsec",
+            state.id, method,route, tostring(stream), errno[eno], errno.strerror(eno), rsec
         )
         cqueues.sleep(rsec)
         return push(state, req, method,route, retries+1)
@@ -178,7 +178,7 @@ function push(state, req, method,route, retries)
     end
 
     if headers:get"x-ratelimit-global" then
-        util.info("Route %s:%s has been downgraded to global limiting.", method, name)
+        util.info("Route %s:%s has been downgraded to global limiting.", method, route)
         global = true
         state.routex[route] = false -- downgrade the route
     end
@@ -198,13 +198,13 @@ function push(state, req, method,route, retries)
             end
             retry = retries < 5
             if retry then
-                util.warn("(%i, %q) :  retrying after %fsec : %s", code, reason[rawcode], delay, name)
+                util.warn("(%i, %q) :  retrying after %fsec : %s%s", code, reason[rawcode], delay, method, route)
                 cqueues.sleep(delay)
                 if global then state.global_lock:unlock() end
                 return push(state, req, method,route, retries+1)
             end
         else
-            util.error("(%i, %q) : %s", code, reason[rawcode], name)
+            util.error("(%i, %q) : %s%s", code, reason[rawcode], method, route)
             return nil, data, delay, global
         end
     end

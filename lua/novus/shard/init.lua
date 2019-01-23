@@ -88,7 +88,7 @@ function connect(state)
     else
         util.info("Shard-%s has connected.", state.options.id)
         state.connected = true --+
-        me():wrap(run_frames, state)
+        me():wrap(frames, state)
         return state, true
     end
 end
@@ -160,8 +160,10 @@ local function should_reconnect(state, code)
 end
 
 function frames(state)
+    local code
     repeat
-        local frame, op, code = state.socket:receive()
+        local frame, op
+            frame, op, code = state.socket:receive()
         if frame ~= nil then
             local payload, cont = read_frame(state, frame, op)
             if cont then goto continue end
@@ -179,7 +181,8 @@ function frames(state)
             break end
         end
         ::continue::
-    until code
+    until code or frame == nil
+    util.warn('Shard-%s has stop receiving: %q', state.options.id, code or 'no code')
     local reconnect = should_reconnect(state, code)
     if reconnect and state.reconnect then
         state.reconnect = nil
@@ -191,11 +194,6 @@ function frames(state)
         sleep(time)
         return connect(state)
     end
-end
-
-function run_frames(state)
-    local s, e = pcall(frames ,state)
-    assert(s, traceback(e))
 end
 
 local function includes(t, val)
