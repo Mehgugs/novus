@@ -1,5 +1,5 @@
 return {
-     text     = 0
+      text     = 0
 	,private  = 1
 	,voice    = 2
 	,group    = 3
