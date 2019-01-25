@@ -1,4 +1,4 @@
-describe('tests #patterns', function()
+describe('#patterns', function()
     local patterns, lpeg, real_token, rand_mention
     setup(function()
         require"novus.util"
