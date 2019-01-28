@@ -22,9 +22,8 @@ local insert = table.insert
 local concat = table.concat
 local floor = math.floor
 local pairs = pairs
-local assert = assert
 local traceback = debug.traceback
-local pcall = pcall
+local xpcall = xpcall
 local toquery = httputil.dict_to_query
 local tostring = tostring
 --start-module--
@@ -66,10 +65,6 @@ function init(options, idmutex)
     state.is_ready = promise.new()
     state.ready_metadata = {}
     state.beats = 0
-    if state.options.transport_compression then
-        state.transport_infl = zlib.inflate()
-        state.transport_buffer = {}
-    end
     util.info("Initialized Shard-%s with TOKEN-%x", state.options.id, util.hash(state.options.token))
     state.url_options = toquery({
         v = tostring(const.gateway.version),
@@ -91,6 +86,10 @@ function connect(state)
     else
         util.info("Shard-%s has connected.", state.options.id)
         state.connected = true --+
+        if state.options.transport_compression then
+            state.transport_infl = zlib.inflate()
+            state.transport_buffer = {}
+        end
         state.loop:wrap(frames, state)
         return state, true
     end
@@ -180,16 +179,15 @@ local function should_reconnect(state, code)
     if code == 4004 then
         return util.fatal("Token is invalid, shutting down.")
     end
-    return state.reconnect or state.auto_reconnect
+    return state.reconnect or state.options.auto_reconnect
 end
 
 function frames(state)
-    local rec_timeout = state.options.receive_timeout or 30*60
-    local code, err
+    local rec_timeout = state.options.receive_timeout or 60
+    local err
     repeat
-        local frame, op
-            frame, op, code = state.socket:receive(60)
-        if frame ~= nil then
+        local success, frame, op = xpcall(state.socket.receive, traceback, state.socket, rec_timeout)
+        if success and frame ~= nil then
             local payload, cont = read_frame(state, frame, op)
             if cont then goto continue end
             if payload and not payload.close then
@@ -204,16 +202,21 @@ function frames(state)
             else
                 disconnect(state, 4000, 'could not decode payload')
             break end
-        else
+        elseif success and frame == nil then
             err = op
+        elseif not success then
+            err = frame
         end
         ::continue::
-    until code or frame == nil
+    until state.socket.got_close_code or frame == nil or not success
     --disconnect handling
     state.connected = false
     stop_heartbeat(state)
-    util.warn('Shard-%s has stop receiving: (%s %q) (close code %s) %.3fsec elapsed',
-        state.options.id, err and errno[err], err and errno.strerror(err), code,
+
+    util.warn('Shard-%s has stopped receiving: (%q) (close code %s) %.3fsec elapsed',
+        state.options.id,
+        err or state.socket.got_close_message,
+        state.socket.got_close_code,
         cqueues.monotime() - state.loop:novus().begin
     )
 
@@ -221,7 +224,7 @@ function frames(state)
         state.is_ready:set(false)
     end
 
-    local reconnect = should_reconnect(state, code)
+    local reconnect = should_reconnect(state, state.socket.got_close_code)
     util.warn("Shard-%s %s reconnect.", state.options.id, reconnect and "will" or "will not")
 
     if reconnect and state.reconnect then
@@ -233,8 +236,6 @@ function frames(state)
         util.info("Shard-%s will automatically reconnect in %.2fsec", state.options.id, time)
         sleep(time)
         return connect(state)
-    else
-        util.throw("NORE")
     end
 end
 

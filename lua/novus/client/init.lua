@@ -10,7 +10,7 @@ local xpcall, pcall = xpcall, pcall
 local require = require
 local unpack = table.unpack
 local tonumber = tonumber
-local debug = debug
+local traceback = debug.traceback
 local pairs = pairs
 local gettime = cqueues.monotime
 --start-module--
@@ -38,16 +38,11 @@ end)
 
 local old_wrap
 old_wrap = cqueues.interpose('wrap', function(self, ...)
-    local my_traceback = debug.traceback()
     return old_wrap(self, function(fn, ...)
-        local s, e = xpcall(fn, debug.traceback, ...)
+        local s, e = xpcall(fn, traceback, ...)
         if not s then
-            local id = util.rid()
-            if fn == nil then util.error(":wrap traceback: %s", my_traceback) end
-            util.error("Had error-%s: %s", id, e)
-            util.throw("error-%s", id)
+            util.error(e)
         end
-        return
     end, ...)
 end)
 
@@ -118,8 +113,13 @@ local function runner(client)
         if client.app.owner then
             client.owner = user.new_from(
                 client,
-                client.app.owner,
-                client.cache.methods.user
+                client.app.owner
+            )
+        end
+        if client.app.id then
+            client.me = user.get_from(
+                client,
+                client.app.id
             )
         end
         local limit = data.session_start_limit

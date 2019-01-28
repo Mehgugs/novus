@@ -4,8 +4,10 @@ local snowflake = require"novus.snowflakes.snowflake"
 local const = require"novus.const"
 local api = require"novus.api"
 local cqueues = require"cqueues"
+local null = require"rapidjson".null
 local setmetatable = setmetatable
 local gettime = cqueues.monotime
+local running = cqueues.running
 --start-module--
 local _ENV = snowflake "user"
 
@@ -70,6 +72,19 @@ function methods.dm(user, ...)
         return channel:send(...)
     else
         return nil, err
+    end
+end
+
+function methods.set_username(user, nick)
+    local state = running():novus()
+    if util.uint(state.app.id) == user[1] then
+        local success, data, err = api.modify_current_user(state.api, {username = nick or null})
+        if success then
+            user[4] = data.username
+            return user
+        else return nil, err
+        end
+    else return false, "Cannot change someone else's username! (bot: %s; passed in: %s)" % {state.me, user}
     end
 end
 

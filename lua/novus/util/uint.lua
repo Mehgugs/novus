@@ -24,29 +24,29 @@ local function to_integer_worker(s) -- string -> uint64
 end
 
 local two_63 = 2^63
-local two_64 = 2^64 
+local two_64 = 2^64
 
 local function float_to_uint(f)
-    if f > max_int then 
+    if f > max_int then
         return mtoint(((f + two_63) % two_64) - two_63)
-    else 
+    else
         return mtoint(f)
     end
-end 
+end
 
 local function lnum_to_uint(l)
-    if mntype(l) == 'integer' then 
-        return l 
-    else 
+    if mntype(l) == 'integer' then
+        return l
+    else
         return float_to_uint(l)
     end
 end
 
 local numeral = lpeg.digit^1 * -1
-function touint(s) 
+function touint(s)
     if type(s) == 'number' then return lnum_to_uint(s)
     elseif type(s) == 'string' and numeral:match(s) then
-        return to_integer_worker(s) 
+        return to_integer_worker(s)
     end
 end
 
@@ -70,14 +70,14 @@ function timestamp(s)
     return udiv((touint(s) >> 22) + epoch , 1000)
 end
 
-function fromtime(s) 
+function fromtime(s)
     s = by10(s or time(), 3)
     return (s - epoch) << 22
 end
 local inc = -1
 function synthesize(s, worker, pid)
-    inc = (inc + 1) &  0xFFF 
-    worker = ((worker or 0) & 63) << 17 
+    inc = (inc + 1) &  0xFFF
+    worker = ((worker or 0) & 63) << 17
     pid = ((pid or 0) & 63) << 12
     return fromtime(s) | worker | pid | inc
 end

@@ -1,7 +1,7 @@
 --imports--
 local util = require"novus.util"
 local setmetatable = setmetatable
-local type = type 
+local type = type
 local pairs = pairs
 local select = select
 local insert = table.insert
@@ -38,10 +38,10 @@ permissions = util.reflect{
     manageRoles         = 0x10000000,
     manageWebhooks      = 0x20000000,
     manageEmojis        = 0x40000000
-} 
+}
 
 function to_permission(num_or_str)
-    if type(num_or_str) == 'number' and permissions[num_or_str] then 
+    if type(num_or_str) == 'number' and permissions[num_or_str] then
         return num_or_str
     elseif type(num_or_str) == 'string' and permissions[num_or_str] then
         return permissions[num_or_str]
@@ -52,7 +52,7 @@ NONE = 0
 ALL = 0 for value in pairs(permissions) do ALL = ALL | to_permission(value) end
 
 local function to_permission_fuzzy(s)
-    return to_permission(s) or NONE 
+    return to_permission(s) or NONE
 end
 
 function ctor(...)
@@ -70,7 +70,7 @@ end
 
 function union(...)
     return util.vfold(bor, ...)
-end 
+end
 
 function intersection(...)
     return util.vfold(band, ...)
@@ -81,7 +81,7 @@ function difference( ... )
 end
 
 function complement(a,...)
-    if ... == nil then return ~a & ALL else 
+    if ... == nil then return ~a & ALL else
     return util.vfold(bnotand, a, ...)
     end
 end
@@ -96,17 +96,17 @@ end
 
 function has(p, v)
     v = v
-    return v and p & v == v 
+    return v and p & v == v
 end
 
 local function contains_worker(p, n, a, ...)
     a = to_permission(a)
-    if a and n == 1 then 
+    if a and n == 1 then
         return p & a == a
-    elseif a and n > 1 and p & a == a then 
+    elseif a and n > 1 and p & a == a then
         return contains_worker(p & ~a, n - 1, ...)
     else
-        return false 
+        return false
     end
 end
 
@@ -114,11 +114,11 @@ function contains(p, ...)
     return contains_worker(p,select('#', ...), ...)
 end
 
-function decompose(p) 
+function decompose(p)
     local out = {}
     local i = 0
-    while p>>i > 0 do 
-       if p>>i & 1 == 1 then 
+    while p>>i > 0 do
+       if p>>i & 1 == 1 then
           insert(out, permissions[1<<i])
        end
        i=i+1

@@ -8,18 +8,19 @@ local err = error
 --start-module--
 local _ENV = {}
 
+fd = nil
 
 function parseHex(c)
     if c:sub(1,1) == '#' then c = c:sub(2) end
     if c:sub(1,2) == '0x' then c = c:sub(3) end
     local len = #c
-    if not (len == 3 or len == 6) then 
+    if not (len == 3 or len == 6) then
         c = len > 6 and c:sub(1,6) or c .. ("0"):rep(6 - len)
-    elseif len == 3 then 
+    elseif len == 3 then
         c = c:gsub("(.)", "%1%1")
     end
     local out = {}
-    for i = 1,6,2 do 
+    for i = 1,6,2 do
         insert(out, tonumber(c:sub(i,i+1), 16))
     end
     return unpack(out, 1, 3)
@@ -44,6 +45,16 @@ end
 
 colors = {}
 
+colors[0] = {
+    info  = ""
+    ,warn  = ""
+    ,error = ""
+    ,white = ""
+    ,info_highlight  = ""
+    ,warn_highlight  = ""
+    ,error_highlight = ""
+}
+
 colors[24] = {
     info  = color_code_to_seq"#1a6"
    ,warn  = color_code_to_seq"#ef5"
@@ -55,40 +66,44 @@ colors[24] = {
 }
 
 colors[3] = {
-     info  = "\27[0m\27[32m" 
-    ,warn  = "\27[0m\27[33m" 
+     info  = "\27[0m\27[32m"
+    ,warn  = "\27[0m\27[33m"
     ,error = "\27[0m\27[31m"
     ,white = "\27[0m\27[1;37m"
-    ,info_highlight  = "\27[0m\27[1;32m" 
-    ,warn_highlight  = "\27[0m\27[1;33m" 
+    ,info_highlight  = "\27[0m\27[1;32m"
+    ,warn_highlight  = "\27[0m\27[1;33m"
     ,error_highlight = "\27[0m\27[1;31m"
 }
 
 colors[8] = {
-     info  = "\27[0m\27[38;5;36m" 
-    ,warn  = "\27[0m\27[38;5;220m" 
+     info  = "\27[0m\27[38;5;36m"
+    ,warn  = "\27[0m\27[38;5;220m"
     ,error = "\27[0m\27[38;5;196m"
     ,white = "\27[0m\27[38;5;231m"
-    ,info_highlight  = "\27[0m\27[38;5;48m" 
-    ,warn_highlight  = "\27[0m\27[38;5;11m" 
-    ,error_highlight = "\27[0m\27[38;5;9m" 
+    ,info_highlight  = "\27[0m\27[38;5;48m"
+    ,warn_highlight  = "\27[0m\27[38;5;11m"
+    ,error_highlight = "\27[0m\27[38;5;9m"
 }
 
-_mode = 3
+_mode = 0
 
-local function writef(fd,...)
-    local str,n = f(...):gsub("($([^;]+);)", function(_, body) 
-        if body == 'reset' then 
+local function writef(ifd,...)
+    local raw = f(...)
+    local str,n = raw:gsub("($([^;]+);)", function(_, body)
+        if body == 'reset' then
             return '\27[0m'
-        elseif colors[_mode][body] then 
+        elseif colors[_mode][body] then
             return colors[_mode][body]
-        elseif _mode == 24 and body:sub(1,9) == "highlight" then 
+        elseif _mode == 24 and body:sub(1,9) == "highlight" then
             return highlight_code_to_seq(body)
         elseif _mode == 24 then
             return color_code_to_seq(body)
         end
     end)
-    return fd:write(str, n > 0 and "\27[0m\n" or "\n")
+    if fd then
+        fd:write(raw:gsub("$[^;]+;", ""), "\n")
+    end
+    return ifd:write(str, n > 0 and "\27[0m\n" or "\n")
 end
 
 function info(...)
@@ -117,7 +132,7 @@ end
 function printf(...) return writef(stdout, ...) end
 
 function mode(m)
-    _mode = m == 24 and 24 or m == 8 and 8 or 3 
+    _mode = m == 24 and 24 or m == 8 and 8 or m == 3 and 3 or 0
 end
 
 
