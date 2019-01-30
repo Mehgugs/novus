@@ -9,10 +9,6 @@ function new(t, f, a)
     local d = 1
     if getmetatable(t) == _ENV then
         d = t.__d + 1
-        if d > _ENV.limit then
-            t = flatten(t)
-            d = 0
-        end
     end
     return setmetatable({__t = t, __f = f, __a = a, __d =d}, _ENV)
 end

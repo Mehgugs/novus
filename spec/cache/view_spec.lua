@@ -84,13 +84,4 @@ describe('tests #view', function()
             assert.are.same(2 * t[k], 2 * myview[k], v)
         end
     end)
-    it('limit will auto flatten new views', function ()
-        view.limit = 5
-        local t = rand_object(); vs = {view.copy(t)}
-        local s = spy.on(view, "flatten")
-        for i = 2, 6 do
-            vs[i] = view.copy(vs[i-1])
-        end
-        assert.spy(s).was_called()
-    end)
 end)
