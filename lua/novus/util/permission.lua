@@ -48,6 +48,10 @@ function to_permission(num_or_str)
     end
 end
 
+function resolve(p)
+    return type(p) == 'table' and p.value or p
+end
+
 NONE = 0
 ALL = 0 for value in pairs(permissions) do ALL = ALL | to_permission(value) end
 
@@ -111,10 +115,11 @@ local function contains_worker(p, n, a, ...)
 end
 
 function contains(p, ...)
-    return contains_worker(p,select('#', ...), ...)
+    return contains_worker(resolve(p),select('#', ...), ...)
 end
 
 function decompose(p)
+    p = resolve(p)
     local out = {}
     local i = 0
     while p>>i > 0 do
@@ -124,6 +129,66 @@ function decompose(p)
        i=i+1
     end
     return out
+end
+
+placeholder = {}
+
+function placeholder.__bor(v, x)
+    if type(x) == 'table' and type(v) == 'number' then
+        v, x = x, v
+    elseif type(x) == 'table' and type(v) == 'table' then
+        v,x = v, x.collected
+    end
+    v.value = v.value | x
+    return v
+end
+
+function placeholder.__band(v, x)
+    if type(x) == 'table' and type(v) == 'number' then
+        v, x = x, v
+    elseif type(x) == 'table' and type(v) == 'table' then
+        v,x = v, x.collected
+    end
+    v.value = v.value & x
+    return v
+end
+
+function placeholder.__bxor(v, x)
+    if type(x) == 'table' and type(v) == 'number' then
+        v, x = x, v
+    elseif type(x) == 'table' and type(v) == 'table' then
+        v,x = v, x.collected
+    end
+    v.value = v.value ~ x
+    return v
+end
+
+function placeholder.__bnot(v)
+    v.value = ~v.value
+    return v
+end
+
+function placeholder:__shr(n)
+    self.value = self.value >> n
+    return self
+end
+
+function placeholder.__index(_,k)
+    if type(_ENV[k]) == 'function' then
+        return _ENV[k]
+    end
+end
+
+placeholder.__name = "permission-object"
+
+function placeholder:__tostring()
+    return ("%s: %#x"):format(placeholder.__name, self.value)
+end
+
+function new(value)
+    return setmetatable({
+         value = resolve(value) or NONE
+    }, placeholder)
 end
 
 --end-module--

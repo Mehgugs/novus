@@ -90,7 +90,7 @@ function connect(state)
             state.transport_infl = zlib.inflate()
             state.transport_buffer = {}
         end
-        state.loop:wrap(frames, state)
+        state.loop:wrap(messages, state)
         return state, true
     end
 end
@@ -127,13 +127,13 @@ function disconnect(state, why, code)
     return state
 end
 
-local function read_frame(state, frame, op)
+local function read_message(state, message, op)
     if op == "text" then
-        return decode(frame)
+        return decode(message)
     elseif op == "binary" then
         if state.options.transport_compression then
-            insert(state.transport_buffer, frame)
-            if #frame < 4 or frame:sub(-4) ~= ZLIB_SUFFIX then
+            insert(state.transport_buffer, message)
+            if #message < 4 or message:sub(-4) ~= ZLIB_SUFFIX then
                 return nil, true
             end
             local msg =  state.transport_infl(concat(state.transport_buffer))
@@ -141,7 +141,7 @@ local function read_frame(state, frame, op)
             return decode(msg)
         else
             local infl = zlib.inflate()
-            return  decode(infl(frame, true))
+            return  decode(infl(message, true))
         end
     end
 end
@@ -182,13 +182,13 @@ local function should_reconnect(state, code)
     return state.reconnect or state.options.auto_reconnect
 end
 
-function frames(state)
+function messages(state)
     local rec_timeout = state.options.receive_timeout or 60
     local err
     repeat
-        local success, frame, op = xpcall(state.socket.receive, traceback, state.socket, rec_timeout)
-        if success and frame ~= nil then
-            local payload, cont = read_frame(state, frame, op)
+        local success, message, op = xpcall(state.socket.receive, traceback, state.socket, rec_timeout)
+        if success and message ~= nil then
+            local payload, cont = read_message(state, message, op)
             if cont then goto continue end
             if payload and not payload.close then
                 local s = payload.s
@@ -202,13 +202,13 @@ function frames(state)
             else
                 disconnect(state, 4000, 'could not decode payload')
             break end
-        elseif success and frame == nil then
+        elseif success and message == nil then
             err = op
         elseif not success then
-            err = frame
+            err = message
         end
         ::continue::
-    until state.socket.got_close_code or frame == nil or not success
+    until state.socket.got_close_code or message == nil or not success
     --disconnect handling
     state.connected = false
     stop_heartbeat(state)
