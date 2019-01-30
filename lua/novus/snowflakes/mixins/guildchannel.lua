@@ -1,0 +1,75 @@
+--imports--
+local api = require"novus.api"
+local snowflake = require"novus.snowflakes.snowflake"
+local perms = require"novus.util.perms"
+local cqueues = require"cqueues"
+local json = require"cjson"
+local null = json.null
+local running = cqueues.running
+local snowflakes = snowflake.snowflakes
+--start-module--
+return function (_ENV)
+
+    function methods.set_name(channel, name)
+        return modify(channel, {name = name or null})
+    end
+
+    function methods.set_category(channel, id)
+        id = snowflake.id(id)
+        return modify(channel, {parent_id = id or null})
+    end
+
+    function methods.invites(channel)
+        local state = running():novus()
+        local success, data, err = api.get_channel_invites(state.api, channel[1])
+        if success and data then
+            local out = {}
+            for i, invite in ipairs(data) do
+                out[i] = snowflakes.invite.new_from(state, invite)
+            end
+            return out
+        else
+            return false, err
+        end
+    end
+
+    local function blank_overwrite(channel, id, type)
+        channel[11][id] = {
+             id = id
+            ,type = type
+            ,allow = perms.new()
+            ,deny =  perms.new()
+        }
+        return channel[11][id]
+    end
+
+    local allowed = {
+         member = true
+        ,role = true
+    }
+
+    function methods.overwrite(channel, user_role)
+        local id = snowflake.id(user_role)
+        local typ = id and user_role.kind
+        if typ and allowed[typ] then
+            return channel[11][id] or blank_overwrite(channel, id, typ)
+        end
+    end
+
+    function methods.update_overwrite(channel, ow)
+        local state = running():novus()
+        local success, _, err = api.edit_channel_permissions(state.api, channel[1], ow.id, {
+            type = ow.type,
+            id = ow.id,
+            allow = perms.resolve(ow.allow),
+            deny = perms.resolve(ow.deny)
+        })
+        if success then
+            return true
+        else
+            return false, err
+        end
+    end
+
+    return _ENV
+end

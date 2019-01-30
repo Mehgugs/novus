@@ -55,6 +55,7 @@ function snowflake_inherit(self, base, name)
     next.__index = makeindex(next)
     next.__newindex = makenewindex(next)
     next.constants.__schema = next.schema
+    next.constants.kind = name
     next.get = makeget(next)
     next.new = makenew(next)
     self.snowflakes[name] = next

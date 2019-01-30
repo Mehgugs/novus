@@ -10,7 +10,7 @@ description = {
     ,homepage = source.url
     ,license = 'MIT'
     ,maintainer = 'm4gicks@gmail.com'
-    ,detailed = 
+    ,detailed =
 "Novus is a wrapper for the official Discord API.\
 It uses cqueues and lua-http to provide a minimal, yet featureful,\
 interface for developing lightweight discord bot applications."
@@ -22,6 +22,7 @@ dependencies = {
     ,'http'
     ,'lua-zlib'
     ,'lpeglabel >= 1.0'
+    ,'lua-cjson == 2.1.0-1'
 }
 
 build = {

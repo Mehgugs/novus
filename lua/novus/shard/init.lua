@@ -6,7 +6,7 @@ local errno = require"cqueues.errno"
 local websocket = require"http.websocket"
 local zlib = require"http.zlib"
 local httputil = require"http.util"
-local json = require"rapidjson"
+local json = require"cjson"
 local util = require"novus.util"
 local const = require"novus.const"
 local mutex = require"novus.util.mutex".new
@@ -21,7 +21,6 @@ local sleep = cqueues.sleep
 local insert = table.insert
 local concat = table.concat
 local floor = math.floor
-local pairs = pairs
 local traceback = debug.traceback
 local xpcall = xpcall
 local toquery = httputil.dict_to_query
@@ -53,7 +52,7 @@ local token_check = lpeg.check(patterns.token * -1)
 function init(options, idmutex)
     local state = {options = {}}
     if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then
-        return util.fatal("Please supply a bot token! It should look like \"Bot %s\"",sample_token)
+        return util.fatal("Please supply a bot token")
     end
     util.mergewith(state.options, options)
 
@@ -93,11 +92,6 @@ function connect(state)
         state.loop:wrap(messages, state)
         return state, true
     end
-end
-
-local function includes(t, val)
-    for _, v in pairs(t) do if v == val then return true end end
-    return false
 end
 
 local function beat_loop(state, interval)

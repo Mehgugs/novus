@@ -1,1 +1,2 @@
-global = false
+global = true
+std = "lua53"
