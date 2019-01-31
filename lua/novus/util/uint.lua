@@ -74,6 +74,17 @@ function fromtime(s)
     s = by10(s or time(), 3)
     return (s - epoch) << 22
 end
+
+function decompose(s)
+    s = touint(s)
+    return {
+         timestamp = timestamp(s)
+        ,worker = (s & 0x3E0000) >> 17
+        ,pid = (s & 0x1F000) >> 12
+        ,increment = s & 0xFFF
+    }
+end
+
 local inc = -1
 function synthesize(s, worker, pid)
     inc = (inc + 1) &  0xFFF
