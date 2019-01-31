@@ -93,7 +93,7 @@ local function writef(ifd,...)
     if fd then
         fd:write(raw, "\n")
     end
-    ifd:write(raw)
+    ifd:write(raw, "\n")
 end
 
 function info(...)
