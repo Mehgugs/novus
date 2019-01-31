@@ -52,6 +52,9 @@ function __gc(snowflake)
         return snowflake[3](snowflake)
     end
 end
+function __tostring(snowflake)
+    retrn ("%s: %u"):format(snowflake.kind, snowflake[1])
+end
 local function snowflake_iter(invar, state)
     local key, idx = next(invar.__schema, state)
     if key ~= sc_len then

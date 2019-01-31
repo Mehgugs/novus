@@ -137,7 +137,7 @@ function placeholder.__bor(v, x)
     if type(x) == 'table' and type(v) == 'number' then
         v, x = x, v
     elseif type(x) == 'table' and type(v) == 'table' then
-        v,x = v, x.collected
+        v,x = v, x.value
     end
     v.value = v.value | x
     return v
@@ -147,7 +147,7 @@ function placeholder.__band(v, x)
     if type(x) == 'table' and type(v) == 'number' then
         v, x = x, v
     elseif type(x) == 'table' and type(v) == 'table' then
-        v,x = v, x.collected
+        v,x = v, x.value
     end
     v.value = v.value & x
     return v
@@ -157,7 +157,7 @@ function placeholder.__bxor(v, x)
     if type(x) == 'table' and type(v) == 'number' then
         v, x = x, v
     elseif type(x) == 'table' and type(v) == 'table' then
-        v,x = v, x.collected
+        v,x = v, x.value
     end
     v.value = v.value ~ x
     return v

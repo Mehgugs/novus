@@ -47,53 +47,53 @@ describe("#permission", function()
     end)
     describe(".to_permission", function()
         it('takes a string and fetches a number value', function()
-            assert.are.equals(
+            assert.are.equal(
                 permission.to_permission"administrator",
                 0x8
             )
-            assert.are.equals(
+            assert.are.equal(
                 permission.to_permission"sendMessages",
                 0x800
             )
         end)
         it('returns nil for strings which dont match', function()
-            assert.are.equals(
+            assert.are.equal(
                 permission.to_permission"err",
                 nil
             )
         end)
         it('takes a number value and returns a number value', function()
-            assert.are.equals(
+            assert.are.equal(
                 permission.to_permission(0x8),
                 0x8
             )
-            assert.are.equals(
+            assert.are.equal(
                 permission.to_permission(0x800),
                 0x800
             )
         end)
         it('returns nil for numbers which dont match', function()
-            assert.are.equals(
+            assert.are.equal(
                 permission.to_permission(1.2),
                 nil
             )
         end)
     end)
     it('.ALL is correct', function()
-        assert.are.equals(2146958847, permission.ALL)
+        assert.are.equal(2146958847, permission.ALL)
     end)
     it('.NONE is correct', function()
-        assert.are.equals(0, permission.NONE)
+        assert.are.equal(0, permission.NONE)
     end)
     describe('.construct', function()
         it('takes N string|number and returns one number', function()
-            assert.are.equals(
+            assert.are.equal(
                 permission.construct(table.unpack(util.keys(permission.permissions)))
                 ,permission.ALL
             )
         end)
         it('returns zero for invalid values', function()
-            assert.are.equals(
+            assert.are.equal(
                 permission.construct("err")
                 ,0
             )
@@ -101,7 +101,7 @@ describe("#permission", function()
     end)
     describe('.union', function()
         it('bors together permission values', function()
-            assert.are.equals(
+            assert.are.equal(
                 0x8 | 0x800,
                 permission.union(permission"administrator", permission"sendMessages")
             )
@@ -111,17 +111,17 @@ describe("#permission", function()
                 permission.union("administrator", "sendMessages")
             end)
         end)
-        it('(ALL, _) always equals ALL', function()
+        it('(ALL, _) always equal ALL', function()
             local values = util.map(permission, pick_random(10, permission.permissions, 'number'))
-            assert.are.equals(
+            assert.are.equal(
                 permission.ALL,
                 permission.union(permission.ALL, table.unpack(values))
             )
         end)
-        it('(NONE, _) always equals _', function()
+        it('(NONE, _) always equal _', function()
             local values = util.map(permission, pick_random(10, permission.permissions, 'number'))
             local value = permission.construct(table.unpack(values))
-            assert.are.equals(
+            assert.are.equal(
                 value,
                 permission.union(permission.NONE, table.unpack(values))
             )
@@ -129,7 +129,7 @@ describe("#permission", function()
     end)
     describe('.intersection', function()
         it('bands together permission values', function()
-            assert.are.equals(
+            assert.are.equal(
                 permission.intersection(permission.ALL , 0x8),
                 permission.ALL & 0x8
             )
@@ -139,18 +139,18 @@ describe("#permission", function()
                 permission.intersection("administrator", "sendMessages")
             end)
         end)
-        it('(ALL, _) always equals _', function()
+        it('(ALL, _) always equal _', function()
             local values = util.map(permission, pick_random(10, permission.permissions, 'number'))
             local value = permission.construct(table.unpack(values))
-            assert.are.equals(
+            assert.are.equal(
                 value,
                 permission.intersection(permission.ALL, value)
             )
         end)
-        it('(NONE, _) always equals NONE', function()
+        it('(NONE, _) always equal NONE', function()
             local values = util.map(permission, pick_random(10, permission.permissions, 'number'))
             local value = permission.construct(table.unpack(values))
-            assert.are.equals(
+            assert.are.equal(
                 permission.NONE,
                 permission.intersection(permission.NONE, value)
             )
@@ -158,7 +158,7 @@ describe("#permission", function()
     end)
     describe('difference', function()
         it('xors permission values', function ()
-            assert.are.equals(
+            assert.are.equal(
                 0x8,
                 permission.difference(0x8|0x800, 0x800)
             )
@@ -168,18 +168,18 @@ describe("#permission", function()
                 permission.difference("administrator", "sendMessages")
             end)
         end)
-        it('(NONE, _) always equals _', function()
+        it('(NONE, _) always equal _', function()
             local values = util.map(permission, pick_random(10, permission.permissions, 'number'))
             local value = permission.construct(table.unpack(values))
-            assert.are.equals(
+            assert.are.equal(
                 value,
                 permission.difference(permission.NONE, value)
             )
         end)
-        it('(_, _) always equals NONE', function()
+        it('(_, _) always equal NONE', function()
             local values = util.map(permission, pick_random(10, permission.permissions, 'number'))
             local value = permission.construct(table.unpack(values))
-            assert.are.equals(
+            assert.are.equal(
                 permission.NONE,
                 permission.difference(value, value)
             )
@@ -191,7 +191,7 @@ describe("#permission", function()
             local value = permission.construct(table.unpack(values))
             local first = values[1]
             local without = permission.construct(table.unpack(values, 2))
-            assert.are.equals(
+            assert.are.equal(
                 without,
                 permission.disable(value, first)
             )
@@ -236,6 +236,28 @@ describe("#permission", function()
                 {},
                 permission.decompose(permission.NONE)
             )
+        end)
+    end)
+    describe('placeholder', function()
+        it('is a stateful permission container', function()
+            local p = permission.new(permission.ALL)
+            assert.same(p:decompose(), decompose_all)
+        end)
+        it('can be used in place of a permission value', function ()
+            local p = permission.new()
+            assert.are.equal(p.value, 0)
+            assert.has_no.errors(function()
+                permission.enable(p, 'administrator', 'sendMessages')
+            end)
+            assert.are.equal(p.value, permission.construct('administrator', 'sendMessages'))
+            assert.has_no.errors(function()
+                permission.union(p, p)
+            end)
+            assert.are.equal(p.value, permission.construct('administrator', 'sendMessages'))
+            assert.has_no.errors(function()
+                permission.intersection(p, 0x8)
+            end)
+            assert.are.equal(p.value, 0x8)
         end)
     end)
 end)
