@@ -70,7 +70,7 @@ function init(options, idmutex)
         encoding = const.gateway.encoding,
         compress = state.options.transport_compression and const.gateway.compress or nil
     })
-    state.loop = state.options.loop or me()
+    state.loop = cqueues.new()
     return state
 end
 
@@ -90,6 +90,10 @@ function connect(state)
             state.transport_buffer = {}
         end
         state.loop:wrap(messages, state)
+        local client = me():novus()
+        if client.loops[state.options.id] == nil then
+            state.loop:novus_associate(client, state.options.id)
+        end
         return state, true
     end
 end
@@ -180,11 +184,11 @@ function messages(state)
     local rec_timeout = state.options.receive_timeout or 60
     local err
     repeat
-        local success, message, op = xpcall(state.socket.receive, traceback, state.socket, rec_timeout)
+        local success, message, op = xpcall(state.socket.receive, traceback, state.socket)
         if success and message ~= nil then
             local payload, cont = read_message(state, message, op)
             if cont then goto continue end
-            if payload and not payload.close then
+            if payload then
                 local s = payload.s
                 local t = payload.t
                 local d = payload.d

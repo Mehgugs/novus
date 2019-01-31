@@ -17,7 +17,8 @@ local insert, concat = table.insert, table.concat
 local next, tonumber = next, tonumber
 local setmetatable = setmetatable
 local max = math.max
-local pcall = pcall
+local xpcall = xpcall
+local traceback = debug.traceback
 local type = type
 local tostring = tostring
 
@@ -134,7 +135,7 @@ function request(state, method, endpoint, payload, query, files)
     state.global_lock:lock()
     if routex then routex:lock() end
 
-    local success, data, err, delay, global = pcall(push, state, req, method, route, 0)
+    local success, data, err, delay, global = xpcall(push, traceback, state, req, method, route, 0)
     if not success then
         return util.fatal("api.push failed %q", tostring(data))
     end
@@ -154,7 +155,7 @@ function push(state, req, method,route, retries)
     local delay = 1 -- seconds
     local global = false -- whether the delay incurred is on the global limit
 
-    local headers , stream , eno = req:go(10)
+    local headers , stream , eno = req:go()
 
     if not headers and retries < const.api.max_retries then
         local rsec = util.rand(1, 2)

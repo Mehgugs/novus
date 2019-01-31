@@ -24,12 +24,27 @@ cqueues.interpose('novus', function(self)
     return clients[self]
 end)
 
+local function do_loop(id, loop)
+    while not loop:empty() do
+        local ok, err = loop:step()
+        if not ok then util.warn("%s loop.step: " .. err, id)
+            if id == 'main' then
+                util.fatal('main loop had error!')
+            end
+        end
+    end
+    util.warn("Terminating loop-%s", id)
+end
+
 cqueues.interpose('novus_associate', function(self, client, id)
     clients[self] = client
     if client.loops[id] ~= nil then
         util.fatal("Client-%s has conflicting controller ids; %s is already set.", client.id, id)
     end
     client.loops[id] = self
+    if client.loops.main and id ~= 'main' then
+        client.loops.main:wrap(do_loop, id, self)
+    end
 end)
 
 cqueues.interpose('novus_dispatch', function(self, s, E, ...)
@@ -131,8 +146,6 @@ local function runner(client)
             util.info("Client-%s is launching %d shards", client.id, total)
             client.total_shards = total
             for id = first, last do
-                local loop = cqueues.new()
-                loop:novus_associate(client, id)
                 client.shards[id] = shard.init({
                      token = client.options.token
                     ,id = id
@@ -143,7 +156,6 @@ local function runner(client)
                     ,large_threshold = client.options.large_threshold
                     ,auto_reconnect = client.options.auto_reconnect
                     ,receive_timeout = client.receive_timeout
-                    ,loop = loop
                 }, client.id_mutex)
                 shard.connect(client.shards[id])
             end
@@ -161,15 +173,7 @@ end
 
 function run(client)
     client.loops.main:wrap(runner, client)
-    local use_driver = client.options.driver or "default"
-    local driver_at = "novus.client.drivers.%s" % use_driver
-    local found, driver = pcall(require, driver_at)
-    if found then
-        util.info("Client-%s is using %q to run it's main loop.", client.id, driver_at)
-        return driver(client)
-    else
-        return util.fatal("Client-%s could not find a driver at %q!", client.id, driver_at)
-    end
+    return do_loop('main', client.loops.main)
 end
 
 --end-module--
