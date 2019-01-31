@@ -9,6 +9,7 @@ local httputil = require"http.util"
 local json = require"rapidjson"
 local util = require"novus.util"
 local const = require"novus.const"
+local mutex = require"novus.util.mutex".new
 
 local lpeg = util.lpeg
 local patterns = util.patterns
@@ -50,15 +51,15 @@ local ops = util.reflect{
 local token_check = lpeg.check(patterns.token * -1)
 
 
-function init(options, mutex)
+function init(options, idmutex)
     local state = {options = {}}
     if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then
         return util.fatal("Please supply a bot token! It should look like \"Bot %s\"",sample_token)
     end
     util.mergewith(state.options, options)
 
-    state.shard_mutex = util.mutex() --+
-    state.identify_mutex = mutex
+    state.shard_mutex = mutex() --+
+    state.identify_mutex = idmutex
     state.heart_acknowledged  = cond.new()
     state.stop_heart = cond.new()
     state.identify_wait = cond.new()
@@ -75,22 +76,50 @@ function init(options, mutex)
         encoding = const.gateway.encoding,
         compress = state.options.transport_compression and const.gateway.compress or nil
     })
+    state.loop = state.options.loop or me()
     return state
 end
 
 function connect(state)
-    util.info("Shard-%s is connecting to %s...", state.options.id, state.options.gateway)
-    state.socket = websocket.new_from_uri("%s?%s" % {state.options.gateway, state.url_options}) --++
-    local success, _, err = state.socket:connect()
+    local final_url = "%s?%s" % {state.options.gateway, state.url_options}
+    util.info("Shard-%s is connecting to %s", state.options.id, final_url)
+    state.socket = websocket.new_from_uri(final_url) --++
+    local success, _, err = state.socket:connect(3)
     if not success then
         util.error("Shard-%s had an error while connecting %s - %s", state.options.id, errno[err], errno.strerror(err))
         return state, false
     else
         util.info("Shard-%s has connected.", state.options.id)
         state.connected = true --+
-        me():wrap(frames, state)
+        state.loop:wrap(frames, state)
         return state, true
     end
+end
+
+local function includes(t, val)
+    for _, v in pairs(t) do if v == val then return true end end
+    return false
+end
+
+local function beat_loop(state, interval)
+    while state.connected do
+        util.warn("Outgoing heart beating")
+        state.beats = state.beats + 1
+        send(state, ops.HEARTBEAT, state._seq or json.null, true)
+        local r1,r2 = poll(state.stop_heart, interval)
+        if r1 == state.stop_heart or r2 == state.stop_heart then
+            util.warn("Shard-%s heart was stopped via signal", state.options.id)
+            break
+        end
+    end
+end
+
+local function stop_heartbeat(state)
+    return state.stop_heart:signal(1)
+end
+
+local function start_heartbeat(state, interval)
+    state.loop:wrap(beat_loop, state, interval)
 end
 
 function disconnect(state, why, code)
@@ -115,11 +144,6 @@ local function read_frame(state, frame, op)
             local infl = zlib.inflate()
             return  decode(infl(frame, true))
         end
-    elseif op == "close" then
-        local code, i = ('>H'):unpack(payload)
-        local msg = #payload > i and payload:sub(i) or 'Connection closed'
-        util.warn("%i - %q", code, msg)
-        return {close = code, msg}
     end
 end
 
@@ -160,10 +184,11 @@ local function should_reconnect(state, code)
 end
 
 function frames(state)
-    local code
+    local rec_timeout = state.options.receive_timeout or 30*60
+    local code, err
     repeat
         local frame, op
-            frame, op, code = state.socket:receive()
+            frame, op, code = state.socket:receive(60)
         if frame ~= nil then
             local payload, cont = read_frame(state, frame, op)
             if cont then goto continue end
@@ -179,11 +204,26 @@ function frames(state)
             else
                 disconnect(state, 4000, 'could not decode payload')
             break end
+        else
+            err = op
         end
         ::continue::
     until code or frame == nil
-    util.warn('Shard-%s has stop receiving: %q', state.options.id, code or 'no code')
+    --disconnect handling
+    state.connected = false
+    stop_heartbeat(state)
+    util.warn('Shard-%s has stop receiving: (%s %q) (close code %s) %.3fsec elapsed',
+        state.options.id, err and errno[err], err and errno.strerror(err), code,
+        cqueues.monotime() - state.loop:novus().begin
+    )
+
+    if state.is_ready:status() == 'pending' then
+        state.is_ready:set(false)
+    end
+
     local reconnect = should_reconnect(state, code)
+    util.warn("Shard-%s %s reconnect.", state.options.id, reconnect and "will" or "will not")
+
     if reconnect and state.reconnect then
         state.reconnect = nil
         sleep(util.rand(1, 5))
@@ -193,31 +233,9 @@ function frames(state)
         util.info("Shard-%s will automatically reconnect in %.2fsec", state.options.id, time)
         sleep(time)
         return connect(state)
+    else
+        util.throw("NORE")
     end
-end
-
-local function includes(t, val)
-    for _, v in pairs(t) do if v == val then return true end end
-    return false
-end
-
-local function beat_loop(state, interval)
-    while 1 do
-        state.beats = state.beats + 1
-        send(state, ops.HEARTBEAT, state._seq or json.null, true)
-        local r = {poll(state.stop_heart, interval)}
-        if includes(r, state.stop_heart) then
-            break
-        end
-    end
-end
-
-local function stop_heartbeat(state)
-    return state.stop_heart:signal(1)
-end
-
-local function start_heartbeat(state, interval)
-    me():wrap(beat_loop, state, interval)
 end
 
 function HELLO(state, _, d)
@@ -247,6 +265,7 @@ function HEARTBEAT_ACK(state)
     if state.beats < 0 then
         util.warn("Shard-%s is missing heartbeat acknowledgement! (deficit=%s)", state.options.id, -state.beats)
     end
+    state.loop:novus_dispatch(state, "HEARTBEAT", state.beats)
     return state
 end
 
@@ -268,21 +287,21 @@ function DISPATCH(state, _, d, t, s)
     if t == 'READY' then
         t = 'SHARD_READY'
     end
-    return me():dispatch(state, t, d)
+    return state.loop:novus_dispatch(state, t, d)
 end
 
 local function await_ready(state)
     if state.identify_wait:wait(1.5 * identify_delay) then
         sleep(identify_delay)
     end
-    state.identify_mutex:unlock()
+    return state.identify_mutex:unlock()
 end
 
 function identify(state)
     state.identify_mutex:lock()
 
 
-    me():wrap(await_ready, state)
+    state.loop:wrap(await_ready, state)
 
     state._seq = nil ---
     state.session_id = nil
@@ -306,8 +325,8 @@ end
 function resume(state)
     return send(state, ops.RESUME, {
         token = state.options.token,
-        session_id = state.options.session_id,
-        seq = state.options._seq
+        session_id = state.session_id,
+        seq = state._seq
     })
 end
 

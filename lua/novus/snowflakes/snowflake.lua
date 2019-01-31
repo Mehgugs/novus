@@ -21,15 +21,15 @@ schema {
 }
 
 function __eq(A, B)
-    return A[1] == B[1] 
+    return A[1] == B[1]
 end
 
 function id(v)
-    if v and type(v) == 'table' and v[_ENV] then 
+    if v and type(v) == 'table' and v[_ENV] then
         return v[1]
     else
         return util.uint(v)
-    end 
+    end
 end
 
 methods, properties, constants = {}, {}, {}
@@ -40,21 +40,21 @@ end
 
 function properties.timestamp(obj) return createdAt(obj):toISO() end
 
-function get_from(state, snowflake)
-    return util.throw("Could not get a new a %s; it does not implement snowflake.get!", snowflake.__name)
+function get_from()
+    return util.throw("snowflake.get not implemented.")
 end
 
 __index = methods
 __newindex = util.makenewindex(_ENV)
 
 function __gc(snowflake)
-    if snowflake[3] and gettime() - snowflake[2] <= lifetimes[snowflake.__name] then 
+    if snowflake[3] and gettime() - snowflake[2] <= lifetimes[snowflake.__name] then
         return snowflake[3](snowflake)
     end
 end
 local function snowflake_iter(invar, state)
     local key, idx = next(invar.__schema, state)
-    if key ~= sc_len then 
+    if key ~= sc_len then
         return key, invar[idx]
     else
         return snowflake_iter(invar, key)

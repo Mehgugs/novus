@@ -1,11 +1,11 @@
 return {
     _all = {
-         coverage = true 
+         coverage = true
         ,lpath = "./lua/?.lua;./lua/?/init.lua"
         ,shuffle = true
     }
     ,default = {
-         
+
     }
     ,permission = {
         tags = "permission"
@@ -19,9 +19,21 @@ return {
     ,view = {
         tags = "view"
     }
+    ,list = {
+        tags = "list"
+    }
+    ,func = {
+        tags = "func"
+    }
+    ,string = {
+        tags = "string"
+    }
+    ,table = {
+        tags = "table"
+    }
 	,ci = {
 	  	 coverage = false
 		,output = "TAP"
 	}
-	
+
 }

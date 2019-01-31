@@ -1,4 +1,4 @@
-describe('tests #uint', function()
+describe('#uint', function()
     local uint
     local random_uintstr
     setup(function()

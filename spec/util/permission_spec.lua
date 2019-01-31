@@ -30,7 +30,7 @@ local decompose_all = {
     "manageEmojis"
 }
 
-describe("tests #permission", function()
+describe("#permission", function()
     local permission, util
     local pick_random
     setup(function()
