@@ -89,33 +89,23 @@ _mode = 0
 
 local function writef(ifd,...)
     local raw = f(...)
-    local str,n = raw:gsub("($([^;]+);)", function(_, body)
-        if body == 'reset' then
-            return '\27[0m'
-        elseif colors[_mode][body] then
-            return colors[_mode][body]
-        elseif _mode == 24 and body:sub(1,9) == "highlight" then
-            return highlight_code_to_seq(body)
-        elseif _mode == 24 then
-            return color_code_to_seq(body)
-        end
-    end)
+
     if fd then
-        fd:write(raw:gsub("$[^;]+;", ""), "\n")
+        fd:write(raw, "\n")
     end
-    return ifd:write(str, n > 0 and "\27[0m\n" or "\n")
+    ifd:write(str)
 end
 
 function info(...)
-    return writef(stdout, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
+    return writef(stdout, "%s INF %s", date"!%c", f(...))
 end
 
 function warn(...)
-    return writef(stdout, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
+    return writef(stdout, "%s WRN %s", date"!%c", f(...))
 end
 
 function error(...)
-    return writef(stderr, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
+    return writef(stderr, "%s ERR %s", date"!%c", f(...))
 end
 
 function throw(...)
