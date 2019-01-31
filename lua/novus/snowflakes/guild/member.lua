@@ -3,6 +3,7 @@ local api = require"novus.api"
 local util = require"novus.snowflakes.helpers"
 local snowflake = require"novus.snowflakes.snowflake"
 local cqueues = require"cqueues"
+local perms = require"novus.util.permission"
 local setmetatable = setmetatable
 local gettime = cqueues.monotime
 local running = cqueues.running
@@ -135,6 +136,56 @@ function methods.undeafen(member)
     else
         return false, err
     end
+end
+
+local permissioned = {
+     guildtextchannel = true
+    ,guildvoicechannel = true
+    ,guildcategorychannel = true
+}
+
+function methods.get_permissions(member, channel)
+    local guild = member.guild
+    if channel and not (snowflake.id(channel) and permissioned[channel.kind]) then
+        util.throw("Object is not a valid guildchannel %s", channel)
+    end
+
+    if member[1] == guild[owner_id] then
+        return perms.new(perms.ALL)
+    end
+
+    local ret = perms.new(guild[default_role][9])
+    local overwrites = channel[11]
+    local used_overwrites = {perms.new(),perms.new()}
+    for id, role in pairs(member.role_objects) do
+        ret:union(role[9])
+        if overwrites[id] and id ~= guild[1] then
+            used_overwrites[1]:union(overwrites[id].allow)
+            used_overwrites[2]:union(overwrites[id].deny)
+        end
+    end
+
+    if ret:contains'administrator' then
+        return perms.new(perms.ALL)
+    end
+
+    if channel then
+
+        local everyone = overwrites[guild[1]]
+        if everyone then
+            ret:complement(everyone.deny)
+            ret:union(everyone.allow)
+        end
+        ret:complement(used_overwrites[2])
+        ret:union(used_overwrites[1])
+
+        local myoverwrite = overwrites[member[1]]
+        if myoverwrite then
+            ret:complement(myoverwrite.allow)
+            ret:union(myoverwrite.deny)
+        end
+    end
+    return ret
 end
 
 function methods.kick(member, reason)

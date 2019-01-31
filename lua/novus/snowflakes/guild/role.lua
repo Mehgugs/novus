@@ -14,14 +14,14 @@ local snowflakes = snowflake.snowflakes
 local _ENV = snowflake "role"
 
 schema {
-     "guild_id"
-    ,"name"
-    ,"color"
-    ,"hoisted"
-    ,"position"
-    ,"permissions"
-    ,"managed"
-    ,"is_mentionable"
+     "guild_id" --4
+    ,"name" --5
+    ,"color" --6
+    ,"hoisted" --7
+    ,"position" --8
+    ,"permissions" --9
+    ,"managed" --10
+    ,"is_mentionable" -- 11
 }
 
 function new_from( state, payload )

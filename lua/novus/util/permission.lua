@@ -80,13 +80,13 @@ function intersection(...)
     return util.vfold(band, ...)
 end
 
-function difference( ... )
+function unique( ... )
     return util.vfold(bxor, ...)
 end
 
 function complement(a,...)
     if ... == nil then return ~a & ALL else
-    return util.vfold(bnotand, a, ...)
+    return util.vfold(bandnot, a, ...)
     end
 end
 

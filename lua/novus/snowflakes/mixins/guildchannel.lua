@@ -1,7 +1,8 @@
 --imports--
+local uint = require"novus.util.uint"
 local api = require"novus.api"
 local snowflake = require"novus.snowflakes.snowflake"
-local perms = require"novus.util.perms"
+local perms = require"novus.util.permission"
 local cqueues = require"cqueues"
 local json = require"cjson"
 local null = json.null
@@ -9,6 +10,30 @@ local running = cqueues.running
 local snowflakes = snowflake.snowflakes
 --start-module--
 return function (_ENV)
+
+    schema {
+        "guild_id" --7
+       ,"name" --8
+       ,"position" --9
+       ,"parent_id" --10
+       ,"permission_overwrites" --11
+   }
+
+    processor.parent_id = uint.touint
+    processor.guild_id  = uint.touint
+
+    function processor.overwrites (o)
+        if o then
+            local new = {}
+            for _, ow in ipairs(o) do
+                ow.id = uint(ow.id)
+                ow.allow = perms.new(ow.allow)
+                ow.deny =  perms.new(ow.deny)
+                new[ow.id] = ow
+            end
+            return new
+        end
+    end
 
     function methods.set_name(channel, name)
         return modify(channel, {name = name or null})
