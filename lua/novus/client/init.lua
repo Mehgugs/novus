@@ -5,6 +5,8 @@ local api = require"novus.api"
 local shard = require"novus.shard"
 local cache = require"novus.cache"
 local user = require"novus.snowflakes.user"
+local mutex = require"novus.util.mutex".new
+local gettime = cqueues.monotime
 local pcall = pcall
 local require = require
 local unpack = table.unpack
@@ -23,11 +25,15 @@ cqueues.interpose('novus', function(self)
     return clients[self]
 end)
 
-cqueues.interpose('associate', function(self, client)
+cqueues.interpose('novus_associate', function(self, client, id)
     clients[self] = client
+    if client.loops[id] ~= nil then
+        util.fatal("Client-%s has conflicting controller ids; %s is already set.", client.id, id)
+    end
+    client.loops[id] = self
 end)
 
-cqueues.interpose('dispatch', function(self, s, E, ...)
+cqueues.interpose('novus_dispatch', function(self, s, E, ...)
     return clients[self].dispatch[E] and clients[self].dispatch[E](clients[self], s, E, ...)
 end)
 
@@ -53,8 +59,8 @@ function create(options)
     client.options = util.mergewith({}, options)
     client.api = api.init{token = client.options.token}
     client.shards = {}
-    client.loop = cqueues.new()
-    client.id_mutex = util.mutex()
+    client.loops = {}
+    client.id_mutex = mutex()
     client._readies = 0
     client.dispatch = util.default(function(_, _, t)
         util.info("Got %q", t)
@@ -66,8 +72,8 @@ function create(options)
             return client.dispatch.READY(self)
         end
     end
-    client.mutex = util.mutex()
-    client.loop:associate( client )
+    client.mutex = mutex()
+    cqueues.new():novus_associate( client, 'main')
     client.cache = cache.new()
     return client
 end
@@ -104,6 +110,7 @@ end
 
 local function runner(client)
     client.mutex:lock()
+    client.begin = gettime()
     local token_nonce = util.hash(client.options.token)
     util.info("Client-%s is starting using TOKEN-%s.", client.id, token_nonce)
     local success, data, _ = api.get_gateway_bot(client.api)
@@ -139,7 +146,7 @@ local function runner(client)
                 client.shards[id].dispatch = client.dispatch
                 shard.connect(client.shards[id])
             end
-            client.loop:wrap(await_ready, client)
+            client.loops.main:wrap(await_ready, client)
         else
             util.warn("TOKEN-%s can no longer identify for %s.",
                 token_nonce, util.Date.Interval(limit.reset_after / 1000)
@@ -152,7 +159,7 @@ local function runner(client)
 end
 
 function run(client)
-    client.loop:wrap(runner, client)
+    client.loops.main:wrap(runner, client)
     local use_driver = client.options.driver or "default"
     local driver_at = "novus.client.drivers.%s" % use_driver
     local found, driver = pcall(require, driver_at)

@@ -7,6 +7,7 @@ local httputil = require "http.util"
 local json = require"rapidjson"
 local util = require"novus.util"
 local const = require"novus.const"
+local mutex = require"novus.util.mutex".new
 local lpeg = util.lpeg
 local patterns = util.patterns
 local Date = util.Date
@@ -43,7 +44,7 @@ local function mutex_cache()
     {
         __mode = "v",
         __index = function (self, k)
-            self[k] = util.mutex(k)
+            self[k] = mutex(k)
             return self[k]
         end
     })
@@ -98,7 +99,7 @@ function init(options)
     state.token = options.token
     state.id = util.rid()
     state.routex = mutex_cache()
-    state.global_lock = util.mutex()
+    state.global_lock = mutex()
     util.info("Initialized API-%s with TOKEN-%x", state.id, util.hash(state.token))
     return state
 end
