@@ -8,7 +8,7 @@ time_unit = "seconds"
 discord_epoch = 1420070400
 gateway_delay = .5
 identify_delay = 5
-api_version = 6
+api_version = 7
 
 api = {
      base_endpoint = "https://discordapp.com/api"

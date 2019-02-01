@@ -6,7 +6,6 @@ local snowflake = require"novus.snowflakes.snowflake"
 local textchannel = require"novus.snowflakes.channel.textchannel"
 local modifiable = require"novus.snowflakes.mixins.modifiable"
 local guildchannel = require"novus.snowflakes.mixins.guildchannel"
-local perms = require"novus.util.permission"
 local cqueues = require"cqueues"
 local json = require"cjson"
 local null = json.null

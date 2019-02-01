@@ -44,9 +44,9 @@ mentions.role = re.compile([[
 ]], defs)
 
 local mention_patt
-for type, patt in pairs(mentions) do 
-    if mention_patt then mention_patt = mention_patt + patt 
-    else mention_patt = patt 
+for type, patt in pairs(mentions) do
+    if mention_patt then mention_patt = mention_patt + patt
+    else mention_patt = patt
     end
 end
 
@@ -56,16 +56,38 @@ local iter_patt = lpeg.anywhere(Cp() * mention_patt * Cp())
 
 local function mention_iter(invariant, state)
     local pos,next, after = iter_patt:match(invariant, state[2])
-    if pos then 
+    if pos then
         return {pos,after}, next
     end
 end
 
 local function mention_iterate(_, s)
-    return mention_iter, s, {1,1} 
+    return mention_iter, s, {1,1}
 end
 
 setmetatable(mentions, {__call = mention_iterate})
+
+-- markdown formats
+
+codeblock = re.compile[[("```" (!"```" .)* "```")]]
+
+codesnip = re.compile[[("`" (!"`" .)+ "`")]]
+doublesnip = re.compile[[("``" (!"``" .)+ "``")]]
+
+codesnippet = doublesnip + codesnip
+
+italic = re.compile[["*" {((!("*"[^*]).)/"**")*} "*"]]
+       + re.compile[["_" {((!("_"[^_]).)/"__")*} "_"]]
+bold = re.compile[["**"{ ((!("**"[^*]).)/"****")* }"**"]]
+underline = re.compile[["__"{ ((!("__"[^_]).)/"____")* }"__"]]
+
+spoiler = re.compile[[
+    spoiler <- {"||" ((!"|" .) / spoiler)* "||"}
+]]
+
+strikethrough = re.compile[[
+    strikethrough <- {"~~" ((!"~" .) / strikethrough)+ "~~"}
+]]
 
 --end-module--
 return _ENV

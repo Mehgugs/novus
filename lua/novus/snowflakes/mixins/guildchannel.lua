@@ -59,13 +59,13 @@ return function (_ENV)
     end
 
     local function blank_overwrite(channel, id, type)
-        channel[11][id] = {
+        channel.permission_overwrites[id] = {
              id = id
             ,type = type
             ,allow = perms.new()
             ,deny =  perms.new()
         }
-        return channel[11][id]
+        return channel.permission_overwrites[id]
     end
 
     local allowed = {
@@ -77,7 +77,7 @@ return function (_ENV)
         local id = snowflake.id(user_role)
         local typ = id and user_role.kind
         if typ and allowed[typ] then
-            return channel[11][id] or blank_overwrite(channel, id, typ)
+            return channel.permission_overwrites[id] or blank_overwrite(channel, id, typ)
         end
     end
 

@@ -184,7 +184,7 @@ function messages(state)
     local rec_timeout = state.options.receive_timeout or 60
     local err
     repeat
-        local success, message, op = xpcall(state.socket.receive, traceback, state.socket)
+        local success, message, op, code = xpcall(state.socket.receive, traceback, state.socket)
         if success and message ~= nil then
             local payload, cont = read_message(state, message, op)
             if cont then goto continue end
@@ -201,6 +201,8 @@ function messages(state)
                 disconnect(state, 4000, 'could not decode payload')
             break end
         elseif success and message == nil then
+            util.warn("%s", code and errno.strerror(code))
+            util.warn("%s %s %s", success, message, op)
             err = op
         elseif not success then
             err = message

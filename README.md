@@ -34,10 +34,7 @@ interface for developing lightweight discord bot applications.
 Currently the client and top-level have not been finished,
 you can test current functionality with the following:
 ```lua
-local util = require"novus.util"
 local client = require"novus.client"
-local cqueues = require"cqueues"
-local json = require"rapidjson"
 
 local myclient = client.create{
      token = "Bot "..os.getenv"TOKEN"
