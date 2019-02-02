@@ -1,3 +1,8 @@
+--- Discord REST api client.
+-- Dependencies: `novus.util`,  `novus.const`, `novus.util.mutex`, `novus.util.lpeg`, `novus.util.patterns`
+-- @module novus.api
+-- @alias _ENV
+
 --imports--
 local cqueues = require"cqueues"
 local errno = require"cqueues.errno"
@@ -21,11 +26,18 @@ local xpcall = xpcall
 local traceback = debug.traceback
 local type = type
 local tostring = tostring
-
+local _VERSION = _VERSION
 --start-module--
 local _ENV = {}
 
+--- (CONSTANT) The api URL the client uses connect.
+-- @string URL
+-- @within novus.api
 URL = const.api.endpoint
+
+--- (CONSTANT) The user-agent used to connect with. (mandated by discord)
+-- @string USER_AGENT
+-- @within novus.api
 USER_AGENT = ("DiscordBot (%s, %s) lua-version:\"%s\""):format(const.homepage,const.version, _VERSION )
 
 local BOUNDARY1 = "novus" .. util.rid()
@@ -92,6 +104,9 @@ end
 
 local token_check = lpeg.check(patterns.token * -1)
 
+--- Creates a new api state for connecting to discord.
+-- @tab options The options table. Must contain a `token` field with the api token to use.
+-- @treturn table The api state object.
 function init(options)
     local state = {}
     if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then
@@ -105,6 +120,16 @@ function init(options)
     return state
 end
 
+--- Makes a request to discord.
+-- @tab state The api state.
+-- @string method The HTTP method to use.
+-- @string endpoint The endpoint to connect to.
+-- @tab[opt={}] payload An optional payload for PUT/PATCH/POST requests.
+-- @tab[opt={}] query An optional table to convert into a url query string, appended to the URL.
+-- @tab[opt=nil] files An optional table of files to upload in a multi-part formdata request.
+-- @treturn boolean Whether the request succeeded.
+-- @treturn table The decoded JSON data returned by discord.
+-- @return An error if the request did not succeed.
 function request(state, method, endpoint, payload, query, files)
     if not cqueues.running() then
         return util.fatal("Please call REST methods asynchronously.")
@@ -269,6 +294,16 @@ local endpoints = {
     WEBHOOK_TOKEN_GITHUB          = "/webhooks/%u/%s/github",
     WEBHOOK_TOKEN_SLACK           = "/webhooks/%u/%s/slack",
 }
+
+--- Request a specific resource.
+-- Function name is the routepath in snake_case
+-- Please see the [discord api documentation](https://discordapp.com/developers/docs/reference) for requesting specific routes.
+-- @function route_path
+-- @tab state The api state.
+-- @param ... Parameters to the request
+-- @return @{api.request}
+-- @usage
+--  api.get_channel(state, id)
 
 function get_guild_audit_log(state, guild_id)
     local endpoint = endpoints.GUILD_AUDIT_LOGS:format(guild_id)

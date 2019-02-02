@@ -1,3 +1,24 @@
+--- Constant values.
+-- @module novus.const
+-- @alias _ENV
+
+--- The novus library version string.
+-- @string version
+-- @within novus.const
+
+--- The novus library homepage.
+-- @string homepage
+-- @within novus.const
+
+--- The gateway and api version the library is connecting to.
+-- @int api_version
+-- @within novus.const
+
+--- The cache lifetimes for kinds of snowflakes.
+-- @table lifetimes
+-- @number default The default lifetime.
+-- @within novus.const
+
 local setmetatable = setmetatable
 --start-module--
 local _ENV = {}

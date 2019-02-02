@@ -1,4 +1,5 @@
 --- Permission value utilities.
+-- Dependencies: `novus.util`
 -- @module novus.util.permission
 -- @alias _ENV
 -- @see novus.util

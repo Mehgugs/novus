@@ -6,6 +6,7 @@ dir = 'docs'
 pretty = 'lxsh'
 --prettify_files=true
 not_luadoc=true
+convert_opt=true
 use_markdown_titles = true
 topics = {'docs_topics/01-Introduction.md'}
 examples = {'./examples'}
@@ -19,4 +20,6 @@ kind_names={topic='Manual',module='Libraries'}
 tparam_alias('array','array')
 tparam_alias('pattern','lpeg-pattern')
 tparam_alias('int', 'integer')
+tparam_alias('tab', 'table')
+tparam_alias('view', 'View')
 alias('ret',{'return',modifiers={type="$1"}})

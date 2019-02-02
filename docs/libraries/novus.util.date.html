@@ -39,6 +39,10 @@
 
 <h2>Libraries</h2>
 <ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
   <li><a href="../libraries/novus.util.html">novus.util</a></li>
   <li><strong>novus.util.date</strong></li>
   <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
@@ -47,6 +51,7 @@
   <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
   <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
   <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
   <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
   <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
   <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
@@ -66,7 +71,7 @@
 <h1>Module <code>novus.util.date</code></h1>
 <p>Date and time utilities.</p>
 <p> This is a minimal copy of the penlight version.
- Dependencies: <code>novus.util.plcompat</code> <a href="../libraries/novus.util.uint.html#">novus.util.uint</a></p>
+ Dependencies: <a href="../libraries/novus.util.plcompat.html#">novus.util.plcompat</a> <a href="../libraries/novus.util.uint.html#">novus.util.uint</a></p>
     <h3>See also:</h3>
     <ul>
          <a href="../libraries/novus.util.html#">novus.util</a>
@@ -205,35 +210,35 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date.fromSnowflake">Date.fromSnowflake (id)</a></td>
-	<td class="summary">constructs a Date object from a discord snowflake id</td>
+	<td class="summary">Constructs a Date object from a discord snowflake id.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date:toISO">Date:toISO ()</a></td>
-	<td class="summary">converts a Date object to an ISO (8601) format timestamp.</td>
+	<td class="summary">Converts a Date object to an ISO (8601) format timestamp.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date.parseISO">Date.parseISO (str)</a></td>
-	<td class="summary">parsers an ISO (8601) format timestamp into a numerical timestamp.</td>
+	<td class="summary">Parses an ISO (8601) format timestamp into a numerical timestamp.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date.fromDateTableUTC">Date.fromDateTableUTC (str)</a></td>
-	<td class="summary">parses an ISO (8601) format timestamp into a date object.</td>
+	<td class="summary">Parses an ISO (8601) format timestamp into a date object.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date.fromDateTableUTC">Date.fromDateTableUTC (tbl)</a></td>
-	<td class="summary">alias for Date(tbl, true) which constructs a UTC date object</td>
+	<td class="summary">Alias for <code>Date(tbl, true)</code> which constructs a UTC date object.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date.fromHeader">Date.fromHeader (str)</a></td>
-	<td class="summary">parses a HTTP header into a Date object</td>
+	<td class="summary">Parses a HTTP header into a Date object.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date.parseTableUTC">Date.parseTableUTC (t)</a></td>
-	<td class="summary">parses a UTC date table into a timestamp</td>
+	<td class="summary">Parses a UTC date table into a timestamp.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#Date.parseHeader">Date.parseHeader (str)</a></td>
-	<td class="summary">parses a HTTP header into a timestamp</td>
+	<td class="summary">Parses a HTTP header into a timestamp.</td>
 	</tr>
 </table>
 
@@ -871,7 +876,7 @@ in which case current values will be used.</li>
     <strong>Date.fromSnowflake (id)</strong>
     </dt>
     <dd>
-    constructs a Date object from a discord snowflake id
+    Constructs a Date object from a discord snowflake id.
 
 
     <h3>Parameters:</h3>
@@ -897,7 +902,7 @@ in which case current values will be used.</li>
     <strong>Date:toISO ()</strong>
     </dt>
     <dd>
-    converts a Date object to an ISO (8601) format timestamp.
+    Converts a Date object to an ISO (8601) format timestamp.
 
 
 
@@ -917,7 +922,7 @@ in which case current values will be used.</li>
     <strong>Date.parseISO (str)</strong>
     </dt>
     <dd>
-    parsers an ISO (8601) format timestamp into a numerical timestamp.
+    Parses an ISO (8601) format timestamp into a numerical timestamp.
 
 
     <h3>Parameters:</h3>
@@ -944,7 +949,7 @@ in which case current values will be used.</li>
     <strong>Date.fromDateTableUTC (str)</strong>
     </dt>
     <dd>
-    parses an ISO (8601) format timestamp into a date object.
+    Parses an ISO (8601) format timestamp into a date object.
 
 
     <h3>Parameters:</h3>
@@ -971,12 +976,13 @@ in which case current values will be used.</li>
     <strong>Date.fromDateTableUTC (tbl)</strong>
     </dt>
     <dd>
-    alias for Date(tbl, true) which constructs a UTC date object
+    Alias for <code>Date(tbl, true)</code> which constructs a UTC date object.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">tbl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          A date table in the same format as the constructor.
         </li>
     </ul>
@@ -997,12 +1003,13 @@ in which case current values will be used.</li>
     <strong>Date.fromHeader (str)</strong>
     </dt>
     <dd>
-    parses a HTTP header into a Date object
+    Parses a HTTP header into a Date object.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          The header string.
         </li>
     </ul>
@@ -1023,12 +1030,13 @@ in which case current values will be used.</li>
     <strong>Date.parseTableUTC (t)</strong>
     </dt>
     <dd>
-    parses a UTC date table into a timestamp
+    Parses a UTC date table into a timestamp.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          A date table for <a href="https://www.lua.org/manual/5.3/manual.html#pdf-os.time">os.time</a>.
         </li>
     </ul>
@@ -1049,12 +1057,13 @@ in which case current values will be used.</li>
     <strong>Date.parseHeader (str)</strong>
     </dt>
     <dd>
-    parses a HTTP header into a timestamp
+    Parses a HTTP header into a timestamp.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          the header string.
         </li>
     </ul>
@@ -1077,7 +1086,7 @@ in which case current values will be used.</li>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+<i style="float:right;">Last updated 2019-02-02 17:55:03 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

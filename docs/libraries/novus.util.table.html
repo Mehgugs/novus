@@ -39,6 +39,10 @@
 
 <h2>Libraries</h2>
 <ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
   <li><a href="../libraries/novus.util.html">novus.util</a></li>
   <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
   <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
@@ -47,6 +51,7 @@
   <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
   <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
   <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
   <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
   <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
   <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
@@ -65,8 +70,7 @@
 
 <h1>Module <code>novus.util.table</code></h1>
 <p>Table utilities.</p>
-<p>
-</p>
+<p> Dependencies: <a href="../libraries/novus.util.func.html#">novus.util.func</a></p>
     <h3>See also:</h3>
     <ul>
          <a href="../libraries/novus.util.html#">novus.util</a>
@@ -151,12 +155,12 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">A</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
         </li>
         <li><span class="parameter">B</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
         </li>
@@ -189,7 +193,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">...</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          Tables to merge
         </li>
     </ul>
@@ -216,11 +220,11 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">t</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          The table to merge onto.
         </li>
         <li><span class="parameter">...</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          Tables to merge.
         </li>
     </ul>
@@ -247,7 +251,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">a</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          The table to lazily copy
         </li>
     </ul>
@@ -274,7 +278,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">...</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          Tables to lazily copy from.
         </li>
     </ul>
@@ -305,7 +309,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">t</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          The table to copy.
         </li>
     </ul>
@@ -332,7 +336,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">t</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          The table to deeply copy.
         </li>
     </ul>
@@ -391,7 +395,7 @@ T.foo <span class="comment">--&gt; "novus"</span></pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">t</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
         </li>
@@ -423,12 +427,12 @@ T.foo <span class="comment">--&gt; "novus"</span></pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">U</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
         </li>
         <li><span class="parameter">w</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
         </li>
@@ -457,7 +461,7 @@ T.foo <span class="comment">--&gt; "novus"</span></pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">t</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
         </li>
@@ -485,7 +489,7 @@ T.foo <span class="comment">--&gt; "novus"</span></pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">t</span>
-            <span class="types"><span class="type">tab</span></span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
 
 
         </li>
@@ -552,7 +556,7 @@ T.foo <span class="comment">--&gt; "novus"</span></pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+<i style="float:right;">Last updated 2019-02-02 17:55:03 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

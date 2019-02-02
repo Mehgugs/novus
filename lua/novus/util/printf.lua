@@ -111,28 +111,30 @@ local function writef(ifd,...)
     if fd then
         fd:write(raw:gsub("$[^;]+;", ""), "\n")
     end
-    return ifd:write(str, n > 0 and "\27[0m\n" or "\n")
+    if ifd then
+        ifd:write(str, n > 0 and "\27[0m\n" or "\n")
+    end
 end
 
 --- Logs to stdout, and the output file if set, using the INF info channel.
 -- @string str A format string
 -- @param[opt] ... Values passed into `string.format`.
 function info(...)
-    return writef(stdout, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
+    return writef(nil, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
 end
 
 --- Logs to stdout, and the output file if set, using the WRN warning channel.
 -- @string str A format string
 -- @param[opt] ... Values passed into `string.format`.
 function warn(...)
-    return writef(stdout, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
+    return writef(nil, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
 end
 
 --- Logs to stdout, and the output file if set, using the ERR error channel.
 -- @string str A format string
 -- @param[opt] ... Values passed into `string.format`.
 function error(...)
-    return writef(stderr, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
+    return writef(nil, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
 end
 
 --- Logs an error using `printf.error` and then throws a lua error with the same message.

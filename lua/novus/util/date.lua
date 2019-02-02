@@ -360,21 +360,21 @@ end
 -- Discord related extensions to the pl.Date class --
 
 
---- constructs a Date object from a discord snowflake id
+--- Constructs a Date object from a discord snowflake id.
 -- @param id either a `string` id or a `number` (encoded uint64) id.
 -- @treturn Date object
 function Date.fromSnowflake(id)
     return Date(uint.timestamp(id), true)
 end
 
---- converts a Date object to an ISO (8601) format timestamp.
+--- Converts a Date object to an ISO (8601) format timestamp.
 -- @treturn string The timestamp
 function Date:toISO()
 	return os_date('!%FT%T', self.time) .. '+00:00'
 end
 
---- parsers an ISO (8601) format timestamp into a numerical timestamp.
--- @tparam string str the ISO string.
+--- Parses an ISO (8601) format timestamp into a numerical timestamp.
+-- @string str the ISO string.
 -- @treturn number The timestamp.
 function Date.parseISO(str)
 	local year, month, day, hour, min, sec, other = str:match(
@@ -386,15 +386,15 @@ function Date.parseISO(str)
 	}
 end
 
---- parses an ISO (8601) format timestamp into a date object.
--- @tparam string str the ISO string.
+--- Parses an ISO (8601) format timestamp into a date object.
+-- @string str the ISO string.
 -- @treturn Date object
 function Date.fromDateTableUTC(str)
     return Date(Date.parseISO(str), true)
 end
 
---- alias for Date(tbl, true) which constructs a UTC date object
--- @param tbl A date table in the same format as the constructor.
+--- Alias for `Date(tbl, true)` which constructs a UTC date object.
+-- @tab tbl A date table in the same format as the constructor.
 -- @treturn Date object
 function Date.fromDateTableUTC(tbl)
     return Date(tbl, true)
@@ -405,8 +405,8 @@ local months = {
 	Jul = 7, Aug = 8, Sep = 9, Oct = 10, Nov = 11, Dec = 12
 }
 
---- parses a HTTP header into a Date object
--- @param str The header string.
+--- Parses a HTTP header into a Date object.
+-- @string str The header string.
 -- @treturn Date object
 function Date.fromHeader(str)
 	local day, month, year, hour, min, sec = str:match(
@@ -422,15 +422,15 @@ local function offset()
     return os_difftime(os_time(), os_time(os_date('!*t')))
 end
 
---- parses a UTC date table into a timestamp
--- @param t A date table for `os.time`.
+--- Parses a UTC date table into a timestamp.
+-- @tab t A date table for `os.time`.
 -- @treturn number The timestamp
 function Date.parseTableUTC(t)
     return os_time(t) + offset()
 end
 
---- parses a HTTP header into a timestamp
--- @param str the header string.
+--- Parses a HTTP header into a timestamp.
+-- @string str the header string.
 -- @treturn number The timestamp
 function Date.parseHeader(str)
 	local day, month, year, hour, min, sec = str:match(

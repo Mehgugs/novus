@@ -1,4 +1,5 @@
 --- Table utilities.
+-- Dependencies: `novus.util.func`
 -- @module novus.util.table
 -- @see novus.util
 -- @alias _ENV

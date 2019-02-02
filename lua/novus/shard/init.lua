@@ -1,3 +1,7 @@
+--- The gateway websocket connection container.
+-- Dependencies: `novus.util`, `novus.const`, `novus.util.mutex`, `novus.util.lpeg`, `novus.util.patterns`
+-- @module novus.shard
+
 --imports--
 local cqueues = require"cqueues"
 local cond = require"cqueues.condition"

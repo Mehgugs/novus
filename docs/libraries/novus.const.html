@@ -33,9 +33,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
-<li><a href="#Tables">Tables</a></li>
-<li><a href="#Mutex">Mutex</a></li>
+<li><a href="#novus_const">novus.const</a></li>
 </ul>
 
 
@@ -43,14 +41,14 @@
 <ul class="nowrap">
   <li><a href="../libraries/novus.api.html">novus.api</a></li>
   <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
-  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><strong>novus.const</strong></li>
   <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
   <li><a href="../libraries/novus.util.html">novus.util</a></li>
   <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
   <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
   <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
   <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><strong>novus.util.mutex</strong></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
   <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
   <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
   <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
@@ -70,43 +68,29 @@
 
 <div id="content">
 
-<h1>Module <code>novus.util.mutex</code></h1>
-<p>A minimal mutex implementation.</p>
+<h1>Module <code>novus.const</code></h1>
+<p>Constant values.</p>
 <p>
 </p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../libraries/novus.util.html#">novus.util</a>
-    </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#novus_const">novus.const</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#new">new ()</a></td>
-	<td class="summary">Creates a new mutex</td>
-	</tr>
-</table>
-<h2><a href="#Tables">Tables</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#Mutex">Mutex</a></td>
-	<td class="summary">Mutex Object.</td>
-	</tr>
-</table>
-<h2><a href="#Mutex">Mutex</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#Mutex:lock">Mutex:lock ([timeout])</a></td>
-	<td class="summary">Locks the mutex.</td>
+	<td class="name" nowrap><a href="#version">version</a></td>
+	<td class="summary">The novus library version string.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Mutex:lock">Mutex:lock ()</a></td>
-	<td class="summary">Unlocks the mutex.</td>
+	<td class="name" nowrap><a href="#homepage">homepage</a></td>
+	<td class="summary">The novus library homepage.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Mutex:unlockAfter">Mutex:unlockAfter (time)</a></td>
-	<td class="summary">Unlocks the mutex after the specified time in seconds.</td>
+	<td class="name" nowrap><a href="#api_version">api_version</a></td>
+	<td class="summary">The gateway and api version the library is connecting to.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#lifetimes">lifetimes</a></td>
+	<td class="summary">The cache lifetimes for kinds of snowflakes.</td>
 	</tr>
 </table>
 
@@ -114,112 +98,85 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="novus_const"></a>novus.const</h2>
 
     <dl class="function">
     <dt>
-    <a name = "new"></a>
-    <strong>new ()</strong>
+    <a name = "version"></a>
+    <strong>version</strong>
     </dt>
     <dd>
-    Creates a new mutex
+    The novus library version string.
 
 
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../libraries/novus.util.mutex.html#Mutex">Mutex</a></span>
+    <ul>
+        <li><span class="parameter">version</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
 
 
-    </ol>
+        </li>
+    </ul>
+
 
 
 
 
 </dd>
-</dl>
-    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
-
-    <dl class="function">
     <dt>
-    <a name = "Mutex"></a>
-    <strong>Mutex</strong>
+    <a name = "homepage"></a>
+    <strong>homepage</strong>
     </dt>
     <dd>
-    Mutex Object.
+    The novus library homepage.
+
+
+    <ul>
+        <li><span class="parameter">homepage</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "api_version"></a>
+    <strong>api_version</strong>
+    </dt>
+    <dd>
+    The gateway and api version the library is connecting to.
+
+
+    <ul>
+        <li><span class="parameter">api_version</span>
+            <span class="types"><span class="type">integer</span></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "lifetimes"></a>
+    <strong>lifetimes</strong>
+    </dt>
+    <dd>
+    The cache lifetimes for kinds of snowflakes.
 
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">cond</span>
-         The condition variable.
-        </li>
-        <li><span class="parameter">inuse</span>
-            <span class="types"><span class="type">bool</span></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Mutex"></a>Mutex</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "Mutex:lock"></a>
-    <strong>Mutex:lock ([timeout])</strong>
-    </dt>
-    <dd>
-    Locks the mutex.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">timeout</span>
+        <li><span class="parameter">default</span>
             <span class="types"><span class="type">number</span></span>
-         an optional timeout to wait.
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Mutex:lock"></a>
-    <strong>Mutex:lock ()</strong>
-    </dt>
-    <dd>
-    Unlocks the mutex.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Mutex:unlockAfter"></a>
-    <strong>Mutex:unlockAfter (time)</strong>
-    </dt>
-    <dd>
-    Unlocks the mutex after the specified time in seconds.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">time</span>
-            <span class="types"><span class="type">number</span></span>
-         The time to unlock after, in seconds.
+         The default lifetime.
         </li>
     </ul>
 

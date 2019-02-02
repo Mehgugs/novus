@@ -1,6 +1,5 @@
 --- Provides the relabel module from lpeglabel.
 -- Some extra syntax is added to make some re constructs terser.
--- `require"novus.util.relabel+"`.
 -- @module novus.util.relabel
 -- @see novus.util
 

@@ -1,4 +1,5 @@
 --- Unsigned integer encoding and utilities.
+-- Dependencies: `novus.util.lpeg`, `novus.const`
 -- @module novus.util.uint
 -- @alias _ENV
 -- @see novus.util

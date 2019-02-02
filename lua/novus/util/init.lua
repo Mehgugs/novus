@@ -1,4 +1,8 @@
 --- Utilities.
+-- Dependencies: `novus.util.string`, `novus.util.table`.
+--
+-- This module has an `__index` metamethod which will load other utilities:
+-- `util.lpeg` loads `novus.util.lpeg`.
 -- @module novus.util
 -- @alias _ENV
 

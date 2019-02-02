@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#novus_api">novus.api</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><strong>novus.api</strong></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.api</code></h1>
+<p>Discord REST api client.</p>
+<p> Dependencies: <a href="../libraries/novus.util.html#">novus.util</a>,  <a href="../libraries/novus.const.html#">novus.const</a>, <a href="../libraries/novus.util.mutex.html#">novus.util.mutex</a>, <a href="../libraries/novus.util.lpeg.html#">novus.util.lpeg</a>, <a href="../libraries/novus.util.patterns.html#">novus.util.patterns</a></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#init">init (options)</a></td>
+	<td class="summary">Creates a new api state for connecting to discord.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#request">request (state, method, endpoint[, payload={}][, query={}][, files=nil])</a></td>
+	<td class="summary">Makes a request to discord.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#route_path">route_path (state, ...)</a></td>
+	<td class="summary">Request a specific resource.</td>
+	</tr>
+</table>
+<h2><a href="#novus_api">novus.api</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#URL">URL</a></td>
+	<td class="summary">(CONSTANT) The api URL the client uses connect.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#USER_AGENT">USER_AGENT</a></td>
+	<td class="summary">(CONSTANT) The user-agent used to connect with.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "init"></a>
+    <strong>init (options)</strong>
+    </dt>
+    <dd>
+    Creates a new api state for connecting to discord.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">options</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The options table. Must contain a <code>token</code> field with the api token to use.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The api state object.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "request"></a>
+    <strong>request (state, method, endpoint[, payload={}][, query={}][, files=nil])</strong>
+    </dt>
+    <dd>
+    Makes a request to discord.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">state</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The api state.
+        </li>
+        <li><span class="parameter">method</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The HTTP method to use.
+        </li>
+        <li><span class="parameter">endpoint</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The endpoint to connect to.
+        </li>
+        <li><span class="parameter">payload</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         An optional payload for PUT/PATCH/POST requests.
+         (<em>default</em> {})
+        </li>
+        <li><span class="parameter">query</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         An optional table to convert into a url query string, appended to the URL.
+         (<em>default</em> {})
+        </li>
+        <li><span class="parameter">files</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         An optional table of files to upload in a multi-part formdata request.
+         (<em>default</em> nil)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">boolean</span></span>
+        Whether the request succeeded.</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The decoded JSON data returned by discord.</li>
+        <li>
+        An error if the request did not succeed.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "route_path"></a>
+    <strong>route_path (state, ...)</strong>
+    </dt>
+    <dd>
+    Request a specific resource.
+ Function name is the routepath in snake_case
+ Please see the <a href="https://discordapp.com/developers/docs/reference">discord api documentation</a> for requesting specific routes.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">state</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The api state.
+        </li>
+        <li><span class="parameter">...</span>
+         Parameters to the request
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        <a href="../libraries/novus.api.html#request">api.request</a>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">api.get_channel(state, id)</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="novus_api"></a>novus.api</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "URL"></a>
+    <strong>URL</strong>
+    </dt>
+    <dd>
+    (CONSTANT) The api URL the client uses connect.
+
+
+    <ul>
+        <li><span class="parameter">URL</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "USER_AGENT"></a>
+    <strong>USER_AGENT</strong>
+    </dt>
+    <dd>
+    (CONSTANT) The user-agent used to connect with.  (mandated by discord)
+
+
+    <ul>
+        <li><span class="parameter">USER_AGENT</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 17:55:03 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

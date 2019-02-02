@@ -1,10 +1,13 @@
+--- Compatability modules for penlight based dependencies.
+-- @module novus.util.plcompat
+
 --imports--
 local error = error
 local getmetatable, setmetatable = getmetatable, setmetatable
-local io = io 
-local pairs = pairs 
-local rawget, rawset = rawget, rawset 
-local tostring = tostring 
+local io = io
+local pairs = pairs
+local rawget, rawset = rawget, rawset
+local tostring = tostring
 local type = type
 --start-module--
 local _ENV = {}
@@ -152,7 +155,7 @@ local function _class(base,c_arg,c)
     return c
 end
 
-class = setmetatable({}, {__call = function(_, ...) 
+class = setmetatable({}, {__call = function(_, ...)
     return _class(...)
 end})
 
@@ -183,7 +186,7 @@ function class.properties._class_init(klass)
     end
 end
 
--- assertion functions from pl.utils -- 
+-- assertion functions from pl.utils --
 
 function assert_arg (n,val,tp,verify,msg,lev)
     if type(val) ~= tp then

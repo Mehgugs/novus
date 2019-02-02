@@ -1,4 +1,5 @@
 --- String utilities.
+-- Dependencies: `novus.util.table`
 -- @module novus.util.string
 -- @alias _ENV
 -- @see novus.util

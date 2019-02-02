@@ -1,4 +1,5 @@
 --- Various Lpeg patterns for discord related parsing.
+-- Dependencies: `novus.util.lpeg`, `novus.util.relabel`, `novus.util.uint`
 -- @module novus.util.patterns
 -- @alias _ENV
 -- @see novus.util
