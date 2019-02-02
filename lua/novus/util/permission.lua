@@ -1,3 +1,8 @@
+--- Permission value utilities.
+-- @module novus.util.permission
+-- @alias _ENV
+-- @see novus.util
+
 --imports--
 local util = require"novus.util"
 local setmetatable = setmetatable
@@ -8,6 +13,10 @@ local insert = table.insert
 --start-module--
 local _ENV = setmetatable({}, {__call = function(self,...) return self.ctor(...) end})
 
+--- Contains individual permissions.
+-- See the [discord api documentation](https://discordapp.com/developers/docs/topics/permissions) for more information.
+-- @table permissions
+-- @within novus.util.permission
 permissions = util.reflect{
     createInstantInvite = 0x00000001,
     kickMembers         = 0x00000002,
@@ -40,6 +49,14 @@ permissions = util.reflect{
     manageEmojis        = 0x40000000
 }
 
+--- Converts a string permission name to a permission integer,
+-- does nothing to permission integers.
+-- @tparam integer|string num_or_str Input value.
+-- @treturn[1] integer The permission integer
+-- @treturn[2] nil Nil if there is no corresponding integer.
+-- @within novus.util.permission
+-- @usage
+--  permission.to_permission("administrator") --> 0x8
 function to_permission(num_or_str)
     if type(num_or_str) == 'number' and permissions[num_or_str] then
         return num_or_str
@@ -48,17 +65,38 @@ function to_permission(num_or_str)
     end
 end
 
+--- Resolves a permission placeholer into its value.
+-- @tparam Placeholder|integer p The permission value.
+-- @treturn integer The numerical permission value.
+-- @within novus.util.permission
 function resolve(p)
     return type(p) == 'table' and p.value or p
 end
 
+--- The permission value for no permissions set.
+-- @tparam integer NONE
+-- @within novus.util.permission
 NONE = 0
+
+--- The permission value for all permissions set.
+-- @tparam integer ALL
+-- @within novus.util.permission
 ALL = 0 for value in pairs(permissions) do ALL = ALL | to_permission(value) end
 
 local function to_permission_fuzzy(s)
     return to_permission(s) or NONE
 end
 
+--- Given a vararg list of permission names / integers,
+-- returns the permission integer for each.
+-- Calling the module table will call this via a metamethod.
+-- Unrecognized values are coerced to @{permission.NONE}.
+-- @tparam integer|string ... Permission integers or permission names.
+-- @treturn integer The permission integers.
+-- @within novus.util.permission
+-- @usage
+--  permission.ctor('sendMessages', 'administrator') --> 0x800, 0x008
+--  permission"sendMessages" --> 0x800
 function ctor(...)
     return util.vmap(to_permission_fuzzy, ...)
 end
@@ -68,36 +106,94 @@ local function band(a,b) return a & b end
 local function bxor(a,b) return a ~ b end
 local function bnotand(a,b) return (~a & b) end
 local function bandnot(a,b) return (a & ~b) end
+
+--- Given a vararg list of permission names / integers,
+-- returns the permission value for the list.
+-- @tparam integer|string ... Permission integers or permission names.
+-- @treturn number The permission values.
+-- @within novus.util.permission
+-- @usage
+--  permission.construct('sendMessages', 'administrator') --> 0x808
 function construct(...)
     return util.vfold(bor, ctor(...))
 end
 
+--- Given a vararg list of permission values,
+-- returns their union.
+-- @tparam integer ... Permission values.
+-- @treturn number The permission value.
+-- @within novus.util.permission
+-- @usage
+--  permission.union(0x808, permission"viewAuditLog") --> 0x888
 function union(...)
     return util.vfold(bor, ...)
 end
 
+--- Given a vararg list of permission values,
+-- returns their intersection.
+-- @tparam integer ... Permission values.
+-- @treturn number The permission value.
+-- @within novus.util.permission
+-- @usage
+--  permission.intersection(0x808, permission"administrator") --> 0x008
 function intersection(...)
     return util.vfold(band, ...)
 end
 
+--- Given a vararg list of permission values,
+-- removes values which are in both. (exlusive union)
+-- @tparam integer ... Permission values.
+-- @treturn number The permission value.
+-- @within novus.util.permission
+-- @usage
+--  permission.unique(0x808, 0x88) --> 0x880
 function unique( ... )
     return util.vfold(bxor, ...)
 end
 
+--- Given a permission value `a` and a vararg list of permission values,
+-- returns `a` without the permission values in the vararg.
+-- @tparam integer a permission to substract from.
+-- @tparam integer ... Permission values.
+-- @treturn number The permission value.
+-- @within novus.util.permission
+-- @usage
+--  permission.complement(0x808, 0x8) --> 0x800
 function complement(a,...)
     if ... == nil then return ~a & ALL else
     return util.vfold(bandnot, a, ...)
     end
 end
 
+--- Given a permission value `p` and a vararg list of permissions,
+-- sets the permissions (BORs them with `p`).
+-- @tparam integer p The permission value.
+-- @tparam integer ... Permissions.
+-- @treturn number The permission value.
+-- @within novus.util.permission
+-- @usage
+--  permission.enable(0x800, 'viewAuditLog', 'administrator') --> 0x888
 function enable(p ,...)
     return util.vfold(bor, p, ctor(...))
 end
 
+--- Given a permission value `p` and a vararg list of permissions,
+-- clears the permissions (BANDNOTs them with `p`).
+-- @tparam integer p The permission value.
+-- @tparam integer ... Permissions.
+-- @treturn number The permission value.
+-- @within novus.util.permission
+-- @usage
+--  permission.disable(0x888, 'viewAuditLog', 'administrator') --> 0x800
 function disable(p, ...)
     return util.vfold(bandnot, p, ctor(...))
 end
 
+--- Checks if the permission value `p` contains the permission value `v`.
+-- @tparam integer p The permission value to check against.
+-- @tparam integer v The permission value to check.
+-- @treturn boolean
+-- @within novus.util.permission
 function has(p, v)
     v = v
     return v and p & v == v
@@ -114,10 +210,23 @@ local function contains_worker(p, n, a, ...)
     end
 end
 
+--- Checks if the permission value `p` contains the provided permissions.
+-- @tparam integer p The permission value to check against.
+-- @tparam nmber|string ... The permissions to check.
+-- @treturn boolean
+-- @within novus.util.permission
+-- @usage
+--  permission.contains(0x888, 'administrator', 'sendMessages', 'viewAuditlog') --> true
 function contains(p, ...)
     return contains_worker(resolve(p),select('#', ...), ...)
 end
 
+--- Returns an array of all the permission names contained within a permission value.
+-- @tparam integer p The permission value to decompose.
+-- @treturn table The array of permissions.
+-- @within novus.util.permission
+-- @usage
+--  permission.decompose(0x888) --> {'administrator', 'sendMessages', 'viewAuditlog'}
 function decompose(p)
     p = resolve(p)
     local out = {}
@@ -130,6 +239,18 @@ function decompose(p)
     end
     return out
 end
+
+--- A permission placeholder value. This is a stateful container for a permission value.
+-- You can use a `Placeholder` as a **permission value** in any of this module's functions.
+-- @table Placeholder
+-- @see permission.new
+-- @int value The current permission value.
+-- @usage
+--  placeholder = permission.new()
+--  placeholder:enable('administrator', 'sendMessages', 'viewAuditlog')
+--  placeholder:decompose() --> {'administrator', 'sendMessages', 'viewAuditlog'}
+--  placeholder.value --> 0x888
+
 
 placeholder = {}
 
@@ -185,6 +306,9 @@ function placeholder:__tostring()
     return ("%s: %#x"):format(placeholder.__name, self.value)
 end
 
+--- Constructs a new `Placeholder`.
+-- @int[opt] value Inital permission value.
+-- @within novus.util.permission
 function new(value)
     return setmetatable({
          value = resolve(value) or NONE

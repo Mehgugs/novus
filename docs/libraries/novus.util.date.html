@@ -1,0 +1,1086 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><strong>novus.util.date</strong></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.date</code></h1>
+<p>Date and time utilities.</p>
+<p> This is a minimal copy of the penlight version.
+ Dependencies: <code>novus.util.plcompat</code> <a href="../libraries/novus.util.uint.html#">novus.util.uint</a></p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Date">Date (t, ...)</a></td>
+	<td class="summary">Date constructor.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:set">Date:set (t)</a></td>
+	<td class="summary">set the current time of this Date object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.tzone">Date.tzone (ts)</a></td>
+	<td class="summary">get the time zone offset from UTC.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:toUTC">Date:toUTC ()</a></td>
+	<td class="summary">convert this date to UTC.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:toLocal">Date:toLocal ()</a></td>
+	<td class="summary">convert this UTC date to local.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:year">Date:year (y)</a></td>
+	<td class="summary">set the year.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:month">Date:month (m)</a></td>
+	<td class="summary">set the month.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:day">Date:day (d)</a></td>
+	<td class="summary">set the day.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:hour">Date:hour (h)</a></td>
+	<td class="summary">set the hour.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:min">Date:min (min)</a></td>
+	<td class="summary">set the minutes.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:sec">Date:sec (sec)</a></td>
+	<td class="summary">set the seconds.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:yday">Date:yday (yday)</a></td>
+	<td class="summary">set the day of year.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:year">Date:year (y)</a></td>
+	<td class="summary">get the year.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:month">Date:month ()</a></td>
+	<td class="summary">get the month.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:day">Date:day ()</a></td>
+	<td class="summary">get the day.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:hour">Date:hour ()</a></td>
+	<td class="summary">get the hour.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:min">Date:min ()</a></td>
+	<td class="summary">get the minutes.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:sec">Date:sec ()</a></td>
+	<td class="summary">get the seconds.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:yday">Date:yday ()</a></td>
+	<td class="summary">get the day of year.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:weekday_name">Date:weekday_name (full)</a></td>
+	<td class="summary">name of day of week.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:month_name">Date:month_name (full)</a></td>
+	<td class="summary">name of month.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:is_weekend">Date:is_weekend ()</a></td>
+	<td class="summary">is this day on a weekend?.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:add">Date:add (t)</a></td>
+	<td class="summary">add to a date object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:last_day">Date:last_day ()</a></td>
+	<td class="summary">last day of the month.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:diff">Date:diff (other)</a></td>
+	<td class="summary">difference between two Date objects.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:__tostring">Date:__tostring ()</a></td>
+	<td class="summary">long numerical ISO data format version of this date.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:__eq">Date:__eq (other)</a></td>
+	<td class="summary">equality between Date objects.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:__lt">Date:__lt (other)</a></td>
+	<td class="summary">ordering between Date objects.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:__sub">Date:__sub ()</a></td>
+	<td class="summary">difference between Date objects.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:__add">Date:__add (other)</a></td>
+	<td class="summary">add a date and an interval.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.Interval">Date.Interval (t)</a></td>
+	<td class="summary">Date.Interval constructor</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.Interval:__tostring">Date.Interval:__tostring ()</a></td>
+	<td class="summary">If it&rsquo;s an interval then the format is &lsquo;2 hours 29 sec&rsquo; etc.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.fromSnowflake">Date.fromSnowflake (id)</a></td>
+	<td class="summary">constructs a Date object from a discord snowflake id</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date:toISO">Date:toISO ()</a></td>
+	<td class="summary">converts a Date object to an ISO (8601) format timestamp.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.parseISO">Date.parseISO (str)</a></td>
+	<td class="summary">parsers an ISO (8601) format timestamp into a numerical timestamp.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.fromDateTableUTC">Date.fromDateTableUTC (str)</a></td>
+	<td class="summary">parses an ISO (8601) format timestamp into a date object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.fromDateTableUTC">Date.fromDateTableUTC (tbl)</a></td>
+	<td class="summary">alias for Date(tbl, true) which constructs a UTC date object</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.fromHeader">Date.fromHeader (str)</a></td>
+	<td class="summary">parses a HTTP header into a Date object</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.parseTableUTC">Date.parseTableUTC (t)</a></td>
+	<td class="summary">parses a UTC date table into a timestamp</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Date.parseHeader">Date.parseHeader (str)</a></td>
+	<td class="summary">parses a HTTP header into a timestamp</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Date"></a>
+    <strong>Date (t, ...)</strong>
+    </dt>
+    <dd>
+    Date constructor.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+        <p> this can be either</p>
+
+<ul>
+<li> <code>nil</code> or empty &ndash; use current date and time</li>
+<li> number &ndash; seconds since epoch (as returned by <a href="https://www.lua.org/manual/5.3/manual.html#pdf-os.time">os.time</a>). Resulting time is UTC</li>
+<li> <a href="../libraries/novus.util.date.html#Date">Date</a> &ndash; make a copy of this date</li>
+<li> table &ndash; table containing year, month, etc as for <a href="https://www.lua.org/manual/5.3/manual.html#pdf-os.time">os.time</a>. You may leave out year, month or day,
+in which case current values will be used.</li>
+<li> year (will be followed by month, day etc)</li>
+</ul>
+
+
+        </li>
+        <li><span class="parameter">...</span>
+          true if  Universal Coordinated Time, or two to five numbers: month,day,hour,min,sec
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:set"></a>
+    <strong>Date:set (t)</strong>
+    </dt>
+    <dd>
+    set the current time of this Date object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">integer</span></span>
+         seconds since epoch
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.tzone"></a>
+    <strong>Date.tzone (ts)</strong>
+    </dt>
+    <dd>
+    get the time zone offset from UTC.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ts</span>
+            <span class="types"><span class="type">integer</span></span>
+         seconds ahead of UTC
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:toUTC"></a>
+    <strong>Date:toUTC ()</strong>
+    </dt>
+    <dd>
+    convert this date to UTC.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:toLocal"></a>
+    <strong>Date:toLocal ()</strong>
+    </dt>
+    <dd>
+    convert this UTC date to local.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:year"></a>
+    <strong>Date:year (y)</strong>
+    </dt>
+    <dd>
+    set the year.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">integer</span></span>
+         Four-digit year
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:month"></a>
+    <strong>Date:month (m)</strong>
+    </dt>
+    <dd>
+    set the month.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">m</span>
+            <span class="types"><span class="type">integer</span></span>
+         month
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:day"></a>
+    <strong>Date:day (d)</strong>
+    </dt>
+    <dd>
+    set the day.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">d</span>
+            <span class="types"><span class="type">integer</span></span>
+         day
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:hour"></a>
+    <strong>Date:hour (h)</strong>
+    </dt>
+    <dd>
+    set the hour.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">h</span>
+            <span class="types"><span class="type">integer</span></span>
+         hour
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:min"></a>
+    <strong>Date:min (min)</strong>
+    </dt>
+    <dd>
+    set the minutes.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">min</span>
+            <span class="types"><span class="type">integer</span></span>
+         minutes
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:sec"></a>
+    <strong>Date:sec (sec)</strong>
+    </dt>
+    <dd>
+    set the seconds.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sec</span>
+            <span class="types"><span class="type">integer</span></span>
+         seconds
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:yday"></a>
+    <strong>Date:yday (yday)</strong>
+    </dt>
+    <dd>
+    set the day of year.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">yday</span>
+            <span class="types"><span class="type">integer</span></span>
+         day of year
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:year"></a>
+    <strong>Date:year (y)</strong>
+    </dt>
+    <dd>
+    get the year.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">integer</span></span>
+         Four-digit year
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:month"></a>
+    <strong>Date:month ()</strong>
+    </dt>
+    <dd>
+    get the month.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:day"></a>
+    <strong>Date:day ()</strong>
+    </dt>
+    <dd>
+    get the day.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:hour"></a>
+    <strong>Date:hour ()</strong>
+    </dt>
+    <dd>
+    get the hour.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:min"></a>
+    <strong>Date:min ()</strong>
+    </dt>
+    <dd>
+    get the minutes.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:sec"></a>
+    <strong>Date:sec ()</strong>
+    </dt>
+    <dd>
+    get the seconds.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:yday"></a>
+    <strong>Date:yday ()</strong>
+    </dt>
+    <dd>
+    get the day of year.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:weekday_name"></a>
+    <strong>Date:weekday_name (full)</strong>
+    </dt>
+    <dd>
+    name of day of week.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">full</span>
+            <span class="types"><span class="type">bool</span></span>
+         abbreviated if true, full otherwise.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        name
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:month_name"></a>
+    <strong>Date:month_name (full)</strong>
+    </dt>
+    <dd>
+    name of month.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">full</span>
+            <span class="types"><span class="type">integer</span></span>
+         abbreviated if true, full otherwise.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        name
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:is_weekend"></a>
+    <strong>Date:is_weekend ()</strong>
+    </dt>
+    <dd>
+    is this day on a weekend?.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:add"></a>
+    <strong>Date:add (t)</strong>
+    </dt>
+    <dd>
+    add to a date object.
+ one of <a href="../libraries/novus.util.date.html#Date:year">year</a>,<a href="../libraries/novus.util.date.html#Date:month">month</a>,<a href="../libraries/novus.util.date.html#Date:day">day</a>,<a href="../libraries/novus.util.date.html#Date:hour">hour</a>,<a href="../libraries/novus.util.date.html#Date:min">min</a>,<a href="../libraries/novus.util.date.html#Date:sec">sec</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         a table containing one of the following keys and a value:
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        this date
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:last_day"></a>
+    <strong>Date:last_day ()</strong>
+    </dt>
+    <dd>
+    last day of the month.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        int day
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:diff"></a>
+    <strong>Date:diff (other)</strong>
+    </dt>
+    <dd>
+    difference between two Date objects.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">other</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+         Date object
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date.Interval">Date.Interval</a></span>
+        object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:__tostring"></a>
+    <strong>Date:__tostring ()</strong>
+    </dt>
+    <dd>
+    long numerical ISO data format version of this date.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:__eq"></a>
+    <strong>Date:__eq (other)</strong>
+    </dt>
+    <dd>
+    equality between Date objects.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">other</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:__lt"></a>
+    <strong>Date:__lt (other)</strong>
+    </dt>
+    <dd>
+    ordering between Date objects.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">other</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:__sub"></a>
+    <strong>Date:__sub ()</strong>
+    </dt>
+    <dd>
+    difference between Date objects.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:__add"></a>
+    <strong>Date:__add (other)</strong>
+    </dt>
+    <dd>
+    add a date and an interval.
+ passed to <a href="../libraries/novus.util.date.html#Date:add">Date:add</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">other</span>
+         either a <a href="../libraries/novus.util.date.html#Date.Interval">Date.Interval</a> object or a table such as
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.Interval"></a>
+    <strong>Date.Interval (t)</strong>
+    </dt>
+    <dd>
+    Date.Interval constructor
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">integer</span></span>
+         an interval in seconds
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.Interval:__tostring"></a>
+    <strong>Date.Interval:__tostring ()</strong>
+    </dt>
+    <dd>
+    If it&rsquo;s an interval then the format is &lsquo;2 hours 29 sec&rsquo; etc.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.fromSnowflake"></a>
+    <strong>Date.fromSnowflake (id)</strong>
+    </dt>
+    <dd>
+    constructs a Date object from a discord snowflake id
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">id</span>
+         either a <a href="../libraries/novus.util.string.html">string</a> id or a <code>number</code> (encoded uint64) id.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+        object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date:toISO"></a>
+    <strong>Date:toISO ()</strong>
+    </dt>
+    <dd>
+    converts a Date object to an ISO (8601) format timestamp.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The timestamp
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.parseISO"></a>
+    <strong>Date.parseISO (str)</strong>
+    </dt>
+    <dd>
+    parsers an ISO (8601) format timestamp into a numerical timestamp.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         the ISO string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The timestamp.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.fromDateTableUTC"></a>
+    <strong>Date.fromDateTableUTC (str)</strong>
+    </dt>
+    <dd>
+    parses an ISO (8601) format timestamp into a date object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         the ISO string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+        object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.fromDateTableUTC"></a>
+    <strong>Date.fromDateTableUTC (tbl)</strong>
+    </dt>
+    <dd>
+    alias for Date(tbl, true) which constructs a UTC date object
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tbl</span>
+         A date table in the same format as the constructor.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+        object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.fromHeader"></a>
+    <strong>Date.fromHeader (str)</strong>
+    </dt>
+    <dd>
+    parses a HTTP header into a Date object
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+         The header string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+        object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.parseTableUTC"></a>
+    <strong>Date.parseTableUTC (t)</strong>
+    </dt>
+    <dd>
+    parses a UTC date table into a timestamp
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+         A date table for <a href="https://www.lua.org/manual/5.3/manual.html#pdf-os.time">os.time</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The timestamp
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Date.parseHeader"></a>
+    <strong>Date.parseHeader (str)</strong>
+    </dt>
+    <dd>
+    parses a HTTP header into a timestamp
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+         the header string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The timestamp
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

@@ -1,0 +1,419 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
+<li><a href="#novus_util_patterns">novus.util.patterns</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><strong>novus.util.patterns</strong></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.patterns</code></h1>
+<p>Various Lpeg patterns for discord related parsing.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#mentions">mentions (input)</a></td>
+	<td class="summary">Iterator over all mentions in a string.</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#mentions">mentions</a></td>
+	<td class="summary">Patterns for chat mentions.</td>
+	</tr>
+</table>
+<h2><a href="#novus_util_patterns">novus.util.patterns</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#token">token</a></td>
+	<td class="summary">A discord client token pattern</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mention">mention</a></td>
+	<td class="summary">Matches any kind of mention.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#codeblock">codeblock</a></td>
+	<td class="summary">Matches a codeblock.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#codesnippet">codesnippet</a></td>
+	<td class="summary">Matches a code snippet.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#italic">italic</a></td>
+	<td class="summary">Matches a italic text.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#bold">bold</a></td>
+	<td class="summary">Matches a bold text.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#underline">underline</a></td>
+	<td class="summary">Matches a underlined text.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#spoiler">spoiler</a></td>
+	<td class="summary">Matches a spoilered text.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#strikethrough">strikethrough</a></td>
+	<td class="summary">Matches strikethrough text.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "mentions"></a>
+    <strong>mentions (input)</strong>
+    </dt>
+    <dd>
+    Iterator over all mentions in a string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">input</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> patterns = <span class="global">require</span><span class="string">"novus.util.patterns"</span>
+<span class="keyword">for</span> location, mention <span class="keyword">in</span> patterns.mentions(str) <span class="keyword">do</span>
+    ..
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "mentions"></a>
+    <strong>mentions</strong>
+    </dt>
+    <dd>
+    Patterns for chat mentions.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">emoji</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+         Matches a custom emoji.
+        </li>
+        <li><span class="parameter">animoji</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+         Matches a custom animated emoji.
+        </li>
+        <li><span class="parameter">user</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+         Matches a user mention.
+        </li>
+        <li><span class="parameter">nick</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+         Matches a user nickname mention.
+        </li>
+        <li><span class="parameter">channel</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+         Matches a channel mention.
+        </li>
+        <li><span class="parameter">role</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+         Matches a role mention.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="novus_util_patterns"></a>novus.util.patterns</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "token"></a>
+    <strong>token</strong>
+    </dt>
+    <dd>
+    A discord client token pattern
+
+
+    <ul>
+        <li><span class="parameter">token</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mention"></a>
+    <strong>mention</strong>
+    </dt>
+    <dd>
+    Matches any kind of mention.
+
+
+    <ul>
+        <li><span class="parameter">mention</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "codeblock"></a>
+    <strong>codeblock</strong>
+    </dt>
+    <dd>
+    Matches a codeblock.
+
+
+    <ul>
+        <li><span class="parameter">codeblock</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "codesnippet"></a>
+    <strong>codesnippet</strong>
+    </dt>
+    <dd>
+    Matches a code snippet.
+
+
+    <ul>
+        <li><span class="parameter">codesnippet</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "italic"></a>
+    <strong>italic</strong>
+    </dt>
+    <dd>
+    Matches a italic text.
+
+
+    <ul>
+        <li><span class="parameter">italic</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "bold"></a>
+    <strong>bold</strong>
+    </dt>
+    <dd>
+    Matches a bold text.
+
+
+    <ul>
+        <li><span class="parameter">bold</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "underline"></a>
+    <strong>underline</strong>
+    </dt>
+    <dd>
+    Matches a underlined text.
+
+
+    <ul>
+        <li><span class="parameter">underline</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "spoiler"></a>
+    <strong>spoiler</strong>
+    </dt>
+    <dd>
+    Matches a spoilered text.
+
+
+    <ul>
+        <li><span class="parameter">spoiler</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "strikethrough"></a>
+    <strong>strikethrough</strong>
+    </dt>
+    <dd>
+    Matches strikethrough text.
+
+
+    <ul>
+        <li><span class="parameter">strikethrough</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

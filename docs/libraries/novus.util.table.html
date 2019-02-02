@@ -1,0 +1,561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><strong>novus.util.table</strong></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.table</code></h1>
+<p>Table utilities.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#mergewith">mergewith (A, B)</a></td>
+	<td class="summary">Merges <code>B</code> on top of <code>A</code> in place.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#merge">merge (...)</a></td>
+	<td class="summary">Merges arguments together into a new table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#overwrite">overwrite (t, ...)</a></td>
+	<td class="summary">Merges arguments onto first argument.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#makelazy">makelazy (a)</a></td>
+	<td class="summary">Makes a table which loads entries from <code>a</code> as they are accessed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#inherit">inherit (...)</a></td>
+	<td class="summary">Makes a table which inherits from multiple sources.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#shallowcopy">shallowcopy (t)</a></td>
+	<td class="summary">Makes a shallow copy of the table <code>t</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#deepcopy">deepcopy (t)</a></td>
+	<td class="summary">Deeply copies the table <code>t</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#default">default (v)</a></td>
+	<td class="summary">Creates a table whose default value is <code>v</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#reflect">reflect (t)</a></td>
+	<td class="summary">Reflects the table <code>t</code> into a new table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#subtable">subtable (U, w)</a></td>
+	<td class="summary">Checks if <code>w</code> is a subtable of <code>U</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#keys">keys (t)</a></td>
+	<td class="summary">Returns an array of the keys of <code>t</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tcount">tcount (t)</a></td>
+	<td class="summary">Counts the number of pairs contained in <code>t</code></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#weak">weak ()</a></td>
+	<td class="summary">Creates a weak key table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cache">cache ()</a></td>
+	<td class="summary">Creates a weak value table.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "mergewith"></a>
+    <strong>mergewith (A, B)</strong>
+    </dt>
+    <dd>
+    Merges <code>B</code> on top of <code>A</code> in place.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+            <span class="types"><span class="type">tab</span></span>
+
+
+        </li>
+        <li><span class="parameter">B</span>
+            <span class="types"><span class="type">tab</span></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        <code>A</code>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">table</span>.merge({foo = <span class="string">""</span>, baz = <span class="string">"qux"</span>}, {foo = <span class="string">"bar"</span>})
+  <span class="comment">--&gt; {foo = "bar", baz = "qux"}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "merge"></a>
+    <strong>merge (...)</strong>
+    </dt>
+    <dd>
+    Merges arguments together into a new table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">tab</span></span>
+         Tables to merge
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The resulting table.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "overwrite"></a>
+    <strong>overwrite (t, ...)</strong>
+    </dt>
+    <dd>
+    Merges arguments onto first argument.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">tab</span></span>
+         The table to merge onto.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">tab</span></span>
+         Tables to merge.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        <code>t</code>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "makelazy"></a>
+    <strong>makelazy (a)</strong>
+    </dt>
+    <dd>
+    Makes a table which loads entries from <code>a</code> as they are accessed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">tab</span></span>
+         The table to lazily copy
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        An empty table that will fill as it is accessed.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "inherit"></a>
+    <strong>inherit (...)</strong>
+    </dt>
+    <dd>
+    Makes a table which inherits from multiple sources.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">tab</span></span>
+         Tables to lazily copy from.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">An</span></span>
+        empty table that will fill as it is accessed.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.table.html#makelazy">table.makelazy</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "shallowcopy"></a>
+    <strong>shallowcopy (t)</strong>
+    </dt>
+    <dd>
+    Makes a shallow copy of the table <code>t</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">tab</span></span>
+         The table to copy.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        A shallow copy of <code>t</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "deepcopy"></a>
+    <strong>deepcopy (t)</strong>
+    </dt>
+    <dd>
+    Deeply copies the table <code>t</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">tab</span></span>
+         The table to deeply copy.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The deep copy of <code>t</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "default"></a>
+    <strong>default (v)</strong>
+    </dt>
+    <dd>
+    Creates a table whose default value is <code>v</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+         The default value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">T = <span class="global">table</span>.default<span class="string">"novus"</span>
+T.foo <span class="comment">--&gt; "novus"</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "reflect"></a>
+    <strong>reflect (t)</strong>
+    </dt>
+    <dd>
+    Reflects the table <code>t</code> into a new table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">tab</span></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The result.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="global">table</span>.reflect{foo = <span class="string">"bar"</span>} <span class="comment">--&gt; {foo = "bar", bar = "foo"}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "subtable"></a>
+    <strong>subtable (U, w)</strong>
+    </dt>
+    <dd>
+    Checks if <code>w</code> is a subtable of <code>U</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">U</span>
+            <span class="types"><span class="type">tab</span></span>
+
+
+        </li>
+        <li><span class="parameter">w</span>
+            <span class="types"><span class="type">tab</span></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "keys"></a>
+    <strong>keys (t)</strong>
+    </dt>
+    <dd>
+    Returns an array of the keys of <code>t</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">tab</span></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The key array.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tcount"></a>
+    <strong>tcount (t)</strong>
+    </dt>
+    <dd>
+    Counts the number of pairs contained in <code>t</code>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">tab</span></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "weak"></a>
+    <strong>weak ()</strong>
+    </dt>
+    <dd>
+    Creates a weak key table.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cache"></a>
+    <strong>cache ()</strong>
+    </dt>
+    <dd>
+    Creates a weak value table.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#novus_util_printf">novus.util.printf</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><strong>novus.util.printf</strong></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.printf</code></h1>
+<p>Logging utilities.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#info">info (str[, ...])</a></td>
+	<td class="summary">Logs to stdout, and the output file if set, using the INF info channel.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#warn">warn (str[, ...])</a></td>
+	<td class="summary">Logs to stdout, and the output file if set, using the WRN warning channel.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#error">error (str[, ...])</a></td>
+	<td class="summary">Logs to stdout, and the output file if set, using the ERR error channel.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#throw">throw (str[, ...])</a></td>
+	<td class="summary">Logs an error using <a href="../libraries/novus.util.printf.html#error">printf.error</a> and then throws a lua error with the same message.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#fatal">fatal (str[, ...])</a></td>
+	<td class="summary">Logs an error using <a href="../libraries/novus.util.printf.html#error">printf.error</a> and then exits with a non-zero exit code.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#printf">printf (str[, ...])</a></td>
+	<td class="summary">Logs to stdout, and the output file if set.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mode">mode (m)</a></td>
+	<td class="summary">Change color mode for writing to stdout.</td>
+	</tr>
+</table>
+<h2><a href="#novus_util_printf">novus.util.printf</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#fd">fd</a></td>
+	<td class="summary">An optional lua file object to write output to, must be opened in a write mode.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "info"></a>
+    <strong>info (str[, ...])</strong>
+    </dt>
+    <dd>
+    Logs to stdout, and the output file if set, using the INF info channel.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         A format string
+        </li>
+        <li><span class="parameter">...</span>
+         Values passed into <code>string.format</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "warn"></a>
+    <strong>warn (str[, ...])</strong>
+    </dt>
+    <dd>
+    Logs to stdout, and the output file if set, using the WRN warning channel.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         A format string
+        </li>
+        <li><span class="parameter">...</span>
+         Values passed into <code>string.format</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "error"></a>
+    <strong>error (str[, ...])</strong>
+    </dt>
+    <dd>
+    Logs to stdout, and the output file if set, using the ERR error channel.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         A format string
+        </li>
+        <li><span class="parameter">...</span>
+         Values passed into <code>string.format</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "throw"></a>
+    <strong>throw (str[, ...])</strong>
+    </dt>
+    <dd>
+    Logs an error using <a href="../libraries/novus.util.printf.html#error">printf.error</a> and then throws a lua error with the same message.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         A format string
+        </li>
+        <li><span class="parameter">...</span>
+         Values passed into <code>string.format</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "fatal"></a>
+    <strong>fatal (str[, ...])</strong>
+    </dt>
+    <dd>
+    Logs an error using <a href="../libraries/novus.util.printf.html#error">printf.error</a> and then exits with a non-zero exit code.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         A format string.
+        </li>
+        <li><span class="parameter">...</span>
+         Values passed into <code>string.format</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "printf"></a>
+    <strong>printf (str[, ...])</strong>
+    </dt>
+    <dd>
+    Logs to stdout, and the output file if set.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         A format string.
+        </li>
+        <li><span class="parameter">...</span>
+         Values passed into <code>string.format</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mode"></a>
+    <strong>mode (m)</strong>
+    </dt>
+    <dd>
+    Change color mode for writing to stdout.
+ You can use:
+ &ndash; <code>3</code> for <code>&frac34; bit color</code>
+ &ndash; <code>8</code> for <code>8 bit color</code>
+ &ndash; <code>24</code> for <code>24 bit true color</code>.
+ Setting it to <code>0</code> disables coloured output.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">m</span>
+            <span class="types"><span class="type">number</span></span>
+         The mode.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="novus_util_printf"></a>novus.util.printf</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "fd"></a>
+    <strong>fd</strong>
+    </dt>
+    <dd>
+    An optional lua file object to write output to, must be opened in a write mode.
+
+
+    <ul>
+        <li><span class="parameter">fd</span>
+            <span class="types"><span class="type">file</span></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

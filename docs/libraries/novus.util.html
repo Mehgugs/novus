@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Fields">Fields</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><strong>novus.util</strong></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util</code></h1>
+<p>Utilities.</p>
+<p>
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#seed">seed ()</a></td>
+	<td class="summary">Generates a seed based on <code>cqueues.monotime</code> (an alternative to os.time as a seed).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#shift">shift (n, start1, stop1, start2, stop2)</a></td>
+	<td class="summary">Takes a value <code>n</code> in the range <code>start1</code>, <code>stop1</code> (inclusive) and converts it into a value
+ in the range <code>start2</code>, <code>stop2</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rand">rand (A, B)</a></td>
+	<td class="summary">Returns a random double between [<code>A</code>, <code>B</code>].</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hash">hash (str)</a></td>
+	<td class="summary">Computes the FNV-1a 32-bit hash of the given string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rid">rid ()</a></td>
+	<td class="summary">Returns a random identifier string</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#reseed">reseed ()</a></td>
+	<td class="summary">Reseeds lua&rsquo;s random number generator.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getlastlocal">getlastlocal (at)</a></td>
+	<td class="summary">Gets the last proper local declared at the given stack level, 1 is the current scope.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#arity">arity (f)</a></td>
+	<td class="summary">Computes the arity of a function, which is the number of named parameters it has.</td>
+	</tr>
+</table>
+<h2><a href="#Fields">Fields</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#platform">platform</a></td>
+	<td class="summary">The operating system platform</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "seed"></a>
+    <strong>seed ()</strong>
+    </dt>
+    <dd>
+    Generates a seed based on <code>cqueues.monotime</code> (an alternative to os.time as a seed).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The seed.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "shift"></a>
+    <strong>shift (n, start1, stop1, start2, stop2)</strong>
+    </dt>
+    <dd>
+    Takes a value <code>n</code> in the range <code>start1</code>, <code>stop1</code> (inclusive) and converts it into a value
+ in the range <code>start2</code>, <code>stop2</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">n</span>
+            <span class="types"><span class="type">number</span></span>
+         The input value.
+        </li>
+        <li><span class="parameter">start1</span>
+            <span class="types"><span class="type">number</span></span>
+         The start of the range the value <code>n</code> is in.
+        </li>
+        <li><span class="parameter">stop1</span>
+            <span class="types"><span class="type">number</span></span>
+         The end of the range.
+        </li>
+        <li><span class="parameter">start2</span>
+            <span class="types"><span class="type">number</span></span>
+         The start of the new range.
+        </li>
+        <li><span class="parameter">stop2</span>
+            <span class="types"><span class="type">number</span></span>
+         The end of the new range.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The new value in the range [<code>start2</code>, <code>stop2</code>]
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rand"></a>
+    <strong>rand (A, B)</strong>
+    </dt>
+    <dd>
+    Returns a random double between [<code>A</code>, <code>B</code>].
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">A</span>
+            <span class="types"><span class="type">number</span></span>
+
+
+        </li>
+        <li><span class="parameter">B</span>
+            <span class="types"><span class="type">number</span></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The random number.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hash"></a>
+    <strong>hash (str)</strong>
+    </dt>
+    <dd>
+    Computes the FNV-1a 32-bit hash of the given string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The string to hash.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The numeric hash.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rid"></a>
+    <strong>rid ()</strong>
+    </dt>
+    <dd>
+    Returns a random identifier string
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The random id.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "reseed"></a>
+    <strong>reseed ()</strong>
+    </dt>
+    <dd>
+    Reseeds lua&rsquo;s random number generator.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getlastlocal"></a>
+    <strong>getlastlocal (at)</strong>
+    </dt>
+    <dd>
+    Gets the last proper local declared at the given stack level, 1 is the current scope.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">at</span>
+            <span class="types"><span class="type">number</span></span>
+         The stack level to look at.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The local&rsquo;s name.</li>
+        <li>
+        The local&rsquo;s value.</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        The index of the local.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "arity"></a>
+    <strong>arity (f)</strong>
+    </dt>
+    <dd>
+    Computes the arity of a function, which is the number of named parameters it has.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The function to compute.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The arity.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "platform"></a>
+    <strong>platform</strong>
+    </dt>
+    <dd>
+    The operating system platform
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

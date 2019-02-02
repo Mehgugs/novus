@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><strong>novus.util.lpeg</strong></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.lpeg</code></h1>
+<p>Lpeg combinators and utilities.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#exactly">exactly (n, p)</a></td>
+	<td class="summary">Returns an Lpeg pattern which matches exactly n times.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#just">just (p)</a></td>
+	<td class="summary">Returns an Lpeg pattern which matches just the input pattern or nothing.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#check">check (p)</a></td>
+	<td class="summary">Returns an Lpeg pattern which captures <code>true</code> when it matches or <code>false</code> otherwise.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sepby">sepby (s, p)</a></td>
+	<td class="summary">Returns a pattern which matches one or more of: the input pattern
+  separated by the pattern <code>s</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#endby">endby (s, p)</a></td>
+	<td class="summary">Returns a pattern which matches one or more of: the input pattern
+  followed by the pattern <code>s</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#between">between (b, s)</a></td>
+	<td class="summary">Returns a pattern which matches zero or more of the input pattern,
+  between the pattern <code>s</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#anywhere">anywhere (p)</a></td>
+	<td class="summary">Returns a pattern which matches the input pattern anywhere in the string.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "exactly"></a>
+    <strong>exactly (n, p)</strong>
+    </dt>
+    <dd>
+    Returns an Lpeg pattern which matches exactly n times.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">n</span>
+            <span class="types"><span class="type">number</span></span>
+         The number of times to match.
+        </li>
+        <li><span class="parameter">p</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+        The final pattern.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "just"></a>
+    <strong>just (p)</strong>
+    </dt>
+    <dd>
+    Returns an Lpeg pattern which matches just the input pattern or nothing.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+        The final pattern.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "check"></a>
+    <strong>check (p)</strong>
+    </dt>
+    <dd>
+    Returns an Lpeg pattern which captures <code>true</code> when it matches or <code>false</code> otherwise.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+        The final pattern.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sepby"></a>
+    <strong>sepby (s, p)</strong>
+    </dt>
+    <dd>
+    Returns a pattern which matches one or more of: the input pattern
+  separated by the pattern <code>s</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+        <li><span class="parameter">p</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+        The final pattern.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "endby"></a>
+    <strong>endby (s, p)</strong>
+    </dt>
+    <dd>
+    Returns a pattern which matches one or more of: the input pattern
+  followed by the pattern <code>s</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+        <li><span class="parameter">p</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+        The final pattern.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "between"></a>
+    <strong>between (b, s)</strong>
+    </dt>
+    <dd>
+    Returns a pattern which matches zero or more of the input pattern,
+  between the pattern <code>s</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+         The input pattern.
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+        The final pattern.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "anywhere"></a>
+    <strong>anywhere (p)</strong>
+    </dt>
+    <dd>
+    Returns a pattern which matches the input pattern anywhere in the string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://stevedonovan.github.io/lua-stdlibs/modules/lpeg.html">lpeg-pattern</a></span>
+        The final pattern.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

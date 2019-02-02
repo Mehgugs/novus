@@ -1,3 +1,8 @@
+--- String utilities.
+-- @module novus.util.string
+-- @alias _ENV
+-- @see novus.util
+
 --imports--
 local setmetatable, getmetatable = setmetatable,getmetatable
 local global_string = string
@@ -7,7 +12,6 @@ local type = type
 local tablex = require"novus.util.table"
 --start-module--
 local _ENV = {}
-_ENV.string = string
 
 getmetatable"".__mod = function(s, v)
     if type(v) == 'table' then return s:format(unpack(v))
@@ -15,18 +19,38 @@ getmetatable"".__mod = function(s, v)
     end
 end
 
+--- Check if a string starts with the given string `s`.
+-- @string self The subject string.
+-- @string s The starting value.
+-- @treturn boolean
 function startswith(self, s )
     return self:sub(1, #s) == s
 end
 
+--- Check if a string ends with the given string `s`.
+-- @string self The subject string.
+-- @string s The ending value.
+-- @treturn boolean
 function endswith(self, s )
     return self:sub(-#s) == s
 end
 
+--- Returns the rest of the subject string after the starting value `pre`.
+-- @string self The subject string.
+-- @string pre The starting string.
+-- @treturn string
+-- @usage
+--  ("123456"):suffix("123") --> "456"
 function suffix (self, pre)
     return startswith(self, pre) and self:sub(#pre+1) or self
 end
 
+--- Returns the start of the subject before the ending value `pre`.
+-- @string self The subject string.
+-- @string pre The ending string.
+-- @treturn string
+-- @usage
+--  ("123456"):prefix("456") --> "123"
 function prefix (self, pre)
     return endswith(self, pre) and self:sub(1,-(#pre+1)) or self
 end
@@ -35,6 +59,10 @@ levenshtein_cache = setmetatable({},{__mode = "k"})
 
 local cache_key = ("%s\0%s")
 
+--- Computes the Levenshtein distance between two strings.
+-- @string str1
+-- @string str2
+-- @treturn number The Levenshtein distance.
 function levenshtein(str1, str2)
     if str1 == str2 then return 0 end
 
@@ -72,7 +100,17 @@ function levenshtein(str1, str2)
 	return result
 end
 
+--- Adds the module functions into the global string table,
+-- this is called automatically by @{novus.util}
 function inject() return tablex.overwrite(global_string, _ENV) end
+
+--- Shorthand for formatting a string.
+-- If `value` is a `table` it is unpacked into the format.
+-- @function string:__mod
+-- @param value A value to format into str.
+-- @usage
+--  "%d" % 2 --> "2"
+--  "%d, %d, %d" % {1, 2, 3} --> "1, 2, 3"
 
 --end-module--
 return _ENV

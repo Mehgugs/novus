@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><strong>novus.util.string</strong></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.string</code></h1>
+<p>String utilities.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#startswith">startswith (self, s)</a></td>
+	<td class="summary">Check if a string starts with the given string <code>s</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#endswith">endswith (self, s)</a></td>
+	<td class="summary">Check if a string ends with the given string <code>s</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#suffix">suffix (self, pre)</a></td>
+	<td class="summary">Returns the rest of the subject string after the starting value <code>pre</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#prefix">prefix (self, pre)</a></td>
+	<td class="summary">Returns the start of the subject before the ending value <code>pre</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#levenshtein">levenshtein (str1, str2)</a></td>
+	<td class="summary">Computes the Levenshtein distance between two strings.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#inject">inject ()</a></td>
+	<td class="summary">Adds the module functions into the global string table,
+ this is called automatically by <a href="../libraries/novus.util.html#">novus.util</a></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__mod">__mod (value)</a></td>
+	<td class="summary">Shorthand for formatting a string.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "startswith"></a>
+    <strong>startswith (self, s)</strong>
+    </dt>
+    <dd>
+    Check if a string starts with the given string <code>s</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">self</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The subject string.
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The starting value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "endswith"></a>
+    <strong>endswith (self, s)</strong>
+    </dt>
+    <dd>
+    Check if a string ends with the given string <code>s</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">self</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The subject string.
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The ending value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "suffix"></a>
+    <strong>suffix (self, pre)</strong>
+    </dt>
+    <dd>
+    Returns the rest of the subject string after the starting value <code>pre</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">self</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The subject string.
+        </li>
+        <li><span class="parameter">pre</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The starting string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">(<span class="string">"123456"</span>):suffix(<span class="string">"123"</span>) <span class="comment">--&gt; "456"</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "prefix"></a>
+    <strong>prefix (self, pre)</strong>
+    </dt>
+    <dd>
+    Returns the start of the subject before the ending value <code>pre</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">self</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The subject string.
+        </li>
+        <li><span class="parameter">pre</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The ending string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">(<span class="string">"123456"</span>):prefix(<span class="string">"456"</span>) <span class="comment">--&gt; "123"</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "levenshtein"></a>
+    <strong>levenshtein (str1, str2)</strong>
+    </dt>
+    <dd>
+    Computes the Levenshtein distance between two strings.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+        <li><span class="parameter">str2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The Levenshtein distance.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "inject"></a>
+    <strong>inject ()</strong>
+    </dt>
+    <dd>
+    Adds the module functions into the global string table,
+ this is called automatically by <a href="../libraries/novus.util.html#">novus.util</a>
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__mod"></a>
+    <strong>__mod (value)</strong>
+    </dt>
+    <dd>
+    Shorthand for formatting a string.
+ If <code>value</code> is a <a href="../libraries/novus.util.table.html">table</a> it is unpacked into the format.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+         A value to format into str.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="string">"%d"</span> % <span class="number">2</span> <span class="comment">--&gt; "2"
+</span><span class="string">"%d, %d, %d"</span> % {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>} <span class="comment">--&gt; "1, 2, 3"</span></pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

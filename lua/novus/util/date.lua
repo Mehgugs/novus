@@ -1,10 +1,15 @@
+--- Date and time utilities.
+-- This is a minimal copy of the penlight version.
+-- Dependencies: `novus.util.plcompat` `novus.util.uint`
+-- @module novus.util.date
+-- @see novus.util
 local compat = require"novus.util.plcompat"
 local uint = require"novus.util.uint"
 
 local os_time, os_date, os_difftime = os.time, os.date, os.difftime
 local select = select
-local type = type 
-local error = error 
+local type = type
+local error = error
 local getmetatable = getmetatable
 local pairs, ipairs, next = pairs, ipairs, next
 local ceil = math.ceil
@@ -355,21 +360,21 @@ end
 -- Discord related extensions to the pl.Date class --
 
 
---- constructs a Date object from a discord snowflake id 
--- @param id either a `string` id or a `number` (encoded uint64) id. 
--- @treturn Date object 
+--- constructs a Date object from a discord snowflake id
+-- @param id either a `string` id or a `number` (encoded uint64) id.
+-- @treturn Date object
 function Date.fromSnowflake(id)
     return Date(uint.timestamp(id), true)
 end
 
 --- converts a Date object to an ISO (8601) format timestamp.
--- @treturn string The timestamp  
+-- @treturn string The timestamp
 function Date:toISO()
 	return os_date('!%FT%T', self.time) .. '+00:00'
-end 
+end
 
 --- parsers an ISO (8601) format timestamp into a numerical timestamp.
--- @tparam string str the ISO string. 
+-- @tparam string str the ISO string.
 -- @treturn number The timestamp.
 function Date.parseISO(str)
 	local year, month, day, hour, min, sec, other = str:match(
@@ -382,7 +387,7 @@ function Date.parseISO(str)
 end
 
 --- parses an ISO (8601) format timestamp into a date object.
--- @tparam string str the ISO string. 
+-- @tparam string str the ISO string.
 -- @treturn Date object
 function Date.fromDateTableUTC(str)
     return Date(Date.parseISO(str), true)
@@ -413,19 +418,19 @@ function Date.fromHeader(str)
 	}
 end
 
-local function offset() 
+local function offset()
     return os_difftime(os_time(), os_time(os_date('!*t')))
 end
 
---- parses a UTC date table into a timestamp 
+--- parses a UTC date table into a timestamp
 -- @param t A date table for `os.time`.
 -- @treturn number The timestamp
 function Date.parseTableUTC(t)
     return os_time(t) + offset()
 end
 
---- parses a HTTP header into a timestamp 
--- @param str the header string. 
+--- parses a HTTP header into a timestamp
+-- @param str the header string.
 -- @treturn number The timestamp
 function Date.parseHeader(str)
 	local day, month, year, hour, min, sec = str:match(

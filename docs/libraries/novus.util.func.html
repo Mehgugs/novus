@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><strong>novus.util.func</strong></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.func</code></h1>
+<p>Function utilities.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#compose">compose (a, b)</a></td>
+	<td class="summary">composes two functions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#bind">bind (f, a)</a></td>
+	<td class="summary">binds a single value into the first argument of given function.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#bindmany">bindmany (f, ...)</a></td>
+	<td class="summary">Like <a href="../libraries/novus.util.func.html#bind">bind</a> but accepts many arguments, binding each onto the Nth argument of <code>f</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#call">call (f)</a></td>
+	<td class="summary">Creates a factory function from the given function.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#vmap">vmap (f, ...)</a></td>
+	<td class="summary">Performs a map over a vararg, returning a new vararg.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#vfold">vfold (f, a, ...)</a></td>
+	<td class="summary">Performs a lefthanded reduction over a vararg, returning a value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#vchop">vchop (first, ...)</a></td>
+	<td class="summary">Chops the last value off a vararg, and retuns it and the resulting vararg.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "compose"></a>
+    <strong>compose (a, b)</strong>
+    </dt>
+    <dd>
+    composes two functions.  <code>compose(f,g) = g(f(&hellip;))</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">function</span></span>
+         The inner function.
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><span class="type">function</span></span>
+         The outer function.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        The resulting function.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "bind"></a>
+    <strong>bind (f, a)</strong>
+    </dt>
+    <dd>
+    binds a single value into the first argument of given function.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The function to bind onto.
+        </li>
+        <li><span class="parameter">a</span>
+         The value to bind.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        The new function.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "bindmany"></a>
+    <strong>bindmany (f, ...)</strong>
+    </dt>
+    <dd>
+    Like <a href="../libraries/novus.util.func.html#bind">bind</a> but accepts many arguments, binding each onto the Nth argument of <code>f</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The function to bind onto.
+        </li>
+        <li><span class="parameter">...</span>
+         One or more values to bind.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "call"></a>
+    <strong>call (f)</strong>
+    </dt>
+    <dd>
+    Creates a factory function from the given function.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The function to create a factory from.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        The factory function.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">newprint = call(<span class="global">print</span>)
+myprint = newprint(<span class="string">"Magicks says:"</span>)
+myprint(<span class="string">"Hello, world!"</span>) <span class="comment">--&gt; Magicks says:   Hello, world!</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "vmap"></a>
+    <strong>vmap (f, ...)</strong>
+    </dt>
+    <dd>
+    Performs a map over a vararg, returning a new vararg.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The mapping function.
+        </li>
+        <li><span class="parameter">...</span>
+         The vararg of values.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The new vararg where each member i is f(i).
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "vfold"></a>
+    <strong>vfold (f, a, ...)</strong>
+    </dt>
+    <dd>
+    Performs a lefthanded reduction over a vararg, returning a value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The reducer.
+        </li>
+        <li><span class="parameter">a</span>
+         The inital value of the accumulator.
+        </li>
+        <li><span class="parameter">...</span>
+         The vararg of values.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The accumulated value.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "vchop"></a>
+    <strong>vchop (first, ...)</strong>
+    </dt>
+    <dd>
+    Chops the last value off a vararg, and retuns it and the resulting vararg.
+ You should call this function with a vararg <code>vchop(&hellip;)</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">first</span>
+         The first vararg value.
+        </li>
+        <li><span class="parameter">...</span>
+         The rest of the vararg.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+        The last value of the vararg.</li>
+        <li>
+        The vararg with the last value removed.</li>
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

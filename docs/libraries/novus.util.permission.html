@@ -1,0 +1,736 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Tables">Tables</a></li>
+<li><a href="#novus_util_permission">novus.util.permission</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><strong>novus.util.permission</strong></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.permission</code></h1>
+<p>Permission value utilities.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Placeholder">Placeholder</a></td>
+	<td class="summary">A permission placeholder value.</td>
+	</tr>
+</table>
+<h2><a href="#novus_util_permission">novus.util.permission</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#permissions">permissions</a></td>
+	<td class="summary">Contains individual permissions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_permission">to_permission (num_or_str)</a></td>
+	<td class="summary">Converts a string permission name to a permission integer,
+ does nothing to permission integers.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#resolve">resolve (p)</a></td>
+	<td class="summary">Resolves a permission placeholer into its value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#NONE">NONE</a></td>
+	<td class="summary">The permission value for no permissions set.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ALL">ALL</a></td>
+	<td class="summary">The permission value for all permissions set.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ctor">ctor (...)</a></td>
+	<td class="summary">Given a vararg list of permission names / integers,
+ returns the permission integer for each.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#construct">construct (...)</a></td>
+	<td class="summary">Given a vararg list of permission names / integers,
+ returns the permission value for the list.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#union">union (...)</a></td>
+	<td class="summary">Given a vararg list of permission values,
+ returns their union.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#intersection">intersection (...)</a></td>
+	<td class="summary">Given a vararg list of permission values,
+ returns their intersection.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unique">unique (...)</a></td>
+	<td class="summary">Given a vararg list of permission values,
+ removes values which are in both.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#complement">complement (a, ...)</a></td>
+	<td class="summary">Given a permission value <code>a</code> and a vararg list of permission values,
+ returns <code>a</code> without the permission values in the vararg.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#enable">enable (p, ...)</a></td>
+	<td class="summary">Given a permission value <code>p</code> and a vararg list of permissions,
+ sets the permissions (BORs them with <code>p</code>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#disable">disable (p, ...)</a></td>
+	<td class="summary">Given a permission value <code>p</code> and a vararg list of permissions,
+ clears the permissions (BANDNOTs them with <code>p</code>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#has">has (p, v)</a></td>
+	<td class="summary">Checks if the permission value <code>p</code> contains the permission value <code>v</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#contains">contains (p, ...)</a></td>
+	<td class="summary">Checks if the permission value <code>p</code> contains the provided permissions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#decompose">decompose (p)</a></td>
+	<td class="summary">Returns an array of all the permission names contained within a permission value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#new">new ([value])</a></td>
+	<td class="summary">Constructs a new <a href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a>.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Placeholder"></a>
+    <strong>Placeholder</strong>
+    </dt>
+    <dd>
+    A permission placeholder value.  This is a stateful container for a permission value.
+ You can use a <a href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a> as a <strong>permission value</strong> in any of this module&rsquo;s functions.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">integer</span></span>
+         The current permission value.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.permission.html#new">permission.new</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">placeholder = permission.new()
+placeholder:enable(<span class="string">'administrator'</span>, <span class="string">'sendMessages'</span>, <span class="string">'viewAuditlog'</span>)
+placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMessages', 'viewAuditlog'}
+</span>placeholder.value <span class="comment">--&gt; 0x888</span></pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="novus_util_permission"></a>novus.util.permission</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "permissions"></a>
+    <strong>permissions</strong>
+    </dt>
+    <dd>
+    Contains individual permissions.
+ See the <a href="https://discordapp.com/developers/docs/topics/permissions">discord api documentation</a> for more information.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_permission"></a>
+    <strong>to_permission (num_or_str)</strong>
+    </dt>
+    <dd>
+    Converts a string permission name to a permission integer,
+ does nothing to permission integers.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">num_or_str</span>
+            <span class="types"><span class="type">integer</span> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Input value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">integer</span></span>
+        The permission integer
+    </ol>
+     <h3>Or</h3>
+    <ol>
+
+           <span class="types"><span class="type">nil</span></span>
+        Nil if there is no corresponding integer.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.to_permission(<span class="string">"administrator"</span>) <span class="comment">--&gt; 0x8</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "resolve"></a>
+    <strong>resolve (p)</strong>
+    </dt>
+    <dd>
+    Resolves a permission placeholer into its value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a> or <span class="type">integer</span></span>
+         The permission value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">integer</span></span>
+        The numerical permission value.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "NONE"></a>
+    <strong>NONE</strong>
+    </dt>
+    <dd>
+    The permission value for no permissions set.
+
+
+    <ul>
+        <li><span class="parameter">NONE</span>
+            <span class="types"><span class="type">integer</span></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ALL"></a>
+    <strong>ALL</strong>
+    </dt>
+    <dd>
+    The permission value for all permissions set.
+
+
+    <ul>
+        <li><span class="parameter">ALL</span>
+            <span class="types"><span class="type">integer</span></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ctor"></a>
+    <strong>ctor (...)</strong>
+    </dt>
+    <dd>
+    Given a vararg list of permission names / integers,
+ returns the permission integer for each.
+ Calling the module table will call this via a metamethod.
+ Unrecognized values are coerced to <a href="../libraries/novus.util.permission.html#NONE">permission.NONE</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Permission integers or permission names.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">integer</span></span>
+        The permission integers.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.ctor(<span class="string">'sendMessages'</span>, <span class="string">'administrator'</span>) <span class="comment">--&gt; 0x800, 0x008
+</span>permission<span class="string">"sendMessages"</span> <span class="comment">--&gt; 0x800</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "construct"></a>
+    <strong>construct (...)</strong>
+    </dt>
+    <dd>
+    Given a vararg list of permission names / integers,
+ returns the permission value for the list.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Permission integers or permission names.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The permission values.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.construct(<span class="string">'sendMessages'</span>, <span class="string">'administrator'</span>) <span class="comment">--&gt; 0x808</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "union"></a>
+    <strong>union (...)</strong>
+    </dt>
+    <dd>
+    Given a vararg list of permission values,
+ returns their union.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span></span>
+         Permission values.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The permission value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.union(<span class="number">0x808</span>, permission<span class="string">"viewAuditLog"</span>) <span class="comment">--&gt; 0x888</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "intersection"></a>
+    <strong>intersection (...)</strong>
+    </dt>
+    <dd>
+    Given a vararg list of permission values,
+ returns their intersection.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span></span>
+         Permission values.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The permission value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.intersection(<span class="number">0x808</span>, permission<span class="string">"administrator"</span>) <span class="comment">--&gt; 0x008</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "unique"></a>
+    <strong>unique (...)</strong>
+    </dt>
+    <dd>
+    Given a vararg list of permission values,
+ removes values which are in both.  (exlusive union)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span></span>
+         Permission values.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The permission value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.unique(<span class="number">0x808</span>, <span class="number">0x88</span>) <span class="comment">--&gt; 0x880</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "complement"></a>
+    <strong>complement (a, ...)</strong>
+    </dt>
+    <dd>
+    Given a permission value <code>a</code> and a vararg list of permission values,
+ returns <code>a</code> without the permission values in the vararg.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">integer</span></span>
+         permission to substract from.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span></span>
+         Permission values.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The permission value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.complement(<span class="number">0x808</span>, <span class="number">0x8</span>) <span class="comment">--&gt; 0x800</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "enable"></a>
+    <strong>enable (p, ...)</strong>
+    </dt>
+    <dd>
+    Given a permission value <code>p</code> and a vararg list of permissions,
+ sets the permissions (BORs them with <code>p</code>).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><span class="type">integer</span></span>
+         The permission value.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span></span>
+         Permissions.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The permission value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.enable(<span class="number">0x800</span>, <span class="string">'viewAuditLog'</span>, <span class="string">'administrator'</span>) <span class="comment">--&gt; 0x888</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "disable"></a>
+    <strong>disable (p, ...)</strong>
+    </dt>
+    <dd>
+    Given a permission value <code>p</code> and a vararg list of permissions,
+ clears the permissions (BANDNOTs them with <code>p</code>).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><span class="type">integer</span></span>
+         The permission value.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">integer</span></span>
+         Permissions.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The permission value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.disable(<span class="number">0x888</span>, <span class="string">'viewAuditLog'</span>, <span class="string">'administrator'</span>) <span class="comment">--&gt; 0x800</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "has"></a>
+    <strong>has (p, v)</strong>
+    </dt>
+    <dd>
+    Checks if the permission value <code>p</code> contains the permission value <code>v</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><span class="type">integer</span></span>
+         The permission value to check against.
+        </li>
+        <li><span class="parameter">v</span>
+            <span class="types"><span class="type">integer</span></span>
+         The permission value to check.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "contains"></a>
+    <strong>contains (p, ...)</strong>
+    </dt>
+    <dd>
+    Checks if the permission value <code>p</code> contains the provided permissions.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><span class="type">integer</span></span>
+         The permission value to check against.
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">nmber</span> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The permissions to check.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.contains(<span class="number">0x888</span>, <span class="string">'administrator'</span>, <span class="string">'sendMessages'</span>, <span class="string">'viewAuditlog'</span>) <span class="comment">--&gt; true</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "decompose"></a>
+    <strong>decompose (p)</strong>
+    </dt>
+    <dd>
+    Returns an array of all the permission names contained within a permission value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">p</span>
+            <span class="types"><span class="type">integer</span></span>
+         The permission value to decompose.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The array of permissions.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">permission.decompose(<span class="number">0x888</span>) <span class="comment">--&gt; {'administrator', 'sendMessages', 'viewAuditlog'}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "new"></a>
+    <strong>new ([value])</strong>
+    </dt>
+    <dd>
+    Constructs a new <a href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">integer</span></span>
+         Inital permission value.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

@@ -1,3 +1,8 @@
+--- Logging utilities.
+-- @module novus.util.printf
+-- @alias _ENV
+-- @see novus.util
+
 --imports--
 local insert, unpack = table.insert, table.unpack
 local f = string.format
@@ -8,6 +13,9 @@ local err = error
 --start-module--
 local _ENV = {}
 
+--- An optional lua file object to write output to, must be opened in a write mode.
+-- @tparam file fd
+-- @within novus.util.printf
 fd = nil
 
 function parseHex(c)
@@ -106,31 +114,56 @@ local function writef(ifd,...)
     return ifd:write(str, n > 0 and "\27[0m\n" or "\n")
 end
 
+--- Logs to stdout, and the output file if set, using the INF info channel.
+-- @string str A format string
+-- @param[opt] ... Values passed into `string.format`.
 function info(...)
     return writef(stdout, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
 end
 
+--- Logs to stdout, and the output file if set, using the WRN warning channel.
+-- @string str A format string
+-- @param[opt] ... Values passed into `string.format`.
 function warn(...)
     return writef(stdout, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
 end
 
+--- Logs to stdout, and the output file if set, using the ERR error channel.
+-- @string str A format string
+-- @param[opt] ... Values passed into `string.format`.
 function error(...)
     return writef(stderr, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
 end
 
+--- Logs an error using `printf.error` and then throws a lua error with the same message.
+-- @string str A format string
+-- @param[opt] ... Values passed into `string.format`.
 function throw(...)
     error(...)
     return err(f(...))
 end
 
+--- Logs an error using `printf.error` and then exits with a non-zero exit code.
+-- @string str A format string.
+-- @param[opt] ... Values passed into `string.format`.
 function fatal(...)
     error(...)
     error"Fatal error: quitting!"
     return exit(1)
 end
 
+--- Logs to stdout, and the output file if set.
+-- @string str A format string.
+-- @param[opt] ... Values passed into `string.format`.
 function printf(...) return writef(stdout, ...) end
 
+--- Change color mode for writing to stdout.
+-- You can use:
+-- - `3` for `3/4 bit color`
+-- - `8` for `8 bit color`
+-- - `24` for `24 bit true color`.
+-- Setting it to `0` disables coloured output.
+-- @tparam number m The mode.
 function mode(m)
     _mode = m == 24 and 24 or m == 8 and 8 or m == 3 and 3 or 0
 end

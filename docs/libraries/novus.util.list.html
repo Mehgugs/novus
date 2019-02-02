@@ -1,0 +1,417 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><strong>novus.util.list</strong></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.list</code></h1>
+<p>List utilities</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#map">map (f, l, ...)</a></td>
+	<td class="summary">Apply a function to all elements of a list, creating a new table of the results.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#filter">filter (f, l, ...)</a></td>
+	<td class="summary">Apply a function to all elements of a list, if the function
+  returns a truthy value the element is added to the new list.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#zip">zip (f, l1, l2)</a></td>
+	<td class="summary">Zips together two lists, calling the function argument
+ on each pair of the list elements to produce the new value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#fold">fold (f, a, l, ...)</a></td>
+	<td class="summary">Performs a lefthanded reduction over a list, returning a value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#find">find (f, l)</a></td>
+	<td class="summary">Finds the first value in the list which satisfies the predicate <code>f</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#each">each (f, l)</a></td>
+	<td class="summary">Calls a function on each element of a list in order.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#reverse">reverse (l)</a></td>
+	<td class="summary">Reverses a list returning a new list.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#shuffle">shuffle (l)</a></td>
+	<td class="summary">Performs a Fisher-Yates out of place shuffle on <code>l</code> returning the shuffled copy.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "map"></a>
+    <strong>map (f, l, ...)</strong>
+    </dt>
+    <dd>
+    Apply a function to all elements of a list, creating a new table of the results.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The mapping function.
+        </li>
+        <li><span class="parameter">l</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The list.
+        </li>
+        <li><span class="parameter">...</span>
+         Extra arguments to the mapping function <code>f</code>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The list of results.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">list.map(<span class="keyword">function</span>(x) <span class="keyword">return</span> <span class="number">2</span>*x <span class="keyword">end</span>, {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>}) <span class="comment">--&gt; {2, 4, 6}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "filter"></a>
+    <strong>filter (f, l, ...)</strong>
+    </dt>
+    <dd>
+    Apply a function to all elements of a list, if the function
+  returns a truthy value the element is added to the new list.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The predicate function.
+        </li>
+        <li><span class="parameter">l</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The list.
+        </li>
+        <li><span class="parameter">...</span>
+         Extra arguments to the predicate function <code>f</code>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The filtered list
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">list.filter(
+     <span class="keyword">function</span>(x) <span class="keyword">return</span> x % <span class="number">2</span> == <span class="number">0</span> <span class="keyword">end</span>,
+    {<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>}
+) <span class="comment">--&gt; {0, 2, 4}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "zip"></a>
+    <strong>zip (f, l1, l2)</strong>
+    </dt>
+    <dd>
+    Zips together two lists, calling the function argument
+ on each pair of the list elements to produce the new value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The zipping function.
+        </li>
+        <li><span class="parameter">l1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The first list.
+        </li>
+        <li><span class="parameter">l2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The second list.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The resulting list.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">l1, l2 = {<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>}, {<span class="number">5</span>, <span class="number">10</span>, <span class="number">15</span>}
+list.zip(
+    <span class="keyword">function</span>(a, b) <span class="keyword">return</span> a * b <span class="keyword">end</span>,
+    l1, l2
+) <span class="comment">--&gt; {5, 20, 45}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "fold"></a>
+    <strong>fold (f, a, l, ...)</strong>
+    </dt>
+    <dd>
+    Performs a lefthanded reduction over a list, returning a value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The reducer.
+        </li>
+        <li><span class="parameter">a</span>
+         The initial value of the accumulator.
+        </li>
+        <li><span class="parameter">l</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The list.
+        </li>
+        <li><span class="parameter">...</span>
+         Extra values to the reducer <code>f</code>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The accumulated value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">function</span> add(a, x) <span class="keyword">return</span> a + x <span class="keyword">end</span>
+list.fold(add, <span class="number">0</span>, {<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>}) <span class="comment">--&gt; 6</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "find"></a>
+    <strong>find (f, l)</strong>
+    </dt>
+    <dd>
+    Finds the first value in the list which satisfies the predicate <code>f</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The predicate.
+        </li>
+        <li><span class="parameter">l</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The list.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+        The found value.</li>
+        <li>
+        The found key.</li>
+    </ol>
+     <h3>Or</h3>
+    <ol>
+
+           <span class="types"><span class="type">nil</span></span>
+        Nil if nothing satisfies the predicate.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "each"></a>
+    <strong>each (f, l)</strong>
+    </dt>
+    <dd>
+    Calls a function on each element of a list in order.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+
+
+        </li>
+        <li><span class="parameter">l</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The list.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "reverse"></a>
+    <strong>reverse (l)</strong>
+    </dt>
+    <dd>
+    Reverses a list returning a new list.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">l</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The list to reverse.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        A reversed copy of <code>l</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "shuffle"></a>
+    <strong>shuffle (l)</strong>
+    </dt>
+    <dd>
+    Performs a Fisher-Yates out of place shuffle on <code>l</code> returning the shuffled copy.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">l</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The list.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The shuffled copy of the list.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-02 04:35:41 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

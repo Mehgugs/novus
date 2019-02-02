@@ -1,3 +1,9 @@
+--- Provides the relabel module from lpeglabel.
+-- Some extra syntax is added to make some re constructs terser.
+-- `require"novus.util.relabel+"`.
+-- @module novus.util.relabel
+-- @see novus.util
+
 -- $Id: re.lua,v 1.44 2013/03/26 20:11:40 roberto Exp $
 
 -- imported functions and modules
@@ -170,7 +176,7 @@ local String = "'" * m.C((any - "'" - m.P"\n")^0) * expect("'", "MisTerm1")
              + '"' * m.C((any - '"' - m.P"\n")^0) * expect('"', "MisTerm2")
 local Quote =  "`" * m.C((any - "`" - m.P"\n")^0) * expect("`", "MisQuote")
 
-local CallArg = m.V'Exp' + Quote 
+local CallArg = m.V'Exp' + Quote
 
 local defined = "%" * Def / function (c,Defs)
   local cat =  Defs and Defs[c] or Predef[c]
@@ -244,7 +250,7 @@ local exp = m.P{ "Exp",
             * expect(S * m.V"Label", "ExpLab1")
             * expect(S * "}", "MisClose7") / mm.T
           + "\\" * expect(Def / getdef, "ExpName4") * "{" * expect(CallArg * (S * "," * CallArg)^0, "ExpPatt9") * S * "}"
-            /function(f, p,...)  return f(p,...) end 
+            /function(f, p,...)  return f(p,...) end
           + "{:" * (name * ":" + m.Cc(nil)) * expect(m.V"Exp", "ExpPatt5")
             * expect(S * ":}", "MisClose2")
             / function (n, p) return mm.Cg(p, n) end

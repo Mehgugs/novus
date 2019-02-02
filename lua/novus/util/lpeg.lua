@@ -1,3 +1,8 @@
+--- Lpeg combinators and utilities.
+-- @module novus.util.lpeg
+-- @see novus.util
+-- @alias _ENV
+
 --imports--
 local _lpeg = require"lpeglabel"
 local setmetatable = setmetatable
@@ -7,6 +12,10 @@ local select = select
 --start-module--
 local _ENV = setmetatable(_lpeg.locale(), {__index = _lpeg})
 
+--- Returns an Lpeg pattern which matches exactly n times.
+-- @tparam number n The number of times to match.
+-- @tparam lpeg-pattern p
+-- @treturn lpeg-pattern The final pattern.
 function exactly(n, p)
     local patt = P(p)
     local out = patt
@@ -16,21 +25,47 @@ function exactly(n, p)
     return out
 end
 
+--- Returns an Lpeg pattern which matches just the input pattern or nothing.
+-- @tparam lpeg-pattern p
+-- @treturn lpeg-pattern The final pattern.
 function just(p) return  P(p) * -1 end
 
 local function truth() return true end
+
+--- Returns an Lpeg pattern which captures `true` when it matches or `false` otherwise.
+-- @tparam lpeg-pattern p
+-- @treturn lpeg-pattern The final pattern.
 function check(p) return  (P(p)/truth) + Cc(false) end
 
+--- Returns a pattern which matches one or more of: the input pattern
+--  separated by the pattern `s`.
+-- @tparam lpeg-pattern s
+-- @tparam lpeg-pattern p
+-- @treturn lpeg-pattern The final pattern.
 function sepby(s, p) p = P(p) return p * (s * p)^0 end
+
+--- Returns a pattern which matches one or more of: the input pattern
+--  followed by the pattern `s`.
+-- @tparam lpeg-pattern s
+-- @tparam lpeg-pattern p
+-- @treturn lpeg-pattern The final pattern.
 function endby(s, p) p = P(p) return (p * s)^1 end
+
+--- Returns a pattern which matches zero or more of the input pattern,
+--  between the pattern `s`.
+-- @tparam lpeg-pattern b The input pattern.
+-- @tparam lpeg-pattern s
+-- @treturn lpeg-pattern The final pattern.
 function between(b, s) s = P(s) return  b * ((s * b)^1) end
+
+--- Returns a pattern which matches the input pattern anywhere in the string.
+-- @tparam lpeg-pattern p
+-- @treturn lpeg-pattern The final pattern.
 function anywhere (p)
     return P { p + 1 * V(1) }
 end
 
-function some(p) return  P(p)^1 end
 function optionally(p) return  P(p)^-1 end
-
 
 local function swapper(a, b) return b, a end
 function swap(p) return p/swapper end
