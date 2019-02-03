@@ -10,10 +10,12 @@ local errno = require"cqueues.errno"
 local websocket = require"http.websocket"
 local zlib = require"http.zlib"
 local httputil = require"http.util"
+local rapidjson = require"rapidjson"
 local json = require"cjson"
 local util = require"novus.util"
 local const = require"novus.const"
 local mutex = require"novus.util.mutex".new
+local USER_AGENT = require"novus.api".USER_AGENT
 
 local lpeg = util.lpeg
 local patterns = util.patterns
@@ -69,6 +71,9 @@ function init(options, idmutex)
     state.ready_metadata = {}
     state.beats = 0
     util.info("Initialized Shard-%s with TOKEN-%x", state.options.id, util.hash(state.options.token))
+    if not (state.options.compress or state.options.transport_compression) then
+        state.options.transport_compression = true
+    end
     state.url_options = toquery({
         v = tostring(const.gateway.version),
         encoding = const.gateway.encoding,
@@ -80,20 +85,28 @@ end
 
 function connect(state)
     local final_url = "%s?%s" % {state.options.gateway, state.url_options}
-    util.info("Shard-%s is connecting to %s", state.options.id, final_url)
+
+    util.info("Shard-%s is connecting to $white;%s", state.options.id, final_url)
     state.socket = websocket.new_from_uri(final_url) --++
+    util.info("Using user-agent: $white;%s", USER_AGENT)
+    state.socket.request.headers:upsert("user-agent", USER_AGENT)
+
     local success, _, err = state.socket:connect(3)
+
     if not success then
         util.error("Shard-%s had an error while connecting %s - %s", state.options.id, errno[err], errno.strerror(err))
         return state, false
     else
         util.info("Shard-%s has connected.", state.options.id)
         state.connected = true --+
+
         if state.options.transport_compression then
             state.transport_infl = zlib.inflate()
             state.transport_buffer = {}
         end
+
         state.loop:wrap(messages, state)
+
         local client = me():novus()
         if client.loops[state.options.id] == nil then
             state.loop:novus_associate(client, state.options.id)
@@ -175,7 +188,7 @@ local never_reconnect = {
 
 local function should_reconnect(state, code)
     if never_reconnect[code] then
-        util.error("Shard-%s received irrecoverable error(%d): %q",code, never_reconnect[code])
+        util.error("Shard-%s received irrecoverable error(%d): %q", state.options.id, code, never_reconnect[code])
         return false
     end
     if code == 4004 then
@@ -184,11 +197,21 @@ local function should_reconnect(state, code)
     return state.reconnect or state.options.auto_reconnect
 end
 
+local function inspector(...)
+    local locals = util.localsof(3)
+    util.warn"Inspecting locals..."
+    if locals.frame then
+        util.warn("Frame length at time of error: %s", locals.frame.length)
+        --rapidjson.dump(locals.frame, "bad_frame.txt", {pretty= true})
+    end
+    return traceback(...)
+end
+
 function messages(state)
     local rec_timeout = state.options.receive_timeout or 60
     local err
     repeat
-        local success, message, op, code = xpcall(state.socket.receive, traceback, state.socket)
+        local success, message, op, code = xpcall(state.socket.receive, inspector, state.socket)
         if success and message ~= nil then
             local payload, cont = read_message(state, message, op)
             if cont then goto continue end

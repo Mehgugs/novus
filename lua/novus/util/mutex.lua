@@ -61,6 +61,7 @@ end
 
 --- Mutex Object.
 -- @table Mutex
+-- @within Objects
 -- @bool inuse
 -- @field cond The condition variable.
 

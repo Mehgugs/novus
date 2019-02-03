@@ -1,3 +1,8 @@
+--- The novus discord client.
+-- Dependencies: `novus.api`, `novus.shard`, `novus.cache`, `novus.util`, `novus.util.mutex`
+-- @module novus.client
+-- @alias _ENV
+
 --imports--
 local cqueues = require"cqueues"
 local util = require"novus.util"
@@ -6,8 +11,7 @@ local api = require"novus.api"
 local shard = require"novus.shard"
 local cache = require"novus.cache"
 local user = require"novus.snowflakes.user"
-local xpcall, pcall = xpcall, pcall
-local require = require
+local xpcall = xpcall
 local unpack = table.unpack
 local tonumber = tonumber
 local traceback = debug.traceback
@@ -61,6 +65,32 @@ old_wrap = cqueues.interpose('wrap', function(self, ...)
     end, ...)
 end)
 
+--- The client state.
+-- @table client
+-- @within Objects
+-- @see client.create
+-- @tparam client_options options The options used to instantiate the client. (copied)
+-- @tparam novus.api.api api The api state.
+-- @tab shards The collection of shards the client is running.
+-- @tab loops The collection of cqueues controllers associated with the client.
+-- @tab dispatch The raw event dispatch handler table.
+-- @tab cache The cache table.
+
+--- Available options.
+-- @table client_options
+-- @within Objects
+-- @see client.create
+-- @string token The bot token.
+-- @tab sharding A tuple `{first, last}` indicating the first and last shard id to be ran by this client.
+-- @bool[opt=false] compress A boolean to indicate whether the client should request payload compression from the gateway.
+-- @bool[opt=false] transport_compression A boolean to indicate whether the client shards should use transport compression.
+-- @int[opt=100] large_threshold How many members are initially fetched per guild on start.
+-- @bool[opt=false] auto_reconnect A boolean to indicate if the client should automatically connect if a reconnection is possible.
+-- @number[opt=60] receive_timeout The shard websocket receive timeout.
+
+--- Creates a discord client.
+-- @tparam client_options options The options table.
+-- @treturn client The client state.
 function create(options)
     local client = {id = util.rid()}
     util.info("Creating Client-%s", client.id)
@@ -171,6 +201,8 @@ local function runner(client)
     client.mutex:unlock()
 end
 
+--- Starts the client, this will block the current controller.
+-- @tparam client client The client state to run.
 function run(client)
     client.loops.main:wrap(runner, client)
     return do_loop('main', client.loops.main)

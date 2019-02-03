@@ -4,20 +4,20 @@
 
 --- The novus library version string.
 -- @string version
--- @within novus.const
+-- @within Constants
 
 --- The novus library homepage.
 -- @string homepage
--- @within novus.const
+-- @within Constants
 
 --- The gateway and api version the library is connecting to.
 -- @int api_version
--- @within novus.const
+-- @within Constants
 
 --- The cache lifetimes for kinds of snowflakes.
 -- @table lifetimes
 -- @number default The default lifetime.
--- @within novus.const
+-- @within Constants
 
 local setmetatable = setmetatable
 --start-module--

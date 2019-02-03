@@ -13,8 +13,8 @@ end
 
 function makenewindex(_ENV) --luacheck:ignore
     return function(obj, key, val)
-        if schema[key] and obj[schema[key]] then
-            util.throw("%s-%s cannot have property %s overwritten!", __name, obj.id, key)
+        if schema[key] then
+            return set(obj, schema[key], val)
         else return set(obj, key, val)
         end
     end

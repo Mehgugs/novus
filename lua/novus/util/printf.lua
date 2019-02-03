@@ -14,8 +14,6 @@ local err = error
 local _ENV = {}
 
 --- An optional lua file object to write output to, must be opened in a write mode.
--- @tparam file fd
--- @within novus.util.printf
 fd = nil
 
 function parseHex(c)
@@ -120,21 +118,21 @@ end
 -- @string str A format string
 -- @param[opt] ... Values passed into `string.format`.
 function info(...)
-    return writef(nil, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
+    return writef(stdout, "$info_highlight; %s INF $info; %s", date"!%c", f(...))
 end
 
 --- Logs to stdout, and the output file if set, using the WRN warning channel.
 -- @string str A format string
 -- @param[opt] ... Values passed into `string.format`.
 function warn(...)
-    return writef(nil, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
+    return writef(stdout, "$warn_highlight; %s WRN $warn; %s", date"!%c", f(...))
 end
 
 --- Logs to stdout, and the output file if set, using the ERR error channel.
 -- @string str A format string
 -- @param[opt] ... Values passed into `string.format`.
 function error(...)
-    return writef(nil, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
+    return writef(stdout, "$error_highlight; %s ERR $error; %s", date"!%c", f(...))
 end
 
 --- Logs an error using `printf.error` and then throws a lua error with the same message.

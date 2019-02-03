@@ -14,14 +14,15 @@ local _ENV = {}
 -- Its fields are the same as the table it's viewing,
 -- except when the predicate map returns nil.
 -- @see view.new
--- @table View
+-- @table view
+-- @within Objects
 
 --- Construct a new view of the table `t`.
 -- @tab t The table to view.
--- @func f A function which is called with the key, value from `t`, it's return value is
+-- @func f A function which is called with the key, value from `t`, its return value is
 -- the value `view[key]` returns, if it returns nil no value is returned.
 -- @param a An argument to `f`.
--- @treturn View
+-- @treturn view
 -- @usage
 --  v = view.new({1,2,3}, function(_, x) return 2*x end)
 --  v[1] --> 2
@@ -55,7 +56,7 @@ end
 -- except the one specified.
 -- @tab view The table (can be a view) to view.
 -- @param value The value to ignore.
--- @treturn View
+-- @treturn view
 -- @usage
 --  t = {1,2,3,4,5}
 --  v = view.remove(t, 4)
@@ -68,7 +69,7 @@ end
 -- except the one accessed by the key specified.
 -- @tab view The table (can be a view) to view.
 -- @param key The key to ignore.
--- @treturn View
+-- @treturn view
 -- @usage
 --  t = {"foo", "bar", "baz"}
 --  v = view.remove_key(t, 1)
@@ -126,7 +127,7 @@ identity = function(_, x) return x end
 --- Creates a view copy of a table (or view).
 --  Shorthand for `view.new(t, view.identity)`.
 -- @tab t The table to copy.
--- @treturn View The view copy.
+-- @treturn view The view copy.
 function copy(t)
     return new(t, identity)
 end

@@ -30,14 +30,14 @@ local _VERSION = _VERSION
 --start-module--
 local _ENV = {}
 
---- (CONSTANT) The api URL the client uses connect.
+--- The api URL the client uses connect.
 -- @string URL
--- @within novus.api
+-- @within Constants
 URL = const.api.endpoint
 
---- (CONSTANT) The user-agent used to connect with. (mandated by discord)
+--- The user-agent used to connect with. (mandated by discord)
 -- @string USER_AGENT
--- @within novus.api
+-- @within Constants
 USER_AGENT = ("DiscordBot (%s, %s) lua-version:\"%s\""):format(const.homepage,const.version, _VERSION )
 
 local BOUNDARY1 = "novus" .. util.rid()
@@ -106,7 +106,7 @@ local token_check = lpeg.check(patterns.token * -1)
 
 --- Creates a new api state for connecting to discord.
 -- @tab options The options table. Must contain a `token` field with the api token to use.
--- @treturn table The api state object.
+-- @treturn api The api state object.
 function init(options)
     local state = {}
     if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then
@@ -119,6 +119,13 @@ function init(options)
     util.info("Initialized API-%s with TOKEN-%x", state.id, util.hash(state.token))
     return state
 end
+
+--- The api state object.
+-- @table api
+-- @see api.init
+-- @within Objects
+-- @string token The bot token
+-- @string id The RID for this api state.
 
 --- Makes a request to discord.
 -- @tab state The api state.

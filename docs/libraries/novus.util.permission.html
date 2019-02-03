@@ -33,16 +33,20 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Tables">Tables</a></li>
-<li><a href="#novus_util_permission">novus.util.permission</a></li>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Constants">Constants</a></li>
+<li><a href="#Objects">Objects</a></li>
 </ul>
 
 
 <h2>Libraries</h2>
 <ul class="nowrap">
   <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
   <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
   <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
   <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
   <li><a href="../libraries/novus.util.html">novus.util</a></li>
   <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
@@ -78,19 +82,8 @@
     </ul>
 
 
-<h2><a href="#Tables">Tables</a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#Placeholder">Placeholder</a></td>
-	<td class="summary">A permission placeholder value.</td>
-	</tr>
-</table>
-<h2><a href="#novus_util_permission">novus.util.permission</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#permissions">permissions</a></td>
-	<td class="summary">Contains individual permissions.</td>
-	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#to_permission">to_permission (num_or_str)</a></td>
 	<td class="summary">Converts a string permission name to a permission integer,
@@ -99,14 +92,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#resolve">resolve (p)</a></td>
 	<td class="summary">Resolves a permission placeholer into its value.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#NONE">NONE</a></td>
-	<td class="summary">The permission value for no permissions set.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#ALL">ALL</a></td>
-	<td class="summary">The permission value for all permissions set.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#ctor">ctor (...)</a></td>
@@ -162,7 +147,29 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#new">new ([value])</a></td>
-	<td class="summary">Constructs a new <a href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a>.</td>
+	<td class="summary">Constructs a new <a href="../libraries/novus.util.permission.html#placeholder">placeholder</a>.</td>
+	</tr>
+</table>
+<h2><a href="#Constants">Constants</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#permissions">permissions</a></td>
+	<td class="summary">Contains individual permissions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#NONE">NONE</a></td>
+	<td class="summary">The permission value for no permissions set.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#ALL">ALL</a></td>
+	<td class="summary">The permission value for all permissions set.</td>
+	</tr>
+</table>
+<h2><a href="#Objects">Objects</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#placeholder">placeholder</a></td>
+	<td class="summary">A permission placeholder value.</td>
 	</tr>
 </table>
 
@@ -170,61 +177,9 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
-    <dt>
-    <a name = "Placeholder"></a>
-    <strong>Placeholder</strong>
-    </dt>
-    <dd>
-    A permission placeholder value.  This is a stateful container for a permission value.
- You can use a <a href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a> as a <strong>permission value</strong> in any of this module&rsquo;s functions.
-
-
-    <h3>Fields:</h3>
-    <ul>
-        <li><span class="parameter">value</span>
-            <span class="types"><span class="type">integer</span></span>
-         The current permission value.
-        </li>
-    </ul>
-
-
-
-    <h3>See also:</h3>
-    <ul>
-         <a href="../libraries/novus.util.permission.html#new">permission.new</a>
-    </ul>
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">placeholder = permission.new()
-placeholder:enable(<span class="string">'administrator'</span>, <span class="string">'sendMessages'</span>, <span class="string">'viewAuditlog'</span>)
-placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMessages', 'viewAuditlog'}
-</span>placeholder.value <span class="comment">--&gt; 0x888</span></pre>
-    </ul>
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="novus_util_permission"></a>novus.util.permission</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "permissions"></a>
-    <strong>permissions</strong>
-    </dt>
-    <dd>
-    Contains individual permissions.
- See the <a href="https://discordapp.com/developers/docs/topics/permissions">discord api documentation</a> for more information.
-
-
-
-
-
-
-
-</dd>
     <dt>
     <a name = "to_permission"></a>
     <strong>to_permission (num_or_str)</strong>
@@ -274,7 +229,7 @@ placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMess
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">p</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a> or <span class="type">integer</span></span>
+            <span class="types"><a class="type" href="../libraries/novus.util.permission.html#placeholder">placeholder</a> or <span class="type">integer</span></span>
          The permission value.
         </li>
     </ul>
@@ -285,48 +240,6 @@ placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMess
            <span class="types"><span class="type">integer</span></span>
         The numerical permission value.
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "NONE"></a>
-    <strong>NONE</strong>
-    </dt>
-    <dd>
-    The permission value for no permissions set.
-
-
-    <ul>
-        <li><span class="parameter">NONE</span>
-            <span class="types"><span class="type">integer</span></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "ALL"></a>
-    <strong>ALL</strong>
-    </dt>
-    <dd>
-    The permission value for all permissions set.
-
-
-    <ul>
-        <li><span class="parameter">ALL</span>
-            <span class="types"><span class="type">integer</span></span>
-
-
-        </li>
-    </ul>
-
 
 
 
@@ -707,7 +620,7 @@ placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMess
     <strong>new ([value])</strong>
     </dt>
     <dd>
-    Constructs a new <a href="../libraries/novus.util.permission.html#Placeholder">Placeholder</a>.
+    Constructs a new <a href="../libraries/novus.util.permission.html#placeholder">placeholder</a>.
 
 
     <h3>Parameters:</h3>
@@ -725,13 +638,111 @@ placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMess
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Constants"></a>Constants</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "permissions"></a>
+    <strong>permissions</strong>
+    </dt>
+    <dd>
+    Contains individual permissions.
+ See the <a href="https://discordapp.com/developers/docs/topics/permissions">discord api documentation</a> for more information.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "NONE"></a>
+    <strong>NONE</strong>
+    </dt>
+    <dd>
+    The permission value for no permissions set.
+
+
+    <ul>
+        <li><span class="parameter">NONE</span>
+            <span class="types"><span class="type">integer</span></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ALL"></a>
+    <strong>ALL</strong>
+    </dt>
+    <dd>
+    The permission value for all permissions set.
+
+
+    <ul>
+        <li><span class="parameter">ALL</span>
+            <span class="types"><span class="type">integer</span></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Objects"></a>Objects</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "placeholder"></a>
+    <strong>placeholder</strong>
+    </dt>
+    <dd>
+    A permission placeholder value.  This is a stateful container for a permission value.
+ You can use a <a href="../libraries/novus.util.permission.html#placeholder">placeholder</a> as a <strong>permission value</strong> in any of this module&rsquo;s functions.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">integer</span></span>
+         The current permission value.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.permission.html#new">permission.new</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">placeholder = permission.new()
+placeholder:enable(<span class="string">'administrator'</span>, <span class="string">'sendMessages'</span>, <span class="string">'viewAuditlog'</span>)
+placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMessages', 'viewAuditlog'}
+</span>placeholder.value <span class="comment">--&gt; 0x888</span></pre>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-02-02 17:55:03 </i>
+<i style="float:right;">Last updated 2019-02-03 04:44:20 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

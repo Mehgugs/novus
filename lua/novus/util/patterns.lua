@@ -16,7 +16,7 @@ local _ENV = setmetatable({}, {__index = lpeg})
 
 --- A discord client token pattern
 -- @tparam lpeg-pattern token
--- @within novus.util.patterns
+-- @within Patterns
 token = C(S"MN" * exactly(58, R("09", "az", "AZ") + "-" + "_" + "."))
 
 local defs = {}
@@ -70,7 +70,7 @@ end
 
 --- Matches any kind of mention.
 -- @tparam lpeg-pattern mention
--- @within novus.util.patterns
+-- @within Patterns
 mention = mention_patt
 
 local iter_patt = lpeg.anywhere(Cp() * mention_patt * Cp())
@@ -101,7 +101,7 @@ setmetatable(mentions, {__call = mention_iterate})
 
 --- Matches a codeblock.
 -- @tparam lpeg-pattern codeblock
--- @within novus.util.patterns
+-- @within Patterns
 codeblock = re.compile[[("```" (!"```" .)* "```")]]
 
 codesnip = re.compile[[("`" (!"`" .)+ "`")]]
@@ -109,35 +109,35 @@ doublesnip = re.compile[[("``" (!"``" .)+ "``")]]
 
 --- Matches a code snippet.
 -- @tparam lpeg-pattern codesnippet
--- @within novus.util.patterns
+-- @within Patterns
 codesnippet = doublesnip + codesnip
 
 --- Matches a italic text.
 -- @tparam lpeg-pattern italic
--- @within novus.util.patterns
+-- @within Patterns
 italic = re.compile[["*" {((!("*"[^*]).)/"**")*} "*"]]
        + re.compile[["_" {((!("_"[^_]).)/"__")*} "_"]]
 
 --- Matches a bold text.
 -- @tparam lpeg-pattern bold
--- @within novus.util.patterns
+-- @within Patterns
 bold = re.compile[["**"{ ((!("**"[^*]).)/"****")* }"**"]]
 
 --- Matches a underlined text.
 -- @tparam lpeg-pattern underline
--- @within novus.util.patterns
+-- @within Patterns
 underline = re.compile[["__"{ ((!("__"[^_]).)/"____")* }"__"]]
 
---- Matches a spoilered text.
+--- Matches spoilered text.
 -- @tparam lpeg-pattern spoiler
--- @within novus.util.patterns
+-- @within Patterns
 spoiler = re.compile[[
     spoiler <- {"||" ((!"|" .) / spoiler)* "||"}
 ]]
 
 --- Matches strikethrough text.
 -- @tparam lpeg-pattern strikethrough
--- @within novus.util.patterns
+-- @within Patterns
 strikethrough = re.compile[[
     strikethrough <- {"~~" ((!"~" .) / strikethrough)+ "~~"}
 ]]

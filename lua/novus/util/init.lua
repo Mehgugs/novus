@@ -127,6 +127,24 @@ local function getnamespace(at)
     until next == nil
 end
 
+--- Fetches all locals at the provided stack level.
+-- @tparam number at The stack level to look at.
+-- @treturn table A table of `[localname] = value` pairs.
+function localsof(at)
+    at=at or 0
+    local count=1
+    local out ={}
+    while true do
+        local next, val = getlocal(at + 1, count)
+        if next ~= nil and next:sub(1,1) ~= "(" then
+            count = count + 1
+            out[next] = val
+        elseif next == nil or next:sub(1,1) == "(" then
+            return out
+        end
+    end
+end
+
 ---Computes the arity of a function, which is the number of named parameters it has.
 -- @tparam function f The function to compute.
 -- @treturn number The arity.
@@ -145,6 +163,8 @@ local function _platform()
 end
 
 --- The operating system platform
+-- @within Constants
+-- @string platform
 platform = _platform()
 
 function module(s) return (loader(s)) end

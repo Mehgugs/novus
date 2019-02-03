@@ -1,6 +1,6 @@
 --imports--
 local util = require"novus.snowflakes.helpers"
-local snowflake = require"novus.snowflakes.snowflake"
+local snowflake = require"novus.snowflakes"
 local setmetatable = setmetatable
 local snowflakes = snowflake.snowflakes
 --start-module--

@@ -1,6 +1,6 @@
 --imports--
 local util = require"novus.snowflakes.helpers"
-local snowflake = require"novus.snowflakes.snowflake"
+local snowflake = require"novus.snowflakes"
 local cqueues = require"cqueues"
 local view = require"novus.cache.view"
 local api = require"novus.api"

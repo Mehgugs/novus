@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Enumerations">Enumerations</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><strong>novus.enums</strong></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.enums</code></h1>
+<p>Discord enumerations.</p>
+<p> Dependencies: <a href="../libraries/novus.util.html#">novus.util</a>
+ Please refer to the <a href="https://discordapp.com/developers/docs/intro">discord api documentation</a> for specific information.</p>
+
+
+<h2><a href="#Enumerations">Enumerations</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#activitytype">activitytype</a></td>
+	<td class="summary">Game activity types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#auditlogtype">auditlogtype</a></td>
+	<td class="summary">Audit log entry event types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#channeltype">channeltype</a></td>
+	<td class="summary">Channel types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#defaultavatartype">defaultavatartype</a></td>
+	<td class="summary">Default avatar types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#explicitcontentlevel">explicitcontentlevel</a></td>
+	<td class="summary">Explicit content levels.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#messagetype">messagetype</a></td>
+	<td class="summary">Message types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#statustype">statustype</a></td>
+	<td class="summary">Status types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#verificationlevel">verificationlevel</a></td>
+	<td class="summary">Verification levels.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Enumerations"></a>Enumerations</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "activitytype"></a>
+    <strong>activitytype</strong>
+    </dt>
+    <dd>
+    Game activity types.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">default</span>
+            <span class="types"><span class="type">integer</span></span>
+         0
+        </li>
+        <li><span class="parameter">streaming</span>
+            <span class="types"><span class="type">integer</span></span>
+         1
+        </li>
+        <li><span class="parameter">listening</span>
+            <span class="types"><span class="type">integer</span></span>
+         2
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "auditlogtype"></a>
+    <strong>auditlogtype</strong>
+    </dt>
+    <dd>
+    Audit log entry event types.
+ See <a href="https://discordapp.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events">here</a>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "channeltype"></a>
+    <strong>channeltype</strong>
+    </dt>
+    <dd>
+    Channel types.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">text</span>
+            <span class="types"><span class="type">integer</span></span>
+         0
+        </li>
+        <li><span class="parameter">private</span>
+            <span class="types"><span class="type">integer</span></span>
+         1
+        </li>
+        <li><span class="parameter">voice</span>
+            <span class="types"><span class="type">integer</span></span>
+         2
+        </li>
+        <li><span class="parameter">group</span>
+            <span class="types"><span class="type">integer</span></span>
+         3
+        </li>
+        <li><span class="parameter">category</span>
+            <span class="types"><span class="type">integer</span></span>
+         4
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "defaultavatartype"></a>
+    <strong>defaultavatartype</strong>
+    </dt>
+    <dd>
+    Default avatar types.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">blurple</span>
+            <span class="types"><span class="type">integer</span></span>
+         0
+        </li>
+        <li><span class="parameter">grey</span>
+            <span class="types"><span class="type">integer</span></span>
+         1
+        </li>
+        <li><span class="parameter">green</span>
+            <span class="types"><span class="type">integer</span></span>
+         2
+        </li>
+        <li><span class="parameter">orange</span>
+            <span class="types"><span class="type">integer</span></span>
+         3
+        </li>
+        <li><span class="parameter">red</span>
+            <span class="types"><span class="type">integer</span></span>
+         4
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "explicitcontentlevel"></a>
+    <strong>explicitcontentlevel</strong>
+    </dt>
+    <dd>
+    Explicit content levels.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">none</span>
+            <span class="types"><span class="type">integer</span></span>
+         0
+        </li>
+        <li><span class="parameter">medium</span>
+            <span class="types"><span class="type">integer</span></span>
+         1
+        </li>
+        <li><span class="parameter">high</span>
+            <span class="types"><span class="type">integer</span></span>
+         2
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "messagetype"></a>
+    <strong>messagetype</strong>
+    </dt>
+    <dd>
+    Message types.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">default</span>
+            <span class="types"><span class="type">integer</span></span>
+         0
+        </li>
+        <li><span class="parameter">recipientAdd</span>
+            <span class="types"><span class="type">integer</span></span>
+         1
+        </li>
+        <li><span class="parameter">recipientRemove</span>
+            <span class="types"><span class="type">integer</span></span>
+         2
+        </li>
+        <li><span class="parameter">call</span>
+            <span class="types"><span class="type">integer</span></span>
+         3
+        </li>
+        <li><span class="parameter">channelNameChange</span>
+            <span class="types"><span class="type">integer</span></span>
+         4
+        </li>
+        <li><span class="parameter">channelIconchange</span>
+            <span class="types"><span class="type">integer</span></span>
+         5
+        </li>
+        <li><span class="parameter">pinnedMessage</span>
+            <span class="types"><span class="type">integer</span></span>
+         6
+        </li>
+        <li><span class="parameter">memberJoin</span>
+            <span class="types"><span class="type">integer</span></span>
+         7
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "statustype"></a>
+    <strong>statustype</strong>
+    </dt>
+    <dd>
+    Status types.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">online</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         &ldquo;online&rdquo;
+        </li>
+        <li><span class="parameter">idle</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         &ldquo;idle&rdquo;
+        </li>
+        <li><span class="parameter">donotdisturb</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         &ldquo;dnd&rdquo;
+        </li>
+        <li><span class="parameter">invisible</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         &ldquo;invisible&rdquo;
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "verificationlevel"></a>
+    <strong>verificationlevel</strong>
+    </dt>
+    <dd>
+    Verification levels.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">none</span>
+            <span class="types"><span class="type">integer</span></span>
+         0
+        </li>
+        <li><span class="parameter">low</span>
+            <span class="types"><span class="type">integer</span></span>
+         1
+        </li>
+        <li><span class="parameter">medium</span>
+            <span class="types"><span class="type">integer</span></span>
+         2
+        </li>
+        <li><span class="parameter">high</span>
+            <span class="types"><span class="type">integer</span></span>
+         3
+        </li>
+        <li><span class="parameter">veryhigh</span>
+            <span class="types"><span class="type">integer</span></span>
+         4
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-03 04:44:20 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

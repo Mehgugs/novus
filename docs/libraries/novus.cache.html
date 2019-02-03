@@ -33,20 +33,15 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#What">What </a></li>
-<li><a href="#About_these_docs">About these docs </a></li>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Objects">Objects</a></li>
 </ul>
 
 
-<h2>Manual</h2>
-<ul class="nowrap">
-  <li><strong>Introduction
-</strong></li>
-</ul>
 <h2>Libraries</h2>
 <ul class="nowrap">
   <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><strong>novus.cache</strong></li>
   <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
   <li><a href="../libraries/novus.client.html">novus.client</a></li>
   <li><a href="../libraries/novus.const.html">novus.const</a></li>
@@ -67,31 +62,98 @@
   <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
   <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
 </ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
 
 </div>
 
 <div id="content">
 
-    <h2>Introduction</h2>
+<h1>Module <code>novus.cache</code></h1>
+<p>Caching mechanism for novus.</p>
+<p> Dependencies: <a href="../libraries/novus.util.html#">novus.util</a></p>
 
-<p><a name="What"></a></p>
 
-<h3>What</h3>
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new ()</a></td>
+	<td class="summary">Constructs a new cache object.</td>
+	</tr>
+</table>
+<h2><a href="#Objects">Objects</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#cache">cache</a></td>
+	<td class="summary">A collection of weak tables which collect snowflakes.</td>
+	</tr>
+</table>
 
-<p>Novus is a client library for the discord API for bot clients. It&rsquo;s designed to provide
-high level abstractions to make writing bots painless, but also provide a minimal core
-client which can be used for sugar-free applications.</p>
+<br/>
+<br/>
 
-<p>Another feature of novus is its usage of <a href="https://github.com/wahern/cqueues">cqueues</a> and <a href="https://github.com/daurnimator/lua-http">lua-http</a>. Both of these libraries
-provide an excellent networking toolbox which is fully asynchronous. Leveraging cqueues,
-novus is naturally async and multi-threading ready via the <strong>cqueues.thread</strong> module.</p>
 
-<p><a name="About_these_docs"></a></p>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
-<h3>About these docs</h3>
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new ()</strong>
+    </dt>
+    <dd>
+    Constructs a new cache object.
 
-<p>The documentation produced by LDoc aims to be a technical reference of the API exposed by novus and not contain too much waffle. The accompanying <a href="">User Manual</a> will tell you
-<em>how</em> to write bots in novus, with full examples and explanation.</p>
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.cache.html#cache">cache</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Objects"></a>Objects</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "cache"></a>
+    <strong>cache</strong>
+    </dt>
+    <dd>
+    A collection of weak tables which collect snowflakes.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">methods</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Closures for caching specific snowflake types.
+        </li>
+        <li><span class="parameter">type</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Each cachable snowflake type has a table inside the cache, where objects of that type are kept.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.cache.html#new">cache.new</a>
+    </ul>
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->

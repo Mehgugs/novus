@@ -17,7 +17,8 @@ local _ENV = setmetatable({}, {__call = function(self,...) return self.ctor(...)
 --- Contains individual permissions.
 -- See the [discord api documentation](https://discordapp.com/developers/docs/topics/permissions) for more information.
 -- @table permissions
--- @within novus.util.permission
+-- @within Constants
+
 permissions = util.reflect{
     createInstantInvite = 0x00000001,
     kickMembers         = 0x00000002,
@@ -55,7 +56,6 @@ permissions = util.reflect{
 -- @tparam integer|string num_or_str Input value.
 -- @treturn[1] integer The permission integer
 -- @treturn[2] nil Nil if there is no corresponding integer.
--- @within novus.util.permission
 -- @usage
 --  permission.to_permission("administrator") --> 0x8
 function to_permission(num_or_str)
@@ -67,21 +67,22 @@ function to_permission(num_or_str)
 end
 
 --- Resolves a permission placeholer into its value.
--- @tparam Placeholder|integer p The permission value.
+-- @tparam placeholder|integer p The permission value.
 -- @treturn integer The numerical permission value.
--- @within novus.util.permission
+
 function resolve(p)
     return type(p) == 'table' and p.value or p
 end
 
 --- The permission value for no permissions set.
 -- @tparam integer NONE
--- @within novus.util.permission
+-- @within Constants
 NONE = 0
 
 --- The permission value for all permissions set.
 -- @tparam integer ALL
--- @within novus.util.permission
+-- @within Constants
+
 ALL = 0 for value in pairs(permissions) do ALL = ALL | to_permission(value) end
 
 local function to_permission_fuzzy(s)
@@ -94,7 +95,6 @@ end
 -- Unrecognized values are coerced to @{permission.NONE}.
 -- @tparam integer|string ... Permission integers or permission names.
 -- @treturn integer The permission integers.
--- @within novus.util.permission
 -- @usage
 --  permission.ctor('sendMessages', 'administrator') --> 0x800, 0x008
 --  permission"sendMessages" --> 0x800
@@ -112,7 +112,6 @@ local function bandnot(a,b) return (a & ~b) end
 -- returns the permission value for the list.
 -- @tparam integer|string ... Permission integers or permission names.
 -- @treturn number The permission values.
--- @within novus.util.permission
 -- @usage
 --  permission.construct('sendMessages', 'administrator') --> 0x808
 function construct(...)
@@ -123,7 +122,6 @@ end
 -- returns their union.
 -- @tparam integer ... Permission values.
 -- @treturn number The permission value.
--- @within novus.util.permission
 -- @usage
 --  permission.union(0x808, permission"viewAuditLog") --> 0x888
 function union(...)
@@ -134,7 +132,6 @@ end
 -- returns their intersection.
 -- @tparam integer ... Permission values.
 -- @treturn number The permission value.
--- @within novus.util.permission
 -- @usage
 --  permission.intersection(0x808, permission"administrator") --> 0x008
 function intersection(...)
@@ -145,7 +142,6 @@ end
 -- removes values which are in both. (exlusive union)
 -- @tparam integer ... Permission values.
 -- @treturn number The permission value.
--- @within novus.util.permission
 -- @usage
 --  permission.unique(0x808, 0x88) --> 0x880
 function unique( ... )
@@ -157,7 +153,6 @@ end
 -- @tparam integer a permission to substract from.
 -- @tparam integer ... Permission values.
 -- @treturn number The permission value.
--- @within novus.util.permission
 -- @usage
 --  permission.complement(0x808, 0x8) --> 0x800
 function complement(a,...)
@@ -171,7 +166,6 @@ end
 -- @tparam integer p The permission value.
 -- @tparam integer ... Permissions.
 -- @treturn number The permission value.
--- @within novus.util.permission
 -- @usage
 --  permission.enable(0x800, 'viewAuditLog', 'administrator') --> 0x888
 function enable(p ,...)
@@ -183,7 +177,6 @@ end
 -- @tparam integer p The permission value.
 -- @tparam integer ... Permissions.
 -- @treturn number The permission value.
--- @within novus.util.permission
 -- @usage
 --  permission.disable(0x888, 'viewAuditLog', 'administrator') --> 0x800
 function disable(p, ...)
@@ -194,7 +187,6 @@ end
 -- @tparam integer p The permission value to check against.
 -- @tparam integer v The permission value to check.
 -- @treturn boolean
--- @within novus.util.permission
 function has(p, v)
     v = v
     return v and p & v == v
@@ -215,7 +207,6 @@ end
 -- @tparam integer p The permission value to check against.
 -- @tparam nmber|string ... The permissions to check.
 -- @treturn boolean
--- @within novus.util.permission
 -- @usage
 --  permission.contains(0x888, 'administrator', 'sendMessages', 'viewAuditlog') --> true
 function contains(p, ...)
@@ -225,7 +216,6 @@ end
 --- Returns an array of all the permission names contained within a permission value.
 -- @tparam integer p The permission value to decompose.
 -- @treturn table The array of permissions.
--- @within novus.util.permission
 -- @usage
 --  permission.decompose(0x888) --> {'administrator', 'sendMessages', 'viewAuditlog'}
 function decompose(p)
@@ -242,10 +232,11 @@ function decompose(p)
 end
 
 --- A permission placeholder value. This is a stateful container for a permission value.
--- You can use a `Placeholder` as a **permission value** in any of this module's functions.
--- @table Placeholder
+-- You can use a `placeholder` as a **permission value** in any of this module's functions.
+-- @table placeholder
 -- @see permission.new
 -- @int value The current permission value.
+-- @within Objects
 -- @usage
 --  placeholder = permission.new()
 --  placeholder:enable('administrator', 'sendMessages', 'viewAuditlog')
@@ -307,9 +298,9 @@ function placeholder:__tostring()
     return ("%s: %#x"):format(placeholder.__name, self.value)
 end
 
---- Constructs a new `Placeholder`.
+--- Constructs a new `placeholder`.
 -- @int[opt] value Inital permission value.
--- @within novus.util.permission
+
 function new(value)
     return setmetatable({
          value = resolve(value) or NONE

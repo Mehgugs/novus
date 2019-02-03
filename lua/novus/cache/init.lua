@@ -1,3 +1,8 @@
+--- Caching mechanism for novus.
+-- Dependencies: `novus.util`
+-- @module novus.cache
+-- @alias _ENV
+
 --imports--
 local util = require"novus.util"
 local ipairs = ipairs
@@ -19,12 +24,14 @@ function inserter(cache)
         local id = object.id
         local old = cache[id]
         if old then
-            old.cache = nil
+            old[3] = nil
         end
         cache[id] = object
     end
 end
 
+--- Constructs a new cache object.
+-- @treturn cache
 function new()
     local cache = {methods = {}}
     for _, v in ipairs(cachable_entities) do
@@ -37,5 +44,13 @@ function new()
     cache.methods.message = {}
     return cache
 end
+
+--- A collection of weak tables which collect snowflakes.
+-- @table cache
+-- @within Objects
+-- @see cache.new
+-- @tab methods Closures for caching specific snowflake types.
+-- @tab type Each cachable snowflake type has a table inside the cache, where objects of that type are kept.
+
 --end-module--
 return _ENV

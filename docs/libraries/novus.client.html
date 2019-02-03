@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Objects">Objects</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><strong>novus.client</strong></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.client</code></h1>
+<p>The novus discord client.</p>
+<p> Dependencies: <a href="../libraries/novus.api.html#">novus.api</a>, <a href="../libraries/novus.shard.html#">novus.shard</a>, <a href="../libraries/novus.cache.html#">novus.cache</a>, <a href="../libraries/novus.util.html#">novus.util</a>, <a href="../libraries/novus.util.mutex.html#">novus.util.mutex</a></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#create">create (options)</a></td>
+	<td class="summary">Creates a discord client.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#run">run (client)</a></td>
+	<td class="summary">Starts the client, this will block the current controller.</td>
+	</tr>
+</table>
+<h2><a href="#Objects">Objects</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#client">client</a></td>
+	<td class="summary">The client state.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#client_options">client_options</a></td>
+	<td class="summary">Available options.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "create"></a>
+    <strong>create (options)</strong>
+    </dt>
+    <dd>
+    Creates a discord client.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">options</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.html#client">client_options</a></span>
+         The options table.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.client.html#client">client</a></span>
+        The client state.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "run"></a>
+    <strong>run (client)</strong>
+    </dt>
+    <dd>
+    Starts the client, this will block the current controller.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">client</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.html#client">client</a></span>
+         The client state to run.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Objects"></a>Objects</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "client"></a>
+    <strong>client</strong>
+    </dt>
+    <dd>
+    The client state.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">options</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.html#client">client_options</a></span>
+         The options used to instantiate the client. (copied)
+        </li>
+        <li><span class="parameter">api</span>
+            <span class="types"><a class="type" href="../libraries/novus.api.html#api">novus.api.api</a></span>
+         The api state.
+        </li>
+        <li><span class="parameter">shards</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The collection of shards the client is running.
+        </li>
+        <li><span class="parameter">loops</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The collection of cqueues controllers associated with the client.
+        </li>
+        <li><span class="parameter">dispatch</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The raw event dispatch handler table.
+        </li>
+        <li><span class="parameter">cache</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The cache table.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.client.html#create">client.create</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "client_options"></a>
+    <strong>client_options</strong>
+    </dt>
+    <dd>
+    Available options.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">token</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The bot token.
+        </li>
+        <li><span class="parameter">sharding</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         A tuple <code>{first, last}</code> indicating the first and last shard id to be ran by this client.
+        </li>
+        <li><span class="parameter">compress</span>
+            <span class="types"><span class="type">bool</span></span>
+         A boolean to indicate whether the client should request payload compression from the gateway.
+         (<em>default</em> false)
+        </li>
+        <li><span class="parameter">transport_compression</span>
+            <span class="types"><span class="type">bool</span></span>
+         A boolean to indicate whether the client shards should use transport compression.
+         (<em>default</em> false)
+        </li>
+        <li><span class="parameter">large_threshold</span>
+            <span class="types"><span class="type">integer</span></span>
+         How many members are initially fetched per guild on start.
+         (<em>default</em> 100)
+        </li>
+        <li><span class="parameter">auto_reconnect</span>
+            <span class="types"><span class="type">bool</span></span>
+         A boolean to indicate if the client should automatically connect if a reconnection is possible.
+         (<em>default</em> false)
+        </li>
+        <li><span class="parameter">receive_timeout</span>
+            <span class="types"><span class="type">number</span></span>
+         The shard websocket receive timeout.
+         (<em>default</em> 60)
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.client.html#create">client.create</a>
+    </ul>
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-03 04:44:20 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

@@ -1,7 +1,7 @@
 --imports--
 local api = require"novus.api"
 local util = require"novus.snowflakes.helpers"
-local snowflake = require"novus.snowflakes.snowflake"
+local snowflake = require"novus.snowflakes"
 local cqueues = require"cqueues"
 local perms = require"novus.util.permission"
 local setmetatable = setmetatable

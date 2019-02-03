@@ -1,7 +1,7 @@
 --imports--
 local api = require"novus.api"
 local util = require"novus.snowflakes.helpers"
-local snowflake = require"novus.snowflakes.snowflake"
+local snowflake = require"novus.snowflakes"
 local const = require"novus.const"
 local cqueues = require"cqueues"
 local null = require"cjson".null

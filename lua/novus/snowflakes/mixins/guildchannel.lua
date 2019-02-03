@@ -1,7 +1,7 @@
 --imports--
 local uint = require"novus.util.uint"
 local api = require"novus.api"
-local snowflake = require"novus.snowflakes.snowflake"
+local snowflake = require"novus.snowflakes"
 local perms = require"novus.util.permission"
 local cqueues = require"cqueues"
 local json = require"cjson"
