@@ -96,5 +96,15 @@ return function (_ENV)
         end
     end
 
+    function properties.guild(channel)
+        return snowflakes.guild.get(channel.guild_id)
+    end
+
+    function properties.category(channel)
+        if channel.parent_id then
+            return snowflakes.channel.get(channel.parent_id)
+        end
+    end
+
     return _ENV
 end

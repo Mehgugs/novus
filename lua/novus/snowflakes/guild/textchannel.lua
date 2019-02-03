@@ -9,14 +9,15 @@ local guildchannel = require"novus.snowflakes.mixins.guildchannel"
 local cqueues = require"cqueues"
 local json = require"cjson"
 local null = json.null
-
 local running = cqueues.running
 local snowflakes = snowflake.snowflakes
 
-local ipairs = ipairs
-
 --start-module--
 local _ENV = textchannel"guildtextchannel"
+
+_ENV = guildchannel(modifiable(_ENV, api.modify_channel)) --endow common guild channel methods
+
+schema{"ratelimit_per_user"}
 
 function new_from(state, payload)
     local object = textchannel.new_from(_ENV, state, payload)
@@ -25,10 +26,10 @@ function new_from(state, payload)
     object[9] = payload.position
     object[10] = util.uint(payload.parent_id)
     object[11] = processor.overwrites(payload.permission_overwrites)
+    object[12] = payload.rate_limit_per_user
     return object
 end
 
-_ENV = guildchannel(modifiable(_ENV, api.modify_channel)) --endow common guild channel methods
 
 function methods.create_webhook(channel, name)
     local state = running():novus()
@@ -96,18 +97,6 @@ function properties.members(channel)
     local state = running():novus()
     return view.new(state.cache.member, select_members, channel[1])
 end
-
-function properties.guild(channel)
-    return snowflakes.guild.get(channel[7])
-end
-
-function properties.category(channel)
-    if channel[10] then
-        return snowflakes.channel.get(channel[10])
-    end
-end
-
-
 
 --end-module--
 return _ENV
