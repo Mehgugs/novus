@@ -532,9 +532,9 @@ function remove_guild_member_role(state, guild_id, user_id, role_id)
     return request(state, "DELETE", endpoint)
 end
 
-function remove_guild_member(state, guild_id, user_id)
+function remove_guild_member(state, guild_id, user_id, query)
     local endpoint = endpoints.GUILD_MEMBER:format(guild_id, user_id)
-    return request(state, "DELETE", endpoint)
+    return request(state, "DELETE", endpoint, nil, query)
 end
 
 function get_guild_bans(state, guild_id)
@@ -552,9 +552,9 @@ function create_guild_ban(state, guild_id, user_id, payload)
     return request(state, "PUT", endpoint, payload)
 end
 
-function remove_guild_ban(state, guild_id, user_id)
+function remove_guild_ban(state, guild_id, user_id, query)
     local endpoint = endpoints.GUILD_BAN:format(guild_id, user_id)
-    return request(state, "DELETE", endpoint)
+    return request(state, "DELETE", endpoint, nil, query)
 end
 
 function get_guild_roles(state, guild_id)
@@ -582,9 +582,9 @@ function delete_guild_role(state, guild_id, role_id)
     return request(state, "DELETE", endpoint)
 end
 
-function get_guild_prune_count(state, guild_id)
+function get_guild_prune_count(state, guild_id, query)
     local endpoint = endpoints.GUILD_PRUNE:format(guild_id)
-    return request(state, "GET", endpoint)
+    return request(state, "GET", endpoint, nil, query)
 end
 
 function begin_guild_prune(state, guild_id, payload)

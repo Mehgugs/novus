@@ -1,6 +1,3 @@
---- Guild voice channel.
--- @module novus.snowflakes.guild.voicechannel
-
 --imports--
 local api = require"novus.api"
 local util = require"novus.snowflakes.helpers"

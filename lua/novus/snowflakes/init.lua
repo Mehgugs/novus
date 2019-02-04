@@ -53,7 +53,7 @@ function __gc(snowflake)
     end
 end
 function __tostring(snowflake)
-    retrn ("%s: %u"):format(snowflake.kind, snowflake[1])
+    return ("%s: %u"):format(snowflake.kind, snowflake[1])
 end
 local function snowflake_iter(invar, state)
     local key, idx = next(invar.__schema, state)

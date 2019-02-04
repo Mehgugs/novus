@@ -161,12 +161,6 @@ local function runner(client)
                 client.app.owner
             )
         end
-        if client.app.id then
-            client.me = user.get_from(
-                client,
-                client.app.id
-            )
-        end
         local limit = data.session_start_limit
         util.info("TOKEN-%s has used %d/%d sessions.", token_nonce, limit.total - limit.remaining, limit.total)
         if limit.remaining > 0 then

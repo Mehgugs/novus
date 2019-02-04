@@ -36,6 +36,8 @@ api = {
     ,avatar_endpoint = "https://cdn.discordapp.com/avatars/%u/%s.%s"
     ,default_avatar_endpoint = "https://cdn.discordapp.com/embed/avatars/%s.png"
     ,emoji_endpoint = "https://cdn.discordapp.com/emojis/%s.%s"
+    ,icon_endpoint = "https://cdn.discordapp.com/icons/%s/%s.png"
+    ,splash_endpoint = "https://cdn.discordapp.com/splashs/%s/%s.png"
     ,version = api_version
     ,max_retries = 6
 }
@@ -53,6 +55,7 @@ default_avatars = 5
 lifetimes = setmetatable({}, {__index = function(l) return l.default end})
 
 lifetimes.default = 60 * 60
+lifetimes.guild = -1
 
 --end-module--
 return _ENV

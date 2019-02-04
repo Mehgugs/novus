@@ -13,7 +13,7 @@ local _ENV = {}
 --- Apply a function to all elements of a list, creating a new table of the results.
 -- @tparam function f The mapping function.
 -- @tparam table l The list.
--- @param ... Extra arguments to the mapping function `f`.
+-- @param[opt] ... Extra arguments to the mapping function `f`.
 -- @treturn table The list of results.
 -- @usage
 --  list.map(function(x) return 2*x end, {1, 2, 3}) --> {2, 4, 6}
@@ -29,7 +29,7 @@ end
 --  returns a truthy value the element is added to the new list.
 -- @tparam function f The predicate function.
 -- @tparam table l The list.
--- @param ... Extra arguments to the predicate function `f`.
+-- @param[opt] ... Extra arguments to the predicate function `f`.
 -- @treturn table The filtered list
 -- @usage
 --  list.filter(
@@ -68,7 +68,7 @@ end
 -- @tparam function f The reducer.
 -- @param a The initial value of the accumulator.
 -- @tparam table l The list.
--- @param ... Extra values to the reducer `f`.
+-- @param[opt] ... Extra values to the reducer `f`.
 -- @return The accumulated value.
 -- @usage
 --  function add(a, x) return a + x end
@@ -95,9 +95,10 @@ end
 --- Calls a function on each element of a list in order.
 -- @tparam function f
 -- @tparam table l The list.
-function each(f, l)
+-- @param[opt] ... Extra arguments to f.
+function each(f, l, ...)
     for k,v in ipairs(l) do
-        f(v, k)
+        f(v, k, ...)
     end
 end
 
