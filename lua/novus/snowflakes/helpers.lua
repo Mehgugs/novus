@@ -1,9 +1,12 @@
 --imports--
 local util = require"novus.util"
+local tab  = require"novus.util.table"
+local warn = util.warn
 local running = require"cqueues".running
 local setmetatable = setmetatable
 local ipairs = ipairs
 local set = rawset
+local rawget = rawget
 --start-module--
 local _ENV = util.inherit(util)
 
@@ -49,8 +52,26 @@ function new_schema ()
     end}), len
 end
 
+function wrap_defs(obj, key, val)
+    if key == 'new_from' then
+        set(obj, key, function(...)
+            local out = val(...)
+            if not out.cache then
+                util.warn("%s will not be cached [%s]", out ,out[3])
+            end
+            return out.cache and out:cache() or out
+        end)
+    else
+        set(obj, key, val)
+    end
+end
+
 function snowflake_inherit(self, base, name)
-    local next = deepcopy(base)
+    local next = tab.deeplycopy({}, base)
+    if next.constants == nil then
+        tab.deeplycopy({}, base, 0)
+        util.fatal("%s %s %s %s", self, base, base.constants, rawget(base,"constants"))
+    end
     next.__name = name
     next.__index = makeindex(next)
     next.__newindex = makenewindex(next)
@@ -62,13 +83,15 @@ function snowflake_inherit(self, base, name)
     return setmetatable(next, {
          __name = "%s-behaviour" % name
         ,__call = function(...) return snowflake_inherit(self, ...) end
+        ,__newindex = wrap_defs
     })
 end
 
 
 function snowflake_root()
     return setmetatable({snowflakes = {}}, {
-    __call = function(self, name)
+     __name = "snowflake-behaviour"
+    ,__call = function(self, name)
         return snowflake_inherit(self, self, name)
     end})
 end

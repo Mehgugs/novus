@@ -5,6 +5,7 @@ local snowflake = require"novus.snowflakes"
 local perms = require"novus.util.permission"
 local cqueues = require"cqueues"
 local json = require"cjson"
+local ipairs = ipairs
 local null = json.null
 local running = cqueues.running
 local snowflakes = snowflake.snowflakes

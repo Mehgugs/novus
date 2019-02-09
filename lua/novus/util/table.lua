@@ -75,13 +75,13 @@ end
 -- @treturn table A shallow copy of `t`.
 function shallowcopy(t) return mergewith({}, t) end
 
-local function deeplycopy(A, B)
-    setmetatable(A, getmetatable(B))
+function deeplycopy(A, B, level)
     for k, v in pairs(B) do
         if type(v) == 'table' then
             A[k] = deeplycopy(A[k] or {}, v)
         else A[k] = v end
     end
+    setmetatable(A, getmetatable(B))
     return A
 end
 

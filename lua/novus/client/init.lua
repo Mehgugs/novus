@@ -10,13 +10,18 @@ local mutex = require"novus.util.mutex".new
 local api = require"novus.api"
 local shard = require"novus.shard"
 local cache = require"novus.cache"
+local emission = require"novus.client.emission"
+local dispatch = require"novus.client.dispatch"
 local user = require"novus.snowflakes.user"
+local promise = require"cqueues.promise"
 local xpcall = xpcall
 local unpack = table.unpack
 local tonumber = tonumber
 local traceback = debug.traceback
 local pairs = pairs
 local gettime = cqueues.monotime
+local setmetatable = setmetatable
+local huge = math.huge
 --start-module--
 local _ENV = {}
 
@@ -46,6 +51,10 @@ cqueues.interpose('novus_associate', function(self, client, id)
         util.fatal("Client-%s has conflicting controller ids; %s is already set.", client.id, id)
     end
     client.loops[id] = self
+end)
+
+cqueues.interpose('novus_start', function(self, id)
+    local client = clients[self]
     if client.loops.main and id ~= 'main' then
         client.loops.main:wrap(do_loop, id, self)
     end
@@ -65,6 +74,25 @@ old_wrap = cqueues.interpose('wrap', function(self, ...)
     end, ...)
 end)
 
+local events_mt = {}
+function events_mt:__index(key)
+    local new = emission.new()
+    self[key] = new
+    return new
+end
+
+local function make_events()
+    return setmetatable({}, events_mt)
+end
+
+-- default options
+local default_options = {
+     large_threshold = 100
+    ,transport_compression = true
+    ,compress = false
+    ,auto_reconnect = true
+}
+
 --- The client state.
 -- @table client
 -- @within Objects
@@ -74,6 +102,7 @@ end)
 -- @tab shards The collection of shards the client is running.
 -- @tab loops The collection of cqueues controllers associated with the client.
 -- @tab dispatch The raw event dispatch handler table.
+-- @tab events The events table, define your event handlers here.
 -- @tab cache The cache table.
 
 --- Available options.
@@ -88,21 +117,24 @@ end)
 -- @bool[opt=false] auto_reconnect A boolean to indicate if the client should automatically connect if a reconnection is possible.
 -- @number[opt=60] receive_timeout The shard websocket receive timeout.
 
+
 --- Creates a discord client.
 -- @tparam client_options options The options table.
 -- @treturn client The client state.
 function create(options)
-    local client = {id = util.rid()}
+    local client = setmetatable({id = util.rid()}, _ENV)
     util.info("Creating Client-%s", client.id)
-    client.options = util.mergewith({}, options)
+    client.options = util.merge(default_options, options)
     client.api = api.init{token = client.options.token}
     client.shards = {}
     client.loops = {}
     client.id_mutex = mutex()
     client._readies = 0
+    client.events = make_events()
     client.dispatch = util.default(function(_, _, t)
         util.info("Got %q", t)
     end)
+    client.dispatch = util.mergewith(client.dispatch, dispatch)
     function client.dispatch.SHARD_READY(self, s, _)
         util.info("Client-%s Shard-%s online.", self.id, s.options.id)
         self._readies = self._readies + 1
@@ -141,9 +173,9 @@ local function await_ready(client)
         for _, sh in pairs(client.shards) do
             ready = ready and sh.is_ready:get()
         end
-        sleep()
+        cqueues.sleep()
     until ready == true
-    client.dispatch.READY(client, nil, 'READY')
+    client.events.READY:enqueue(true)
 end
 
 local function runner(client)
@@ -155,12 +187,6 @@ local function runner(client)
     if success and success2 then
         client.begin = gettime()
         client.app = app or {}
-        if client.app.owner then
-            client.owner = user.new_from(
-                client,
-                client.app.owner
-            )
-        end
         local limit = data.session_start_limit
         util.info("TOKEN-%s has used %d/%d sessions.", token_nonce, limit.total - limit.remaining, limit.total)
         if limit.remaining > 0 then
@@ -170,6 +196,8 @@ local function runner(client)
             util.info("Client-%s is launching %d shards", client.id, total)
             client.total_shards = total
             for id = first, last do
+                local loop = cqueues.new()
+                loop:novus_associate(client, id)
                 client.shards[id] = shard.init({
                      token = client.options.token
                     ,id = id
@@ -180,6 +208,7 @@ local function runner(client)
                     ,large_threshold = client.options.large_threshold
                     ,auto_reconnect = client.options.auto_reconnect
                     ,receive_timeout = client.receive_timeout
+                    ,loop = loop
                 }, client.id_mutex)
                 shard.connect(client.shards[id])
             end
@@ -195,11 +224,62 @@ local function runner(client)
     client.mutex:unlock()
 end
 
+__index = _ENV
+
 --- Starts the client, this will block the current controller.
 -- @tparam client client The client state to run.
 function run(client)
     client.loops.main:wrap(runner, client)
     return do_loop('main', client.loops.main)
+end
+
+--- Returns the bot application's owner.
+-- @tparam client client
+-- @treturn user|nil
+function owner(client)
+    if client.app.owner then return
+        client.cache.user[util.uint(client.app.owner.id)]
+    or  user.new_from(client, client.app.owner)
+    end
+end
+
+--- Returns the bot application's user object.
+-- @tparam client client
+-- @treturn user|nil
+function me(client)
+    if client.app.id then return
+        client.cache.user[util.uint(client.app.id)]
+    or  user.get_from(client, util.uint(client.app.id))
+    end
+end
+
+local function select_loop(loops)
+    local out, count = nil, huge
+    for _, loop in pairs(loops) do
+        local man = loop:count()
+        if man < count then
+            out, count = loop,man
+        end
+    end
+    return out
+end
+
+--- Like cqueues wrap but using a client managed loop.
+-- @tparam client client
+-- @param ... The arguments to `cqueues.wrap`.
+function wrap(client, ...)
+    local controller = cqueues.running()
+    if controller and clients[controller] == client then
+        return controller:wrap(...)
+    else
+        local use = select_loop(client.loops)
+        util.info("%s", use)
+        return use and use:wrap(...)
+    end
+end
+
+function promised(client, ...)
+    return wrap(client, promise.new, ...)
 end
 
 --end-module--

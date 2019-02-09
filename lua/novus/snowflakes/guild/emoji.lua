@@ -12,16 +12,6 @@ local snowflakes = snowflake.snowflakes
 --start-module--
 local _ENV = snowflake "emoji"
 
--- schema = {
---      guild_id = 1
---     ,name = 2
---     ,roles = 3
---     ,user_id = 4
---     ,require_colons = 5
---     ,managed = 6
---     ,animated = 7
--- }
-
 schema {
      "guild_id"
     ,"name"
@@ -32,15 +22,18 @@ schema {
     ,"animated"
 }
 
-function new_from(state, payload)
-    local user = payload.user
+function processor.user(payload, state)
     local uid
-    if user then
-        uid = util.uint(user.id)
+    if payload.user then
+        uid = util.uint(payload.user.id)
         if not state.cache.user[uid] then
-            snowflakes.user.new_from(state, user, state.cache.methods.user)
+            snowflakes.user.new_from(state, payload.user, state.cache.methods.user)
         end
     end
+    return uid, "user_id"
+end
+
+function new_from(state, payload)
     return setmetatable({
          util.uint(payload.id)
         ,gettime()
@@ -48,21 +41,18 @@ function new_from(state, payload)
         ,payload.guild_id
         ,payload.name
         ,payload.roles or {}
-        ,uid
+        ,processor.user(payload, state)
         ,payload.require_colons
         ,payload.managed
         ,payload.animated
     }, _ENV)
 end
 
-local function modify(emoji, by)
+function modify(emoji, by)
     local state = running():novus()
     local success, data, err = api.modify_guild_emoji(state.api, emoji[4], emoji[1], by)
     if success and data then
-        for key, value in pairs(by) do
-            emoji[schema[key]] = value
-        end
-        return true
+        return new_from(state, data, emoji)
     else
         return false, err
     end

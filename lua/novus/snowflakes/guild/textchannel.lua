@@ -20,7 +20,7 @@ _ENV = guildchannel(modifiable(_ENV, api.modify_channel)) --endow common guild c
 schema{"ratelimit_per_user"}
 
 function new_from(state, payload)
-    local object = textchannel.new_from(_ENV, state, payload)
+    local object = textchannel.newer_from(_ENV, state, payload)
     object[7] = util.uint(payload.guild_id)
     object[8] = payload.name
     object[9] = payload.position

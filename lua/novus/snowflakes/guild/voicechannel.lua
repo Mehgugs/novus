@@ -13,7 +13,7 @@ local snowflakes = snowflake.snowflakes
 local running = cqueues.running
 --start-module--
 local _ENV = base_channel"guildvoicechannel"
-local base = new_from
+local base = newer_from
 
 _ENV = guildchannel(modifiable(_ENV, api.method))
 

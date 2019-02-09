@@ -1,0 +1,782 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Objects">Objects</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
+  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
+  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><strong>novus.util.queue</strong></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><a href="../manual/02-DiveIn.md.html">The First Example
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.util.queue</code></h1>
+<p>Simple double-ended queue from lua examples.</p>
+<p>
+</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.html#">novus.util</a>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new ()</a></td>
+	<td class="summary">Constructs a new <a href="../libraries/novus.util.queue.html">queue</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#push_left">push_left (list, value)</a></td>
+	<td class="summary">Pushes a value onto the front of the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#push_right">push_right (list, value)</a></td>
+	<td class="summary">Pushes a value onto the back of the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pushes_left">pushes_left (list, a[, ...])</a></td>
+	<td class="summary">Pushes multiple values to the front of the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pushes_right">pushes_right (list, a[, ...])</a></td>
+	<td class="summary">Pushes multiple values to the back of the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pop_left">pop_left (list)</a></td>
+	<td class="summary">Pops a value from the front of the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pop_right">pop_right (list)</a></td>
+	<td class="summary">Pops a value from the back of the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_left">from_left (list)</a></td>
+	<td class="summary">Left-handed iterator over the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_right">from_right (list)</a></td>
+	<td class="summary">Right-handed iterator over the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#consume_left">consume_left (list)</a></td>
+	<td class="summary">Iterates over a queue from left to right, consuming the values.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#consume_right">consume_right (list)</a></td>
+	<td class="summary">Iterates over a queue from right to left, consuming the values.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#filter">filter (list, f[, ...])</a></td>
+	<td class="summary">Filters a queue in-place, from left to right.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#filtered">filtered (list, f[, ...])</a></td>
+	<td class="summary">Filters a queue out of place, returning a new queue, from left to right.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#map">map (list, m[, ...])</a></td>
+	<td class="summary">Transforms a queue in place, from left to right.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mapped">mapped (list, m[, ...], list)</a></td>
+	<td class="summary">Transforms a queue out of place, returning a new queue, from left to right.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__len">__len (list)</a></td>
+	<td class="summary">Length of the queue.</td>
+	</tr>
+</table>
+<h2><a href="#Objects">Objects</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#queue">queue</a></td>
+	<td class="summary">Doubled ended queue.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new ()</strong>
+    </dt>
+    <dd>
+    Constructs a new <a href="../libraries/novus.util.queue.html">queue</a>.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "push_left"></a>
+    <strong>push_left (list, value)</strong>
+    </dt>
+    <dd>
+    Pushes a value onto the front of the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+        <li><span class="parameter">value</span>
+         The value to push.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "push_right"></a>
+    <strong>push_right (list, value)</strong>
+    </dt>
+    <dd>
+    Pushes a value onto the back of the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+        <li><span class="parameter">value</span>
+         The value to push.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pushes_left"></a>
+    <strong>pushes_left (list, a[, ...])</strong>
+    </dt>
+    <dd>
+    Pushes multiple values to the front of the queue.
+ Call this with a vararg.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+        <li><span class="parameter">a</span>
+         The first item in the vararg.
+        </li>
+        <li><span class="parameter">...</span>
+         Additional values.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">d = queue.new():pushes_left(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)
+<span class="keyword">for</span> _, value <span class="keyword">in</span> d:from_right() <span class="keyword">do</span>
+    <span class="global">print</span>(value)
+<span class="keyword">end</span> <span class="comment">--&gt; 1
+</span>    <span class="comment">--&gt; 2
+</span>    <span class="comment">--&gt; 3</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "pushes_right"></a>
+    <strong>pushes_right (list, a[, ...])</strong>
+    </dt>
+    <dd>
+    Pushes multiple values to the back of the queue.
+ Call this with a vararg.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+        <li><span class="parameter">a</span>
+         The first item in the vararg.
+        </li>
+        <li><span class="parameter">...</span>
+         Additional values.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">d = queue.new():pushes_right(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)
+<span class="keyword">for</span> _, value <span class="keyword">in</span> d:from_left() <span class="keyword">do</span>
+    <span class="global">print</span>(value)
+<span class="keyword">end</span> <span class="comment">--&gt; 1
+</span>    <span class="comment">--&gt; 2
+</span>    <span class="comment">--&gt; 3</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "pop_left"></a>
+    <strong>pop_left (list)</strong>
+    </dt>
+    <dd>
+    Pops a value from the front of the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pop_right"></a>
+    <strong>pop_right (list)</strong>
+    </dt>
+    <dd>
+    Pops a value from the back of the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_left"></a>
+    <strong>from_left (list)</strong>
+    </dt>
+    <dd>
+    Left-handed iterator over the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue to iterate over.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+        idx Index in list.</li>
+        <li>
+        value The value.</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">d = queue.new():pushes_right(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)
+<span class="keyword">for</span> idx, value <span class="keyword">in</span> d:from_left() <span class="keyword">do</span>
+    <span class="global">print</span>(value)
+<span class="keyword">end</span> <span class="comment">--&gt; 1
+</span>    <span class="comment">--&gt; 2
+</span>    <span class="comment">--&gt; 3</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "from_right"></a>
+    <strong>from_right (list)</strong>
+    </dt>
+    <dd>
+    Right-handed iterator over the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue to iterate over.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+        idx Index in list.</li>
+        <li>
+        value The value.</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">d = queue.new():pushes_right(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)
+<span class="keyword">for</span> idx, value <span class="keyword">in</span> d:from_left() <span class="keyword">do</span>
+    <span class="global">print</span>(value)
+<span class="keyword">end</span> <span class="comment">--&gt; 3
+</span>    <span class="comment">--&gt; 2
+</span>    <span class="comment">--&gt; 1</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "consume_left"></a>
+    <strong>consume_left (list)</strong>
+    </dt>
+    <dd>
+    Iterates over a queue from left to right, consuming the values.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue to iterate over.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        value The consumed value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">d = queue.new():pushes_right(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)
+<span class="global">print</span>(#d, d.first) <span class="comment">--&gt; 3, 1
+</span><span class="keyword">for</span> value <span class="keyword">in</span> d:consume_left() <span class="keyword">do</span>
+    ..
+<span class="keyword">end</span>
+<span class="global">print</span>(#d, d.first) <span class="comment">--&gt; 0, nil</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "consume_right"></a>
+    <strong>consume_right (list)</strong>
+    </dt>
+    <dd>
+    Iterates over a queue from right to left, consuming the values.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue to iterate over.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        value The consumed value.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">d = queue.new():pushes_right(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)
+<span class="global">print</span>(#d, d.first) <span class="comment">--&gt; 3, 1
+</span><span class="keyword">for</span> value <span class="keyword">in</span> d:consume_right() <span class="keyword">do</span>
+    ..
+<span class="keyword">end</span>
+<span class="global">print</span>(#d, d.first) <span class="comment">--&gt; 0, nil</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "filter"></a>
+    <strong>filter (list, f[, ...])</strong>
+    </dt>
+    <dd>
+    Filters a queue in-place, from left to right.
+  See <a href="../libraries/novus.util.list.html#filter">novus.util.list.filter</a> for filtering examples.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue to filter.
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The predicate function.
+        </li>
+        <li><span class="parameter">...</span>
+         Optional arguments to <code>f</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">q = queue.new():pushes_right(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>)
+q:filter(<span class="keyword">function</span>(x) <span class="keyword">return</span> x % <span class="number">2</span> == <span class="number">0</span> <span class="keyword">end</span>)
+<span class="keyword">for</span> _, v <span class="keyword">in</span> q:from_left() <span class="keyword">do</span> <span class="global">print</span>(v) <span class="keyword">end</span>
+<span class="comment">--&gt; 2
+</span><span class="comment">--&gt; 4
+</span><span class="comment">--&gt; 6
+</span><span class="comment">--&gt; 8</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "filtered"></a>
+    <strong>filtered (list, f[, ...])</strong>
+    </dt>
+    <dd>
+    Filters a queue out of place, returning a new queue, from left to right.
+  See <a href="../libraries/novus.util.list.html#filter">novus.util.list.filter</a> for filtering examples.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue to filter.
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The predicate function.
+        </li>
+        <li><span class="parameter">...</span>
+         Optional arguments to <code>f</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+        The new queue containing the results.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "map"></a>
+    <strong>map (list, m[, ...])</strong>
+    </dt>
+    <dd>
+    Transforms a queue in place, from left to right.
+  See <a href="../libraries/novus.util.list.html#map">novus.util.list.map</a> for mapping examples.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The list to transform.
+        </li>
+        <li><span class="parameter">m</span>
+            <span class="types"><span class="type">function</span></span>
+         The mapping function.
+        </li>
+        <li><span class="parameter">...</span>
+         Optional arguments to <code>m</code>.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">q = queue.new():pushes_right(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>)
+q:map(<span class="keyword">function</span>(x) <span class="keyword">return</span> x*x <span class="keyword">end</span>)
+<span class="keyword">for</span> _, v <span class="keyword">in</span> q:from_left() <span class="keyword">do</span> <span class="global">print</span>(v) <span class="keyword">end</span>
+<span class="comment">--&gt; 1
+</span><span class="comment">--&gt; 4
+</span><span class="comment">--&gt; 9
+</span><span class="comment">--&gt; 16
+</span><span class="comment">--&gt; 25</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "mapped"></a>
+    <strong>mapped (list, m[, ...], list)</strong>
+    </dt>
+    <dd>
+    Transforms a queue out of place, returning a new queue, from left to right.
+  See <a href="../libraries/novus.util.list.html#map">novus.util.list.map</a> for mapping examples.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The list to transform
+        </li>
+        <li><span class="parameter">m</span>
+            <span class="types"><span class="type">function</span></span>
+         The mapping function.
+        </li>
+        <li><span class="parameter">...</span>
+         Optional arguments to <code>m</code>.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The list to transform
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__len"></a>
+    <strong>__len (list)</strong>
+    </dt>
+    <dd>
+    Length of the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+
+
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">d = queue.new():pushes_left(<span class="number">1</span>,<span class="number">2</span>):pushes_right(<span class="number">3</span>,<span class="number">4</span>)
+#d <span class="comment">--&gt; 4</span></pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Objects"></a>Objects</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "queue"></a>
+    <strong>queue</strong>
+    </dt>
+    <dd>
+    Doubled ended queue.
+ All functions which take a queue as their first argument can be called from the queue in method form.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">first</span>
+         The first item.
+        </li>
+        <li><span class="parameter">last</span>
+          The last item.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/novus.util.queue.html#new">queue.new</a>
+    </ul>
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-09 17:50:25 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

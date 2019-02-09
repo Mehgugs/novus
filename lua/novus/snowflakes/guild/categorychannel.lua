@@ -13,7 +13,7 @@ local running = cqueues.running
 --start-module--
 local _ENV = base_channel"guildcategorychannel"
 
-local base = new_from
+local base = newer_from
 function new_from(state, payload)
     local object = base(_ENV, state, payload)
     object[5] = util.uint(payload.guild_id)

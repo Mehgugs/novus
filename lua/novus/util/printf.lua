@@ -8,10 +8,12 @@ local insert, unpack = table.insert, table.unpack
 local f = string.format
 local date, exit = os.date, os.exit
 local tonumber = tonumber
-local stdout, stderr = io.stdout, io.stderr
+local _stdout, _stderr = io.stdout, io.stderr
 local err = error
 --start-module--
 local _ENV = {}
+
+stdout = _stdout
 
 --- An optional lua file object to write output to, must be opened in a write mode.
 fd = nil

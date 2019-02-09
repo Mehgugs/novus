@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Importing_Modules">Importing Modules </a></li>
+<li><a href="#Making_a_Client">Making a Client </a></li>
+<li><a href="#Emitters_and_Events">Emitters and Events </a></li>
+<li><a href="#What_if_I_m_morally_against_callbacks_">What if I'm morally against callbacks? </a></li>
+<li><a href="#Recap">Recap </a></li>
+<li><a href="#Listening_for_incoming_messages">Listening for incoming messages </a></li>
+<li><a href="#Parsing_and_propagating">Parsing and propagating </a></li>
+<li><a href="#Recap_2">Recap 2 </a></li>
+</ul>
+
+
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><strong>The First Example
+</strong></li>
+</ul>
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
+  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
+  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>The First Example</h2>
+
+<p>Using the client level we can write a nice example of a command bot.
+We will use the <code>emission</code> api to write an simple, but fancy, command parser.
+Although perhaps a tad overkill for the introductory example, I think it&rsquo;s good to
+dive in deep and get a feel for what&rsquo;s happening.</p>
+
+<p><a name="Importing_Modules"></a></p>
+
+<h3>Importing Modules</h3>
+
+<p>To use the client level we simply import it from <a href="../libraries/novus.client.html#">novus.client</a>, we also need <a href="../libraries/novus.client.emission.html#">novus.client.emission</a> to deal with <code>emitters</code> and it doesn&rsquo;t hurt to loads <a href="../libraries/novus.util.html#">novus.util</a> (the second biggest section of the library 😔)</p>
+
+<p>We need the <a href="../libraries/novus.util.relabel.html#">novus.util.relabel</a> module to write our command&rsquo;s syntax grammar (I promise it&rsquo;s not as scary as it sounds!) so we can check a message does indeed contain commands.</p>
+
+<pre>
+<span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span> <span class="comment">-- Our utilities
+</span><span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span> <span class="comment">-- Client level API
+</span><span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span> <span class="comment">-- Emitter API
+</span><span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span> <span class="comment">-- Parsing / LPeg API</span>
+</pre>
+
+
+<p><a name="Making_a_Client"></a></p>
+
+<h3>Making a Client</h3>
+
+<p>Since the client level api isn&rsquo;t designed to be too complex, we just call <a href="../libraries/novus.client.html#create">client.create</a> with our
+options and get back a <a href="../libraries/novus.client.html#">client</a> state which is just a table bundling all the bits we need to run a bot.</p>
+
+<pre>
+<span class="keyword">local</span> myclient = client.create{
+  token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>
+}
+</pre>
+
+
+<p><a name="Emitters_and_Events"></a></p>
+
+<h3>Emitters and Events</h3>
+
+<p>Novus uses an emitter pattern to communicate events to your code. Inside <code>client.events</code> you will
+find a collection of <a href="../libraries/novus.client.emission.html#emitter">emitter</a> objects, indexed by their event name. Let&rsquo;s make our bot log when it&rsquo;s <code>READY</code>.</p>
+
+<pre>
+<span class="comment">-- An emitter exposes a emitter:listen method to add callbacks.
+</span>myclient.events.READY:listen(<span class="keyword">function</span>(ctx)
+  util.info (<span class="string">"Bot %s online!"</span>, myclient:me().tag)
+<span class="keyword">end</span>)
+</pre>
+
+
+<p>The argument we receive in the callback is the <a href="../libraries/novus.client.context.html#context">context</a> of the event, it will contain all the relevant discord objects involved in the event.</p>
+
+<p><a name="What_if_I_m_morally_against_callbacks_"></a></p>
+
+<h3>What if I'm morally against callbacks?</h3>
+
+<p>If this style doesn&rsquo;t take your fancy there are other ways to receive events:</p>
+
+<p>You can wait for the next event using a condition style API:</p>
+
+<pre>
+myclient :wrap(<span class="keyword">function</span>()
+  <span class="comment">-- this is async so we need to wrap it.
+</span>  <span class="keyword">local</span> ctx = myclient.events.READY:wait()
+  util.info(<span class="string">"[Await] Bot %s online!"</span>, myclient:me().tag)
+<span class="keyword">end</span>)
+</pre>
+
+
+<p>You can wrap everything in a promise and get a stateful object that can be itself awaited
+or passed around:</p>
+
+<pre>
+<span class="comment">-- creates a new promise from the given async function.
+</span><span class="keyword">local</span> has_readied = myclient:promised(<span class="keyword">function</span>()
+<span class="comment">-- :promised grabs a promise for then next event.
+</span>  <span class="keyword">local</span> ready = myclient.events.READY:promised()
+  <span class="keyword">local</span> ctx = ready() <span class="comment">-- awaits the promise
+</span>  util.info (<span class="string">"[Promise] Bot %s online!"</span>, myclient:me().tag)
+  <span class="keyword">return</span> <span class="keyword">true</span>
+<span class="keyword">end</span>)
+</pre>
+
+
+<p>You can iterate over all events asynchronously using <a href="https://www.lua.org/manual/5.3/manual.html#pdf-pairs">pairs</a>:</p>
+
+<pre>
+myclient:wrap(<span class="keyword">function</span>()
+<span class="comment">-- this is async so we need to wrap it.
+</span>  <span class="keyword">for</span> i, ctx <span class="keyword">in</span> <span class="global">pairs</span>(myclient.events.READY) <span class="keyword">do</span>
+    util.info (<span class="string">"[Async Iterator] Bot %s online!"</span>, myclient:me().tag)
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+
+
+<p>Not all of these styles of receiving events are sensible for this use case, I think a callback or await would be sufficient, but it&rsquo;s to showcase how useful the emitters are for communication.</p>
+
+<p><a name="Recap"></a></p>
+
+<h3>Recap</h3>
+
+<p>We've seen: what modules we'll need; how to create a client state; and how to listen to events from discord. Putting that all together and running requires one more function, <a href="../libraries/novus.client.html#run">client.run</a> which will start our bot.</p>
+
+<pre>
+<span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
+<span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span>
+<span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span>
+<span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span>
+
+<span class="keyword">local</span> myclient = client.create{token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>}
+
+myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
+  util.info (<span class="string">"Bot %s online!"</span>, myclient:me().tag)
+<span class="keyword">end</span>)
+
+myclient:run() <span class="comment">--NB this blocks.</span>
+</pre>
+
+
+<blockquote><p>To run this make sure you've read the installation guide!</p></blockquote>
+
+<p>Running this you should get something like the following:</p>
+
+<pre>
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">38</span> <span class="number">2019</span> INF  Creating Client-fd33b1b6
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">38</span> <span class="number">2019</span> INF  Initialized API-da255785 with TOKEN-<span class="number">5</span>bc85d0e
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">38</span> <span class="number">2019</span> INF  Client-fd33b1b6 is starting using TOKEN-<span class="number">1539857678.</span>
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  TOKEN-<span class="number">1539857678</span> has used <span class="number">12</span>/<span class="number">1000</span> sessions.
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  Client-fd33b1b6 is launching <span class="number">1</span> shards
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  Initialized Shard-<span class="number">0</span> with TOKEN-<span class="number">5</span>bc85d0e
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  Shard-<span class="number">0</span> is connecting to wss://gateway.discord.gg?etc
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  Shard-<span class="number">0</span> has connected.
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  discord said hello to Shard-<span class="number">0</span> trace=<span class="string">"gateway-prd-main-ncd7"</span>
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  Shard-<span class="number">0</span> has a heartrate of <span class="number">41</span> sec .
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> WRN  Outgoing heart beating
+Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span class="number">55</span>:<span class="number">39</span> <span class="number">2019</span> INF  Bot Maria 🌚#<span class="number">1477</span> online!
+</pre>
+
+
+<p>Okay so our bot is online, but it doesn&rsquo;t do do anything right now. Let&rsquo;s change that.</p>
+
+<p><a name="Listening_for_incoming_messages"></a></p>
+
+<h3>Listening for incoming messages</h3>
+
+<p>Using what we know about <a href="../libraries/novus.client.emission.html#emitter">emitters</a> we can add a listener to the <code>MESSAGE_CREATE</code>
+event:</p>
+
+<pre>
+myclient.events.MESSAGE_CREATE:listen(<span class="keyword">function</span>(ctx)
+<span class="comment">-- Looking at the <a href="../libraries/novus.client.context.html#context">context</a> docs we see that it has a <code>msg</code> field.
+</span>  <span class="keyword">if</span> ctx.msg.content == <span class="string">"!ping"</span> <span class="keyword">then</span>
+    ctx.msg:reply<span class="string">"Pong!"</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>)
+</pre>
+
+
+<p>If you add this <strong>before your client:run() call</strong> and restart the bot you'll be able to type <code>!ping</code> and get a
+<code>Pong!</code> back from the bot.</p>
+
+<p><a name="Parsing_and_propagating"></a></p>
+
+<h3>Parsing and propagating</h3>
+
+<p>We'd like something more general for this simple example, so let&rsquo;s make a new event
+which is fired when the bot receives a command.</p>
+
+<pre>
+<span class="keyword">local</span> <span class="keyword">function</span> parse_command()
+  <span class="comment">--TODO
+</span><span class="keyword">end</span>
+
+<span class="keyword">local</span> command_parsed = emission.new()
+myclient.events.MESSAGE_CREATE:listen(<span class="keyword">function</span>(ctx)
+  <span class="keyword">local</span> success, nxt = parse_command(ctx)
+  <span class="keyword">if</span> success <span class="keyword">then</span>
+    command_parsed:emit(ntx)
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+
+
+<p>This will be how the listen looks when we add our new event, when the function <code>parse_command</code> returns <code>true</code>
+we will emit an event to <code>command_parsed</code>. The concept of chaining events together with a transforming function is quite nice so there&rsquo;s a built in syntax for it in the emission API:</p>
+
+<pre>
+<span class="keyword">local</span> <span class="keyword">function</span> parse_command()
+  <span class="comment">--TODO
+</span><span class="keyword">end</span>
+
+<span class="keyword">local</span> command_parsed = emission.new() &lt;&lt; parse_command &lt;&lt; myclient.events.MESSAGE_CREATE
+</pre>
+
+
+<p>You can use either one, they're equivalent.</p>
+
+<p>Now onto <code>parse_command</code>. I'm just going to give you the grammar we're going to use and not explain it in detail; you should read the ??? for information.</p>
+
+<pre>
+<span class="comment">-- All you need to know about grammar
+</span><span class="comment">-- is that we call grammar:match("")
+</span><span class="comment">-- and either get nil or a {prefix = "", name = "", args = {""}}
+</span><span class="keyword">local</span> grammar = re.compile<span class="string">[[
+  command &lt;- {|prefix %s? name %s* args|}
+  args &lt;- {:args: {|(arg %s*)*|}:}
+  arg &lt;- string / {%S+}
+  name &lt;- {:name: %S+ :}
+  prefix &lt;- {:prefix: . :}
+  string &lt;- '"' sbody '"'
+  sbody &lt;- {~ (('\"' -&gt; '"') / (!'"' .))* ~}
+]]</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
+  <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
+  <span class="keyword">if</span> result <span class="keyword">then</span>
+    <span class="keyword">return</span> <span class="keyword">true</span>, ctx
+    :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
+    :add_extra(<span class="string">'command'</span>, result)
+  <span class="keyword">else</span>
+    <span class="keyword">return</span> <span class="keyword">false</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+
+
+<p>So this function will use the grammar to parse a string: returning <code>true</code>
+and our updated context on success; or false on failure.</p>
+
+<p><a name="Recap_2"></a></p>
+
+<h3>Recap 2</h3>
+
+<p>Let&rsquo;s use our new event and parse some new commands.</p>
+
+<pre>
+<span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
+<span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span>
+<span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span>
+<span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span>
+
+<span class="keyword">local</span> myclient = client.create{token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>}
+
+myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
+  util.info (<span class="string">"Bot %s online!"</span>, myclient:me().tag)
+<span class="keyword">end</span>)
+
+<span class="keyword">local</span> grammar = re.compile<span class="string">[[
+  command &lt;- {|prefix %s? name %s* args|}
+  args &lt;- {:args: {|(arg %s*)*|}:}
+  arg &lt;- string / {%S+}
+  name &lt;- {:name: %S+ :}
+  prefix &lt;- {:prefix: . :}
+  string &lt;- '"' sbody '"'
+  sbody &lt;- {~ (('\"' -&gt; '"') / (!'"' .))* ~}
+]]</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
+  <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
+  <span class="keyword">if</span> result <span class="keyword">then</span>
+    <span class="keyword">return</span> <span class="keyword">true</span>, ctx
+    :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
+    :add_extra(<span class="string">'command'</span>, result)
+  <span class="keyword">else</span>
+    <span class="keyword">return</span> <span class="keyword">false</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> command_parsed = emission.new() &lt;&lt; parse_command &lt;&lt; myclient.events.MESSAGE_CREATE
+
+command_parsed:listen(<span class="keyword">function</span>(ctx)
+  <span class="keyword">if</span> ctx.cmd == <span class="string">"!ping"</span> <span class="keyword">then</span> ctx.msg:reply<span class="string">"Pong!"</span> <span class="keyword">end</span>
+<span class="keyword">end</span>)
+
+myclient:run()
+</pre>
+
+
+<p>Okay so we've got a parser, but we've kept the same if statement to check if we have a command. Let&rsquo;s add
+a table of commands:</p>
+
+<pre>
+<span class="keyword">local</span> commands = {}
+command_parsed:listen(<span class="keyword">function</span>(ctx)
+  <span class="keyword">local</span> handler = commands[ctx.cmd]
+  <span class="keyword">if</span> handler <span class="keyword">then</span>
+    <span class="keyword">local</span> reply = <span class="global">table</span>.pack(handler(ctx))
+    <span class="keyword">if</span> reply.n &gt; <span class="number">0</span> <span class="keyword">then</span> ctx.msg:reply(<span class="global">table</span>.unpack(reply, <span class="number">1</span>, reply.n))
+  <span class="keyword">end</span>
+<span class="keyword">end</span>)
+</pre>
+
+
+<p>This will lookup the function in <code>commands</code> and call it with the context.</p>
+
+<p>Now our ping command looks like this:</p>
+
+<pre>
+commands[<span class="string">"!ping"</span>] = <span class="keyword">function</span>() <span class="keyword">return</span> <span class="string">"Pong!"</span> <span class="keyword">end</span>
+</pre>
+
+
+<p>And our script so far should look like:</p>
+
+<pre>
+<span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
+<span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span>
+<span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span>
+<span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span>
+
+<span class="keyword">local</span> myclient = client.create{token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>}
+
+myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
+  util.info (<span class="string">"Bot %s online!"</span>, myclient:me().tag)
+<span class="keyword">end</span>)
+
+<span class="keyword">local</span> grammar = re.compile<span class="string">[[
+  command &lt;- {|prefix %s? name %s* args|}
+  args &lt;- {:args: {|(arg %s*)*|}:}
+  arg &lt;- string / {%S+}
+  name &lt;- {:name: %S+ :}
+  prefix &lt;- {:prefix: . :}
+  string &lt;- '"' sbody '"'
+  sbody &lt;- {~ (('\"' -&gt; '"') / (!'"' .))* ~}
+]]</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
+  <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
+  <span class="keyword">if</span> result <span class="keyword">then</span>
+    <span class="keyword">return</span> <span class="keyword">true</span>, ctx
+    :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
+    :add_extra(<span class="string">'command'</span>, result)
+  <span class="keyword">else</span>
+    <span class="keyword">return</span> <span class="keyword">false</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> command_parsed = emission.new() &lt;&lt; parse_command &lt;&lt; myclient.events.MESSAGE_CREATE
+
+<span class="keyword">local</span> commands = {}
+command_parsed:listen(<span class="keyword">function</span>(ctx)
+  <span class="keyword">local</span> handler = commands[ctx.cmd]
+  <span class="keyword">if</span> handler <span class="keyword">then</span>
+    <span class="keyword">local</span> reply = <span class="global">table</span>.pack(handler(ctx))
+    <span class="keyword">if</span> reply.n &gt; <span class="number">0</span> <span class="keyword">then</span> ctx.msg:reply(<span class="global">table</span>.unpack(reply, <span class="number">1</span>, reply.n))
+  <span class="keyword">end</span>
+<span class="keyword">end</span>)
+
+commands[<span class="string">"!ping"</span>] = <span class="keyword">function</span>() <span class="keyword">return</span> <span class="string">"Pong!"</span> <span class="keyword">end</span>
+
+myclient:run()
+</pre>
+
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-09 17:50:25 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

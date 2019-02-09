@@ -17,6 +17,7 @@ schema {
     ,"avatar" --6
     ,"bot"
     ,"mfa_enabled"
+    ,"locale"
     ,"verified"
     ,"email"
 }
@@ -31,6 +32,7 @@ function new_from(state, payload)
         ,payload.avatar
         ,not not payload.bot
         ,not not payload.mfa_enabled
+        ,payload.locale
     }, _ENV)
 end
 

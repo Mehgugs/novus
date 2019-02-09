@@ -26,6 +26,7 @@ local xpcall = xpcall
 local traceback = debug.traceback
 local type = type
 local tostring = tostring
+local ipairs = ipairs
 local _VERSION = _VERSION
 --start-module--
 local _ENV = {}
@@ -173,10 +174,10 @@ function request(state, method, endpoint, payload, query, files)
     end
 
     if global then
-        state.global_lock:unlockAfter(delay)
+        state.global_lock:unlock_after(delay)
         if routex then routex:unlock() end
     else
-        routex:unlockAfter(delay)
+        routex:unlock_after(delay)
         state.global_lock:unlock()
     end
 
@@ -342,9 +343,9 @@ function get_channel_message(state, channel_id, message_id)
     return request(state, "GET", endpoint)
 end
 
-function create_message(state, channel_id, payload)
+function create_message(state, channel_id, payload, files)
     local endpoint = endpoints.CHANNEL_MESSAGES:format(channel_id)
-    return request(state, "POST", endpoint, payload)
+    return request(state, "POST", endpoint, payload, nil, files)
 end
 
 function create_reaction(state, channel_id, message_id, emoji, payload)

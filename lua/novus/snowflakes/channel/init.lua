@@ -8,6 +8,7 @@ local setmetatable = setmetatable
 local gettime = cqueues.monotime
 local running = cqueues.running
 local snowflakes = snowflake.snowflakes
+local pretty = require"pl.pretty"
 --start-module--
 local _ENV = snowflake"channel"
 
@@ -15,11 +16,11 @@ schema {
      "type" --4
 }
 
-function new_from(_ENV, state, payload, cache) --luacheck: ignore
+function newer_from(_ENV, state, payload) --luacheck: ignore
     return setmetatable({
          util.uint(payload.id)
         ,gettime()
-        ,cache
+        ,state.cache.methods.channel
         ,payload.type
     }, _ENV)
 end
@@ -44,17 +45,21 @@ local snowflake_map = {
     ,group = 'groupchannel'
 }
 
-function get_from(state, channel_id, id)
-    local mcache = state.cache.channel[channel_id]
-    if mcache[id] then return mcache[id]
+function get_from(state, channel_id)
+    if state.cache.channel[channel_id] then return state.cache.channel[channel_id]
     else
-        local success, data, err = api.get_message(state.api, channel_id, id)
+        local success, data, err = api.get_channel(state.api, channel_id)
         if success then
             return snowflakes[snowflake_map[channel_type[data.type]]].new_from(state, data)
         else
             return nil, err
         end
     end
+end
+
+function new_from(state, payload, old)
+    local typ = snowflakes[snowflake_map[channel_type[payload.type]]]
+    return typ.new_from(state, payload, old)
 end
 
 --end-module--

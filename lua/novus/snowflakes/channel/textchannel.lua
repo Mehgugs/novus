@@ -4,6 +4,7 @@ local snowflake = require"novus.snowflakes"
 local cqueues = require"cqueues"
 local view = require"novus.cache.view"
 local api = require"novus.api"
+local channel = require"novus.snowflakes.channel"
 local running = cqueues.running
 local setmetatable = setmetatable
 local snowflakes = snowflake.snowflakes
@@ -11,15 +12,15 @@ local type = type
 local ipairs = ipairs
 local insert, concat = table.insert, table.concat
 --start-module--
-local _ENV = require"novus.snowflakes.channel" "textchannel"
+local _ENV =  channel("textchannel")
 
 schema {
      "last_message_id" --5
     ,"messages" --6
 }
 
-local base = new_from
-function new_from(_ENV, state, payload, cache) --luacheck: ignore
+local base = channel.newer_from
+function newer_from(_ENV, state, payload, cache) --luacheck: ignore
     local object = base(_ENV, state, payload, cache)
     object[5] = util.uint(payload.last_message_id)
     object[6] = view.copy(state.cache.message[object[1]])

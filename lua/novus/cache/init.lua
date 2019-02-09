@@ -27,6 +27,7 @@ function inserter(cache)
             old[3] = nil
         end
         cache[id] = object
+        return object
     end
 end
 
@@ -39,9 +40,11 @@ function new()
         cache[v] = new
         cache.methods[v] = inserter(new)
     end
-    -- special case for messages
+    -- special case for messages & members
     cache.message = {}
     cache.methods.message = {}
+    cache.member = {}
+    cache.methods.member = {}
     return cache
 end
 

@@ -1,0 +1,412 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#objects">objects</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
+  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
+  <li><strong>novus.client.emission</strong></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><a href="../manual/02-DiveIn.md.html">The First Example
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>novus.client.emission</code></h1>
+<p>Event emission.</p>
+<p> Dependencies: <a href="../libraries/novus.util.html#">novus.util</a></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new ()</a></td>
+	<td class="summary">Makes a new emitter.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#listen">listen (em, ...)</a></td>
+	<td class="summary">Adds one or more listeners to the emitter.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#emit">emit (em, event)</a></td>
+	<td class="summary">Emits an event calling all the callbacks registered.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#enqueue">enqueue (em, event)</a></td>
+	<td class="summary">Emits an event but wraps the emission in <code>cqueues:wrap</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#remove">remove (em, cb)</a></td>
+	<td class="summary">Removes a callback by value, filtering the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#wait">wait (em[, timeout])</a></td>
+	<td class="summary">Waits for the next event to be emitted, or the timeout to expire.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#promised">promised (em)</a></td>
+	<td class="summary">Returns a promise that will resolve to the event data of the next event emitted.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__pairs">__pairs (em[, timeout])</a></td>
+	<td class="summary"><a href="https://www.lua.org/manual/5.3/manual.html#pdf-pairs">pairs</a> iterator, iterates over all events received until timeout or event data is nil.</td>
+	</tr>
+</table>
+<h2><a href="#objects">objects</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#emitter">emitter</a></td>
+	<td class="summary">An emitter object.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new ()</strong>
+    </dt>
+    <dd>
+    Makes a new emitter.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "listen"></a>
+    <strong>listen (em, ...)</strong>
+    </dt>
+    <dd>
+    Adds one or more listeners to the emitter.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">function</span></span>
+         Callback functions.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "emit"></a>
+    <strong>emit (em, event)</strong>
+    </dt>
+    <dd>
+    Emits an event calling all the callbacks registered.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+        <li><span class="parameter">event</span>
+         The data to emit.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "enqueue"></a>
+    <strong>enqueue (em, event)</strong>
+    </dt>
+    <dd>
+    Emits an event but wraps the emission in <code>cqueues:wrap</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+        <li><span class="parameter">event</span>
+         The data to emit.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "remove"></a>
+    <strong>remove (em, cb)</strong>
+    </dt>
+    <dd>
+    Removes a callback by value, filtering the queue.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+        <li><span class="parameter">cb</span>
+            <span class="types"><span class="type">function</span></span>
+         The callback to remove.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "wait"></a>
+    <strong>wait (em[, timeout])</strong>
+    </dt>
+    <dd>
+    Waits for the next event to be emitted, or the timeout to expire.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span></span>
+         An optional timeout on the wait.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The event data emitted.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+
+           <span class="types"><span class="type">nil</span></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "promised"></a>
+    <strong>promised (em)</strong>
+    </dt>
+    <dd>
+    Returns a promise that will resolve to the event data of the next event emitted.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">promise</span></span>
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__pairs"></a>
+    <strong>__pairs (em[, timeout])</strong>
+    </dt>
+    <dd>
+    <a href="https://www.lua.org/manual/5.3/manual.html#pdf-pairs">pairs</a> iterator, iterates over all events received until timeout or event data is nil.
+  You may set the timeout to 0 to effectively stop receiving events.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span></span>
+
+
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">for</span> ctx, event <span class="keyword">in</span> <span class="global">pairs</span>(emitter) <span class="keyword">do</span>
+   <span class="comment">-- process event here
+</span>   <span class="keyword">if</span> condition <span class="keyword">then</span> ctx.timeout = <span class="number">0</span> <span class="keyword">end</span> <span class="comment">--unsubscribe
+</span><span class="keyword">end</span>
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="objects"></a>objects</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "emitter"></a>
+    <strong>emitter</strong>
+    </dt>
+    <dd>
+    An emitter object.  Set callbacks with <a href="../libraries/novus.client.emission.html#listen">listen</a> and emit events with <a href="../libraries/novus.client.emission.html#emit">emit</a>.
+  All functions which take a emitter as their first argument can be called from the emitter in method form.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">pollfd</span>
+         Condition variable, signalled on emission.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">E = emission.new()
+E:listen(<span class="global">print</span>)
+E:emit<span class="string">"Hello, world!"</span>
+<span class="comment">--&gt; Hello, world!
+</span>E:remove(<span class="global">print</span>)
+E:emit<span class="string">"No one's listening :("</span>
+<span class="comment">--&gt; nothing happens</span></pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-02-09 17:50:25 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

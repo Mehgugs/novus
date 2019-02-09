@@ -3,6 +3,7 @@ local api = require"novus.api"
 local util = require"novus.snowflakes.helpers"
 local cache = require"novus.cache"
 local snowflake = require"novus.snowflakes"
+local modifiable = require"novus.snowflakes.mixins.modifiable"
 local view = require"novus.cache.view"
 local cqueues = require"cqueues"
 local json = require"cjson"
@@ -67,37 +68,41 @@ schema {
     ,"mentioned"
 }
 
-local function update_mentions(state, payload)
+function processor.mentions(payload, state)
     local mentions = {}
-    for i, u in ipairs(payload.mentions) do
-        local uid = util.uint(u.id)
-        if not state.cache.user[uid] then
-            snowflakes.user.new_from(state, u, state.cache.methods.user)
+    if payload.mentions then
+        for i, u in ipairs(payload.mentions) do
+            local uid = util.uint(u.id)
+            if not state.cache.user[uid] then
+                snowflakes.user.new_from(state, u, state.cache.methods.user)
+            end
+            mentions[i] = uid
         end
-        mentions[i] = uid
     end
     return mentions
 end
 
-local function collect_emojis(state, reactions)
-    for _, r in ipairs(reactions) do
-        if r.emoji.id ~= null then
-            snowflakes.emoji.new_from(state, r.emoji)
+function processor.reactions(payload, state)
+    if payload.reactions then
+        for _, r in ipairs(payload.reactions) do
+            if r.emoji.id ~= null then
+                snowflakes.emoji.new_from(state, r.emoji)
+            end
         end
     end
+    return payload.reactions
 end
 
-function new_from(state, payload)
+function processor.author(payload, state)
     local user = payload.author
     local uid = util.uint(user.id)
     if not state.cache.user[uid] then
         snowflakes.user.new_from(state, user, state.cache.methods.user)
     end
+    return uid
+end
 
-    local mentions = update_mentions(state, payload)
-
-    if payload.reactions then collect_emojis(state, payload.reactions) end
-
+function new_from(state, payload)
     local channel_id, guild_id =
      util.uint(payload.channel_id)
     ,util.uint(payload.guild_id)
@@ -108,6 +113,7 @@ function new_from(state, payload)
         mycache = util.cache()
         state.cache.message[channel_id] = mycache
         method = cache.inserter(mycache)
+        state.cache.methods.message[channel_id] = method
     end
 
     return setmetatable({
@@ -116,7 +122,7 @@ function new_from(state, payload)
         ,method
         ,channel_id
         ,guild_id
-        ,uid
+        ,processor.author(payload, state)
         ,payload.type
         ,payload.content
         ,payload.timestamp
@@ -128,36 +134,17 @@ function new_from(state, payload)
         ,payload.pinned
 
         ,payload.mention_everyone
-        ,mentions
+        ,processor.mentions(payload, state)
         ,payload.mention_roles
 
-        ,payload.reactions
+        ,processor.reactions(payload, state)
 
         ,payload.webhook_id
 
     },_ENV)
 end
 
-local function modify(message, by)
-    local state = running():novus()
-    local success, data, err = api.edit_message(state.api, message[4], message[1], by)
-    if success and data then
-        message[23] = nil
-        for key, value in pairs(data) do
-            if schema[key] >= 7 then
-                if key == "mentions" then
-                    value = update_mentions(state, data)
-                elseif key == "reactions" then
-                    collect_emojis(state, value)
-                end
-                message[schema[key]] = value
-            end
-        end
-        return message
-    else
-        return false, err
-    end
-end
+_ENV = modifiable(_ENV, api.edit_message) -- endow with modify
 
 function methods.edit(message, arg, ...)
     local content = null
@@ -316,7 +303,7 @@ function properties.guild(message)
 end
 
 function properties.member(message)
-    return message[5] and snowflakes.member.get(message[6])
+    return message[5] and snowflakes.member.get(message[5], message[6])
 end
 
 function properties.link(message)
@@ -331,7 +318,7 @@ function get_from(state, channel_id, id)
     local mcache = state.cache[__name][channel_id]
     if mcache[id] then return mcache[id]
     else
-        local success, data, err = api.get_message(state.api, channel_id, id)
+        local success, data, err = api.get_channel_message(state.api, channel_id, id)
         if success then
             return new_from(state, data)
         else

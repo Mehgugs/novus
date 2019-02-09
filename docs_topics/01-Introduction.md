@@ -12,8 +12,13 @@ novus is naturally async and multi-threading ready via the **cqueues.thread** mo
 
 ### About these docs
 
-The documentation produced by LDoc aims to be a technical reference of the API exposed by novus and not contain too much waffle. The accompanying [User Manual]() will tell you
+The documentation produced by LDoc aims to be a technical reference of the API exposed by novus and not contain too much waffle. The accompanying Manual pages will tell you
 *how* to write bots in novus, with full examples and explanation.
+
+### Where Do I start?
+
+#### @{02-DiveIn.md|The First Example}
+
 
 [discord]: https://discordapp.com/developers/docs/intro
 [lua]: https://www.lua.org/manual/5.3/

@@ -11,15 +11,13 @@ local cond = require"cqueues.condition"
 local setmetatable = setmetatable
 --start-module--
 local _ENV = {}
-local mutex_behaviour = {}
 
-mutex_behaviour.__index = mutex_behaviour
+__index = _ENV
 
 --- Locks the mutex.
--- @within Mutex
--- @function Mutex:lock
+-- @tparam mutex self
 -- @tparam[opt] number timeout an optional timeout to wait.
-function mutex_behaviour:lock(timeout)
+function lock(self, timeout)
     if self.inuse then
         self.inuse = self.cond:wait(timeout)
     else
@@ -28,9 +26,8 @@ function mutex_behaviour:lock(timeout)
 end
 
 --- Unlocks the mutex.
--- @within Mutex
--- @function Mutex:lock
-function mutex_behaviour:unlock()
+-- @tparam mutex self
+function unlock(self)
     if self.inuse then
         self.inuse = false
         self.cond:signal(1)
@@ -43,24 +40,35 @@ local function unlockAfter(self, time)
 end
 
 --- Unlocks the mutex after the specified time in seconds.
--- @within Mutex
--- @function Mutex:unlockAfter
+-- @tparam mutex self
 -- @tparam number time The time to unlock after, in seconds.
-function mutex_behaviour:unlockAfter(time)
+function unlock_after(self, time)
     me():wrap(unlockAfter, self, time)
 end
 
+local function defered(self)
+    sleep()
+    self:unlock()
+end
+
+--- Unlocks the mutex on the next schedule.
+-- @tparam mutex self
+function defer_unlock(self)
+    me():wrap(defered, self)
+end
+
 --- Creates a new mutex
--- @treturn Mutex
+-- @treturn mutex
 function new()
     return setmetatable({
          cond = cond.new()
         ,inuse= false
-    }, mutex_behaviour)
+    }, _ENV)
 end
 
 --- Mutex Object.
--- @table Mutex
+-- All functions which take a mutex as their first argument can be called from the mutex in method form.
+-- @table mutex
 -- @within Objects
 -- @bool inuse
 -- @field cond The condition variable.

@@ -54,7 +54,7 @@
   <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
   <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
   <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><strong>novus.util.mutex</strong></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
   <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
   <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
   <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
@@ -64,7 +64,7 @@
   <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
   <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
   <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
-  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+  <li><strong>snowflakes</strong></li>
 </ul>
 <h2>Manual</h2>
 <ul class="nowrap">
@@ -78,44 +78,39 @@
 
 <div id="content">
 
-<h1>Module <code>novus.util.mutex</code></h1>
-<p>A minimal mutex implementation.</p>
-<p>
-</p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../libraries/novus.util.html#">novus.util</a>
-    </ul>
+<h1>Module <code>snowflakes</code></h1>
+<p>Snowflake object protocol.</p>
+<p>  Dependencies: <a href="../libraries/novus.const.html#">novus.const</a></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#lock">lock (self[, timeout])</a></td>
-	<td class="summary">Locks the mutex.</td>
+	<td class="name" nowrap><a href="#__eq">__eq (A, B)</a></td>
+	<td class="summary">== metamethod, comparison between two snowflake objects.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#unlock">unlock (self)</a></td>
-	<td class="summary">Unlocks the mutex.</td>
+	<td class="name" nowrap><a href="#__gc">__gc (snowflake)</a></td>
+	<td class="summary">__gc finalizer for caching protocol.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#unlock_after">unlock_after (self, time)</a></td>
-	<td class="summary">Unlocks the mutex after the specified time in seconds.</td>
+	<td class="name" nowrap><a href="#__tostring">__tostring (snowflake)</a></td>
+	<td class="summary">tostring metamethod.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#defer_unlock">defer_unlock (self)</a></td>
-	<td class="summary">Unlocks the mutex on the next schedule.</td>
+	<td class="name" nowrap><a href="#__pairs">__pairs (snowflake)</a></td>
+	<td class="summary"><a href="https://www.lua.org/manual/5.3/manual.html#pdf-pairs">pairs</a> iterator</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#new">new ()</a></td>
-	<td class="summary">Creates a new mutex</td>
+	<td class="name" nowrap><a href="#destroy">destroy (snowflake)</a></td>
+	<td class="summary">Destroys a snowflake object, uncaching it.</td>
 	</tr>
 </table>
 <h2><a href="#Objects">Objects</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#mutex">mutex</a></td>
-	<td class="summary">Mutex Object.</td>
+	<td class="name" nowrap><a href="#snowflake">snowflake</a></td>
+	<td class="summary">Abstract snowflake object.</td>
 	</tr>
 </table>
 
@@ -127,118 +122,126 @@
 
     <dl class="function">
     <dt>
-    <a name = "lock"></a>
-    <strong>lock (self[, timeout])</strong>
+    <a name = "__eq"></a>
+    <strong>__eq (A, B)</strong>
     </dt>
     <dd>
-    Locks the mutex.
+    == metamethod, comparison between two snowflake objects.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">self</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.mutex.html#mutex">mutex</a></span>
+        <li><span class="parameter">A</span>
+            <span class="types"><a class="type" href="../libraries/snowflakes.html#snowflake">snowflake</a></span>
 
 
         </li>
-        <li><span class="parameter">timeout</span>
-            <span class="types"><span class="type">number</span></span>
-         an optional timeout to wait.
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "unlock"></a>
-    <strong>unlock (self)</strong>
-    </dt>
-    <dd>
-    Unlocks the mutex.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">self</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.mutex.html#mutex">mutex</a></span>
+        <li><span class="parameter">B</span>
+            <span class="types"><a class="type" href="../libraries/snowflakes.html#snowflake">snowflake</a></span>
 
 
         </li>
     </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "unlock_after"></a>
-    <strong>unlock_after (self, time)</strong>
-    </dt>
-    <dd>
-    Unlocks the mutex after the specified time in seconds.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">self</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.mutex.html#mutex">mutex</a></span>
-
-
-        </li>
-        <li><span class="parameter">time</span>
-            <span class="types"><span class="type">number</span></span>
-         The time to unlock after, in seconds.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "defer_unlock"></a>
-    <strong>defer_unlock (self)</strong>
-    </dt>
-    <dd>
-    Unlocks the mutex on the next schedule.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">self</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.mutex.html#mutex">mutex</a></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "new"></a>
-    <strong>new ()</strong>
-    </dt>
-    <dd>
-    Creates a new mutex
-
-
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.mutex.html#mutex">mutex</a></span>
-
-
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code> iff. <code>A.id == B.id</code> <code>false</code> otherwise.
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__gc"></a>
+    <strong>__gc (snowflake)</strong>
+    </dt>
+    <dd>
+    __gc finalizer for caching protocol.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">snowflake</span>
+            <span class="types"><a class="type" href="../libraries/snowflakes.html#snowflake">snowflake</a></span>
+         The snowflake object
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__tostring"></a>
+    <strong>__tostring (snowflake)</strong>
+    </dt>
+    <dd>
+    tostring metamethod.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">snowflake</span>
+            <span class="types"><a class="type" href="../libraries/snowflakes.html#snowflake">snowflake</a></span>
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        A string representation of the snowflake.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__pairs"></a>
+    <strong>__pairs (snowflake)</strong>
+    </dt>
+    <dd>
+    <a href="https://www.lua.org/manual/5.3/manual.html#pdf-pairs">pairs</a> iterator
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">snowflake</span>
+            <span class="types"><a class="type" href="../libraries/snowflakes.html#snowflake">snowflake</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "destroy"></a>
+    <strong>destroy (snowflake)</strong>
+    </dt>
+    <dd>
+    Destroys a snowflake object, uncaching it.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">snowflake</span>
+            <span class="types"><a class="type" href="../libraries/snowflakes.html#snowflake">snowflake</a></span>
+
+
+        </li>
+    </ul>
+
 
 
 
@@ -249,23 +252,22 @@
 
     <dl class="function">
     <dt>
-    <a name = "mutex"></a>
-    <strong>mutex</strong>
+    <a name = "snowflake"></a>
+    <strong>snowflake</strong>
     </dt>
     <dd>
-    Mutex Object.
- All functions which take a mutex as their first argument can be called from the mutex in method form.
+    Abstract snowflake object.
 
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">cond</span>
-         The condition variable.
+        <li><span class="parameter">created_at</span>
+            <span class="types"><span class="type">Date</span></span>
+         The date the snowflake was created at.
         </li>
-        <li><span class="parameter">inuse</span>
-            <span class="types"><span class="type">bool</span></span>
-
-
+        <li><span class="parameter">timestamp</span>
+            <span class="types"><span class="type">integer</span></span>
+         The unix timestamp the snowflake was created at.
         </li>
     </ul>
 

@@ -3,13 +3,14 @@ local api = require"novus.api"
 local shard = require"novus.shard"
 local util = require"novus.snowflakes.helpers"
 local list = require"novus.util.list"
+local view = require"novus.cache.view"
 local snowflake = require"novus.snowflakes"
-local modifiable = require"novus.snowflakes.mixins.modifiable"
 local const = require"novus.const"
 local enums = require"novus.enums"
 local json = require"cjson"
 local cqueues = require"cqueues"
 local setmetatable = setmetatable
+local ipairs = ipairs
 local gettime = cqueues.monotime
 local running = cqueues.running
 local snowflakes = snowflake.snowflakes
@@ -102,8 +103,6 @@ schema{
     ,"roles"
 }
 
-_ENV = modifiable(_ENV, api.modify_guild)
-
 function processor.roles(roles, state)
     local out = {}
     for i, r in ipairs(roles) do
@@ -128,10 +127,11 @@ function processor.emojis(emojis, state)
     return out, "emoji_ids"
 end
 
-function processor.members(mems, state)
+function processor.members(mems, state, object)
     local out = {}
     for i, m in ipairs(mems) do
         local mid = util.uint(m.id)
+        m.guild_id = object[1]
         if not state.cache.member[mid] then
             snowflakes.member.new(m)
         end
@@ -140,10 +140,11 @@ function processor.members(mems, state)
     return out, "member_ids"
 end
 
-function processor.channels(chls, state)
+function processor.channels(chls, state, object)
     local out = {}
     for i, c in ipairs(chls) do
         local cid = util.uint(c.id)
+        c.guild_id = object[1]
         if not state.cache.channel[cid] then
             snowflakes.channel.new(c)
         end
@@ -179,7 +180,7 @@ local function new_from_available(state, payload)
          nil
         ,nil
         ,nil
-        ,true
+        ,false
         ,payload.name
         ,payload.icon
         ,payload.splash
@@ -220,10 +221,10 @@ local function new_from_available(state, payload)
         object.presences = payload.presences
     end
 
-    object.members  = view.new(state.cache.member, select_guild_snowflake, gid)
-    object.channels = view.new(state.cache.channel, select_guild_snowflake, gid)
-    object.roles    = view.new(state.cache.role, select_guild_snowflake, gid)
-    object.emojis   = view.new(state.cache.emoji, select_guild_snowflake, gid)
+    object.members  = object.members or view.new(state.cache.member[gid], select_guild_snowflake, gid)
+    object.channels = object.channels or view.new(state.cache.channel, select_guild_snowflake, gid)
+    object.roles    = object.roles or view.new(state.cache.role, select_guild_snowflake, gid)
+    object.emojis   = object.emojis  or view.new(state.cache.emoji, select_guild_snowflake, gid)
 
     return object
 end
@@ -238,6 +239,32 @@ function new_from(state, payload)
         }, _ENV)
     else
         return new_from_available(state, payload)
+    end
+end
+
+function remove_member(guild, id)
+    guild.members = view.remove_key(guild.members, id)
+end
+
+function remove_channel(guild, id)
+    guild.members = view.remove_key(guild.channels, id)
+end
+
+function remove_role(guild, id)
+    guild.roles = view.remove_key(guild.roles, id)
+end
+
+function remove_emoji(guild, id)
+    guild.emojis = view.remove_key(guild.emojis, id)
+end
+
+function modify(snowflake, by)
+    local state = running():novus()
+    local success, data, err = api.modify_guild(state.api, snowflake[1], by)
+    if success and data then
+        return new_from_available(state, data)
+    else
+        return nil, err
     end
 end
 

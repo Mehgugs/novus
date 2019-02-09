@@ -34,17 +34,17 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
-<li><a href="#Objects">Objects</a></li>
+<li><a href="#objects">objects</a></li>
 </ul>
 
 
 <h2>Libraries</h2>
 <ul class="nowrap">
   <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><strong>novus.cache</strong></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
   <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
   <li><a href="../libraries/novus.client.html">novus.client</a></li>
-  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
+  <li><strong>novus.client.context</strong></li>
   <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
   <li><a href="../libraries/novus.const.html">novus.const</a></li>
   <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
@@ -78,23 +78,27 @@
 
 <div id="content">
 
-<h1>Module <code>novus.cache</code></h1>
-<p>Caching mechanism for novus.</p>
-<p> Dependencies: <a href="../libraries/novus.util.html#">novus.util</a></p>
+<h1>Module <code>novus.client.context</code></h1>
+<p>Context object returned in events.</p>
+<p>  Dependencies: <code>novus.snowflakes</code></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#new">new ()</a></td>
-	<td class="summary">Constructs a new cache object.</td>
+	<td class="name" nowrap><a href="#add_extra">add_extra (ctx, field, value)</a></td>
+	<td class="summary">Adds a new key value pair into the context object</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#interpose">interpose (name, value)</a></td>
+	<td class="summary">Interposition mechanism for adding new methods to the context object.</td>
 	</tr>
 </table>
-<h2><a href="#Objects">Objects</a></h2>
+<h2><a href="#objects">objects</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#cache">cache</a></td>
-	<td class="summary">A collection of weak tables which collect snowflakes.</td>
+	<td class="name" nowrap><a href="#context">context</a></td>
+	<td class="summary">An object for holding the various objects emitted in events.</td>
 	</tr>
 </table>
 
@@ -106,20 +110,61 @@
 
     <dl class="function">
     <dt>
-    <a name = "new"></a>
-    <strong>new ()</strong>
+    <a name = "add_extra"></a>
+    <strong>add_extra (ctx, field, value)</strong>
     </dt>
     <dd>
-    Constructs a new cache object.
+    Adds a new key value pair into the context object
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ctx</span>
+            <span class="types"><a class="type" href="../libraries/novus.client.context.html#context">context</a></span>
+
+
+        </li>
+        <li><span class="parameter">field</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+        <li><span class="parameter">value</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "interpose"></a>
+    <strong>interpose (name, value)</strong>
+    </dt>
+    <dd>
+    Interposition mechanism for adding new methods to the context object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The method name to interpose.
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">function</span></span>
+         The function value to interpose.
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.cache.html#cache">cache</a></span>
-
-
+           <span class="types"><span class="type">func</span></span>
+        The old method, if it exists.
     </ol>
 
 
@@ -127,36 +172,53 @@
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Objects"></a>Objects</h2>
+    <h2 class="section-header "><a name="objects"></a>objects</h2>
 
     <dl class="function">
     <dt>
-    <a name = "cache"></a>
-    <strong>cache</strong>
+    <a name = "context"></a>
+    <strong>context</strong>
     </dt>
     <dd>
-    A collection of weak tables which collect snowflakes.
+    An object for holding the various objects emitted in events.
 
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">methods</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-         Closures for caching specific snowflake types.
+        <li><span class="parameter">guild</span>
+         The guild involved in the request.
         </li>
-        <li><span class="parameter">type</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-         Each cachable snowflake type has a table inside the cache, where objects of that type are kept.
+        <li><span class="parameter">channel</span>
+         The channel involved in the request.
+        </li>
+        <li><span class="parameter">user</span>
+         The user object involved in the request.
+        </li>
+        <li><span class="parameter">member</span>
+         The member object involved in the request.
+        </li>
+        <li><span class="parameter">role</span>
+         The role involved in the request.
+        </li>
+        <li><span class="parameter">msg</span>
+         The msg involved in the request.
         </li>
     </ul>
 
 
 
-    <h3>See also:</h3>
+
+    <h3>Usage:</h3>
     <ul>
-         <a href="../libraries/novus.cache.html#new">cache.new</a>
+        <pre class="example"><span class="comment">-- Example
+</span>client.events.MESSAGE_CREATE :listen (<span class="keyword">function</span>(ctx)
+    ctx.channel:send{embed = {
+        title = ctx.guild.name
+        description = <span class="string">"%s sent a message."</span> % ctx.user
+    }}
+<span class="keyword">end</span>)
+</pre>
     </ul>
-
 
 </dd>
 </dl>

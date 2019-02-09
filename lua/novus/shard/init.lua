@@ -10,7 +10,6 @@ local errno = require"cqueues.errno"
 local websocket = require"http.websocket"
 local zlib = require"http.zlib"
 local httputil = require"http.util"
-local rapidjson = require"rapidjson"
 local json = require"cjson"
 local util = require"novus.util"
 local const = require"novus.const"
@@ -31,6 +30,7 @@ local traceback = debug.traceback
 local xpcall = xpcall
 local toquery = httputil.dict_to_query
 local tostring = tostring
+local null = json.null
 --start-module--
 local _ENV = {}
 
@@ -54,6 +54,12 @@ local ops = util.reflect{
 
 local token_check = lpeg.check(patterns.token * -1)
 
+--- Shard state object.
+-- @table shard
+-- @within objects
+-- @field is_ready Condition variable signalled when the shard receives a READY event.
+-- @int to_load The number of guilds the shard expects to load.
+-- @int loaded The number of guilds the shard has loaded.
 
 function init(options, idmutex)
     local state = {options = {}}
@@ -68,7 +74,8 @@ function init(options, idmutex)
     state.stop_heart = cond.new()
     state.identify_wait = cond.new()
     state.is_ready = promise.new()
-    state.ready_metadata = {}
+    state.to_load = -1
+    state.loaded = 0
     state.beats = 0
     util.info("Initialized Shard-%s with TOKEN-%x", state.options.id, util.hash(state.options.token))
     if not (state.options.compress or state.options.transport_compression) then
@@ -79,7 +86,7 @@ function init(options, idmutex)
         encoding = const.gateway.encoding,
         compress = state.options.transport_compression and const.gateway.compress or nil
     })
-    state.loop = cqueues.new()
+    state.loop = state.options.loop
     return state
 end
 
@@ -107,10 +114,7 @@ function connect(state)
 
         state.loop:wrap(messages, state)
 
-        local client = me():novus()
-        if client.loops[state.options.id] == nil then
-            state.loop:novus_associate(client, state.options.id)
-        end
+        state.loop:novus_start(state.options.id)
         return state, true
     end
 end
@@ -173,7 +177,7 @@ function send(state, op, d, identify)
     else
         success, err = false, 'Invalid session'
     end
-    state.shard_mutex:unlockAfter(GATEWAY_DELAY)
+    state.shard_mutex:unlock_after(GATEWAY_DELAY)
     return state, success, err
 end
 
@@ -312,9 +316,6 @@ end
 
 function DISPATCH(state, _, d, t, s)
     state._seq = s --+
-    if t == 'READY' then
-        t = 'SHARD_READY'
-    end
     return state.loop:novus_dispatch(state, t, d)
 end
 

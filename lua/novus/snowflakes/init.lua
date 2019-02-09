@@ -1,14 +1,27 @@
+--- Snowflake object protocol.
+--  Dependencies: `novus.const`
+-- @module snowflakes
+-- @alias _ENV
+
 --imports--
 local util = require"novus.snowflakes.helpers"
 local const = require"novus.const"
-local gettime = require"cqueues".monotime
+local cqueues = require"cqueues"
+local gettime = cqueues.monotime
 local lifetimes = const.lifetimes
 local next = next
 local type = type
+local running = cqueues.running
 --start-module--
 local _ENV = util.snowflake_root()
 
 __name = "snowflake"
+
+--- Abstract snowflake object.
+-- @table snowflake
+-- @within Objects
+-- @tparam Date created_at The date the snowflake was created at.
+-- @int timestamp The unix timestamp the snowflake was created at.
 
 local _schema, sc_len = util.new_schema()
 
@@ -20,6 +33,10 @@ schema {
     ,"cache"
 }
 
+--- == metamethod, comparison between two snowflake objects.
+-- @tparam snowflake A
+-- @tparam snowflake B
+-- @treturn bool `true` iff. `A.id == B.id` `false` otherwise.
 function __eq(A, B)
     return A[1] == B[1]
 end
@@ -32,13 +49,13 @@ function id(v)
     end
 end
 
-methods, properties, constants = {}, {}, {}
+methods, properties, constants, processor = {}, {}, {}, {}
 
 function properties.created_at(obj)
     return util.Date.fromSnowflake(obj[1])
 end
 
-function properties.timestamp(obj) return createdAt(obj):toISO() end
+function properties.timestamp(obj) return util.uint.timestamp(obj[1]) end
 
 function get_from()
     return util.throw("snowflake.get not implemented.")
@@ -47,14 +64,21 @@ end
 __index = methods
 __newindex = util.makenewindex(_ENV)
 
+--- __gc finalizer for caching protocol.
+-- @tparam snowflake snowflake The snowflake object
 function __gc(snowflake)
     if snowflake[3] and gettime() - snowflake[2] <= lifetimes[snowflake.__name] then
         return snowflake[3](snowflake)
     end
 end
+
+--- tostring metamethod.
+-- @tparam snowflake snowflake
+-- @treturn string A string representation of the snowflake.
 function __tostring(snowflake)
     return ("%s: %u"):format(snowflake.kind, snowflake[1])
 end
+
 local function snowflake_iter(invar, state)
     local key, idx = next(invar.__schema, state)
     if key ~= sc_len then
@@ -64,6 +88,8 @@ local function snowflake_iter(invar, state)
     end
 end
 
+--- `pairs` iterator
+-- @tparam snowflake snowflake
 function __pairs(snowflake)
     return snowflake_iter, snowflake
 end
@@ -74,6 +100,8 @@ function destroy_from(state, snowflake)
     if cache then cache[snowflake[1]] = nil end
 end
 
+--- Destroys a snowflake object, uncaching it.
+-- @tparam snowflake snowflake
 function destroy(snowflake)
     return destroy_from(running():novus(), snowflake)
 end
