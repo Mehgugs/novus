@@ -324,7 +324,7 @@ command_parsed:listen(function(ctx)
   local handler = commands[ctx.cmd]
   if handler then
     local reply = table.pack(handler(ctx))
-    if reply.n > 0 then ctx.msg:reply(table.unpack(reply, 1, reply.n))
+    if reply.n > 0 then ctx.msg:reply(table.unpack(reply, 1, reply.n)) end
   end
 end)
 

@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><strong>divein.lua</strong></li>
+</ul>
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
+  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
+  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><a href="../manual/02-DiveIn.md.html">The First Example
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>divein.lua</h2>
+<pre>
+<span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
+<span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span>
+<span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span>
+<span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span>
+
+<span class="keyword">local</span> myclient = client.create{token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>}
+
+myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
+  util.info (<span class="string">"Bot %s online!"</span>, myclient:me().tag)
+<span class="keyword">end</span>)
+
+<span class="keyword">local</span> grammar = re.compile<span class="string">[[
+  command &lt;- {|prefix %s? name %s* args|}
+  args &lt;- {:args: {|(arg %s*)*|}:}
+  arg &lt;- string / {%S+}
+  name &lt;- {:name: %S+ :}
+  prefix &lt;- {:prefix: . :}
+  string &lt;- '"' sbody '"'
+  sbody &lt;- {~ (('\"' -&gt; '"') / (!'"' .))* ~}
+]]</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
+  <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
+  <span class="keyword">if</span> result <span class="keyword">then</span>
+    <span class="keyword">return</span> <span class="keyword">true</span>, ctx
+    :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
+    :add_extra(<span class="string">'command'</span>, result)
+  <span class="keyword">else</span>
+    <span class="keyword">return</span> <span class="keyword">false</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> command_parsed = emission.new() &lt;&lt; parse_command &lt;&lt; myclient.events.MESSAGE_CREATE
+
+<span class="keyword">local</span> commands = {}
+command_parsed:listen(<span class="keyword">function</span>(ctx)
+  <span class="keyword">local</span> handler = commands[ctx.cmd]
+  <span class="keyword">if</span> handler <span class="keyword">then</span>
+    <span class="keyword">local</span> reply = <span class="global">table</span>.pack(handler(ctx))
+    <span class="keyword">if</span> reply.n &gt; <span class="number">0</span> <span class="keyword">then</span> ctx.msg:reply(<span class="global">table</span>.unpack(reply, <span class="number">1</span>, reply.n)) <span class="keyword">end</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>)
+
+commands[<span class="string">"!ping"</span>] = <span class="keyword">function</span>() <span class="keyword">return</span> <span class="string">"Pong!"</span> <span class="keyword">end</span>
+
+myclient:run()</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+
