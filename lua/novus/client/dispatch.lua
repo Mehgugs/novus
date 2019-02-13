@@ -1,5 +1,6 @@
 --imports--
 local cond = require"cqueues.condition"
+local promise = require"cqueues.promise"
 local util = require"novus.util"
 local list = require"novus.util.list"
 local view = require"novus.cache.view"
@@ -18,7 +19,8 @@ local guild = require"novus.snowflakes.guild"
     local role   = require"novus.snowflakes.guild.role"
 local channel = require"novus.snowflakes.channel"
 local dm = require"novus.snowflakes.channel.privatechannel"
-    local message = require"novus.snowflakes.channel.message"
+    local message  = require"novus.snowflakes.channel.message"
+    local reaction = require"novus.snowflakes.channel.reaction"
 
 
 local ipairs = ipairs
@@ -33,15 +35,16 @@ end
 local _ENV = {}
 
 function READY(client, shard, _, event)
+    util.info"READY"
     if event.v ~= const.gateway.version then
         return util.fatal("Gateway responded with an incorrect version: %s", event.v)
     end
     shard.session_id = event.session_id
-    user.new_from(client, event.user)
+    user.upsert(client, event.user)
 
     for _, chan in ipairs(event.private_channels) do
         if chan.type == enums.channeltype.private then
-            dm.new_from(client, chan)
+            dm.upsert(client, chan)
         end
     end
 
@@ -50,19 +53,20 @@ function READY(client, shard, _, event)
     shard.to_load = #event.guilds
     shard.loading = 0
     for _, g in ipairs(event.guilds) do
-        guild.new_from(client, g)
+        guild.upsert(client, g)
     end
-    return client.events.SHARD_READY:enqueue(ctx{shard = shard.options.id})
+    if shard.raw_ready:status() == "pending" then shard.raw_ready:set(true, true) end
+    return client.events.SHARD_READY:emit(ctx{shard = shard.options.id})
 end
 
 function RESUMED(client, shard, _, event)
     util.info("Shard-%s has resumed trace=%q", shard.options.id, concat(event._trace, ', '))
-    return client.events.RESUMED:enqueue(ctx{shard = shard.options.id})
+    return client.events.RESUMED:emit(ctx{shard = shard.options.id})
 end
 
 local function load_members(m, _, state, gid)
     m.guild_id = gid
-    member.new_from(state, m)
+    member.upsert(state, m, gid)
 end
 
 function GUILD_MEMBERS_CHUNK(client, shard, _, event)
@@ -77,7 +81,7 @@ function CHANNEL_CREATE(client, shard, _, event)
     if has_guild then
         g = guild.get_from(client, event.guild_id)
     end
-    return client.events.CHANNEL_CREATE:enqueue(ctx(g, channel.new_from(event)))
+    return client.events.CHANNEL_CREATE:emit(ctx(g, channel.upsert(client, event)))
 end
 
 function CHANNEL_UPDATE(client, shard, _, event)
@@ -87,7 +91,8 @@ function CHANNEL_UPDATE(client, shard, _, event)
     if has_guild then
         g = guild.get_from(client, event.guild_id)
     end
-    return client.events.CHANNEL_UPDATE:enqueue(ctx(g, channel.new_from(event)))
+    local _ = channel.get_from(client, util.uint(event.id))
+    return client.events.CHANNEL_UPDATE:emit(ctx(g, channel.upsert(client, event)))
 end
 
 function CHANNEL_DELETE(client, shard, _, event)
@@ -104,13 +109,14 @@ function CHANNEL_DELETE(client, shard, _, event)
 
     if channel then
         snowflake.destroy(channel)
-        return client.events.CHANNEL_DELETE:enqueue(ctx(g, channel))
+        return client.events.CHANNEL_DELETE:emit(ctx(g, channel))
     else
-        return client.events.CHANNEL_DELETE:enqueue(ctx{uncached = true, g, event})
+        return client.events.CHANNEL_DELETE:emit(ctx{uncached = true, g, event})
     end
 end
 
 function GUILD_CREATE(client, shard, _, event)
+    shard.raw_ready:get()
     event.id = util.uint(event.id)
     local g = client.cache.guild[event.id]
     local was_unavailable = g and g.unavailable
@@ -119,69 +125,70 @@ function GUILD_CREATE(client, shard, _, event)
         shard.loading = shard.loading + 1
         shard.to_load = shard.to_load - 1
         if was_unavailable and not event.unavailable then
-            client.events.GUILD_AVAILABLE:enqueue(ctx(new))
+            client.events.GUILD_AVAILABLE:emit(ctx(new))
         end
-        if shard.to_load == 0 then
+        util.warn("%s loaded - %s left", shard.loading, shard.to_load)
+        if shard.to_load == 0 and shard.is_ready:status() == 'pending' then
             shard.is_ready:set(true, true)
         end
     else
-        return client.events.GUILD_CREATE:enqueue(ctx(new))
+        return client.events.GUILD_CREATE:emit(ctx(new))
     end
 end
 
 function GUILD_UPDATE(client, shard, _, event)
     event.id = util.uint(event.id)
-    local g = client.cache.guild[event.id]
-    return client.events.GUILD_UPDATE:enqueue(ctx(guild.new_from(client, event, g)))
+    return client.events.GUILD_UPDATE:emit(ctx(guild.upsert(client, event)))
 end
 
 function GUILD_DELETE(client, shard, _, event)
     event.id = util.uint(event.id)
     local g = client.cache.guild[event.id]
     if event.unavailable then
-        return client.events.GUILD_UNAVAILABLE:enqueue(ctx(guild.new_from(client, event, g)))
+        return client.events.GUILD_UNAVAILABLE:emit(ctx(guild.upsert(client, event)))
     else
-        return client.events.GUILD_DELETE:enqueue(ctx(g))
+        return client.events.GUILD_DELETE:emit(ctx(g))
     end
 end
 
 function GUILD_BAN_ADD(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     local g = client.cache.guild[event.guild_id]
-    local u = user.new_from(client, event.user)
-    return client.events.BAN_ADD:enqueue(ctx(g, nil, u))
+    local u = user.upsert(client, event.user)
+    return client.events.GUILD_BAN_ADD:emit(ctx(g, nil, u))
 end
 
 function GUILD_BAN_REMOVE(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     local g = client.cache.guild[event.guild_id]
-    local u = user.new_from(client, event.user)
-    return client.events.BAN_REMOVE:enqueue(ctx(g, nil, u))
+    local u = user.upsert(client, event.user)
+    return client.events.GUILD_BAN_REMOVE:emit(ctx(g, nil, u))
 end
 
-local function new_from_map(payload, state, new_from, old)
-    return new_from(state, payload, old)
+local function upsert_map(payload, state, upsert)
+    return upsert(state, payload)
 end
 
 function GUILD_EMOJIS_UPDATE(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     local g = client.cache.guild[event.guild_id]
-    local emojis = list.map(new_from_map, event.emojis, client, emoji.new_from)
-    return client.events.EMOJIS_UPDATE:enqueue(ctx{g, emojis = emojis})
+    local emojis = list.map(upsert_map, event.emojis, client, emoji.upsert)
+    return client.events.GUILD_EMOJIS_UPDATE:emit(ctx{g, emojis = emojis})
 end
 
 function GUILD_MEMBER_ADD(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     local g = client.cache.guild[event.guild_id]
-    local m = member.new_from(state, event)
-    return client.events.MEMBER_ADD:enqueue(ctx(g, nil, m))
+    local m = member.upsert(client, event, g.id)
+    return client.events.GUILD_MEMBER_ADD:emit(ctx(g, nil, m))
 end
 
 function GUILD_MEMBER_UPDATE(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     local g = client.cache.guild[event.guild_id]
-    local m = member.new_from(state, event)
-    return client.events.MEMBER_UPDATE:enqueue(ctx(g, nil, m))
+    local _ = member.get_from(client, event.guild_id, util.uint(event.user.id))
+    local m = member.upsert(client, event, g.id)
+    return client.events.GUILD_MEMBER_UPDATE:emit(ctx(g, nil, m))
 end
 
 function GUILD_MEMBER_REMOVE(client, shard, _, event)
@@ -193,24 +200,25 @@ function GUILD_MEMBER_REMOVE(client, shard, _, event)
         guild.remove_member(g, m.id)
     end
     if m then
-        return client.events.MEMBER_REMOVE:enqueue(ctx(g, nil, m))
+        return client.events.GUILD_MEMBER_REMOVE:emit(ctx(g, nil, m))
     else
-        return client.events.MEMBER_REMOVE:enqueue(ctx{g, nil, m; uncached = true})
+        return client.events.GUILD_MEMBER_REMOVE:emit(ctx{g, nil, m; uncached = true})
     end
 end
 
 function GUILD_ROLE_CREATE(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     local g = client.cache.guild[event.guild_id]
-    local m = role.new_from(client, event)
-    return client.events.ROLE_CREATE:enqueue(ctx(g, nil, nil, m))
+    local m = role.upsert(client, event)
+    return client.events.GUILD_ROLE_CREATE:emit(ctx(g, nil, nil, m))
 end
 
 function GUILD_ROLE_UPDATE(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     local g = client.cache.guild[event.guild_id]
-    local m = role.new_from(client, event)
-    return client.events.ROLE_UPDATE:enqueue(ctx(g, nil, nil, m))
+    local _ = role.get_from(client, util.uint(event.id))
+    local m = role.upsert(client, event)
+    return client.events.GUILD_ROLE_UPDATE:emit(ctx(g, nil, nil, m))
 end
 
 function GUILD_ROLE_DELETE(client, shard, _, event)
@@ -219,40 +227,142 @@ function GUILD_ROLE_DELETE(client, shard, _, event)
     local g = client.cache.guild[event.guild_id]
     local r = client.cache.role[event.role_id]
     if r == nil then
-        return client.events.ROLE_DELETE:enqueue(ctx{g; role_id = event.role_id, uncached = true})
+        return client.events.GUILD_ROLE_DELETE:emit(ctx{g; role_id = event.role_id, uncached = true})
     else
-        return client.events.ROLE_DELETE:enqueue(ctx(g, nil, nil, r))
+        return client.events.GUILD_ROLE_DELETE:emit(ctx(g, nil, nil, r))
     end
 end
 
 function MESSAGE_CREATE(client, shard, _, event)
-    local ch = channel.get(util.uint(event.channel_id))
+    local chid = util.uint(event.channel_id)
+    local ch = client.cache.channel[chid]
+    if ch == nil then ch = promise.new(channel.get_from, client, chid) end
     local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
-    local m = message.new_from(client, event)
-    return client.events.MESSAGE_CREATE:enqueue(ctx(g, ch, m.author, nil, m))
+    local m = message.upsert(client, event, chid)
+    return client.events.MESSAGE_CREATE:emit(ctx(g, ch, m.author, nil, m))
 end
 
 function MESSAGE_UPDATE(client, shard, _, event)
-    local ch = channel.get(util.uint(event.channel_id))
+    local chid = util.uint(event.channel_id)
+    local ch = client.cache.channel[chid]
+    if ch == nil then ch = promise.new(channel.get_from, client, chid) end
     local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
-    local m = message.new_from(client, event)
-    return client.events.MESSAGE_UPDATE:enqueue(ctx(g, ch, m.author, nil, m))
+    local _ = message.get_from(client, chid, util.uint(event.id))
+    local m = message.upsert(client, event, chid)
+    return client.events.MESSAGE_UPDATE:emit(ctx(g, ch, m.author, nil, m))
 end
 
 function MESSAGE_DELETE(client, shard, _, event)
-    local ch = channel.get(util.uint(event.channel_id))
+    local chid = util.uint(event.channel_id)
+    local ch = client.cache.channel[chid]
+    if ch == nil then ch = promise.new(channel.get_from, client, chid) end
     local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
-    local m = client.cache.message[ch.id][util.uint(event.id)]
+    local m = client.cache.message[ch.id] and client.cache.message[ch.id][util.uint(event.id)]
     if m == nil then
-        return client.events.MESSAGE_DELETE:enqueue(ctx{g, ch, m.author, nil, event; uncached = true})
+        return client.events.MESSAGE_DELETE:emit(ctx{g, ch, nil, nil, event; uncached = true, id = true})
     else
-        return client.events.MESSAGE_DELETE:enqueue(ctx(g, ch, m.author, nil, m))
+        return client.events.MESSAGE_DELETE:emit(ctx(g, ch, m.author, nil, m))
     end
 end
 
+function MESSAGE_DELETE_BULK(client, shard, _, event)
+    local ch = channel.get(util.uint(event.channel_id))
+    local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
+    for _, id in ipairs(event.ids) do
+        local m = client.cache.message[ch.id][util.uint(id)]
+        if m == nil then
+            client.events.MESSAGE_DELETE:emit(ctx{g, ch, nil, nil, event; uncached = true})
+        else
+            client.events.MESSAGE_DELETE:emit(ctx(g, ch, m.author, nil, m))
+        end
+    end
+end
 
+function MESSAGE_REACTION_ADD(client, shard, _, event)
+    local chid = util.uint(event.channel_id)
+    local ch = client.cache.channel[chid]
+    local uid = util.uint(event.user_id)
+    local u = client.cache.user[uid]
+    local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
 
+    local mid = util.uint(event.message_id)
+    local m = client.cache.message[chid] and client.cache.message[chid][mid]
+    if m then
+        local rid = reaction.processor.emoji(event, client)
+        local r = m.reactions[rid] or reaction.upsert(client, {
+             emoji = event.emoji
+            ,count = 0
+            ,me = uid == client.app.id
+        })
+        r.count = r.count+1
+        return client.events.MESSAGE_REACTION_ADD:emit(ctx{g, ch, u, nil, m; reaction = r})
+    else
+        return client.events.MESSAGE_REACTION_ADD:emit(
+        ctx{g, ch, u, nil, nil;
+             reaction = event
+            ,uncached = true
+        })
+    end
+end
 
+function MESSAGE_REACTION_REMOVE(client, shard, _, event)
+    local chid = util.uint(event.channel_id)
+    local ch = client.cache.channel[chid]
+    local uid = util.uint(event.user_id)
+    local u = client.cache.user[uid]
+    local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
+
+    local mid = util.uint(event.message_id)
+    local m = client.cache.message[chid] and client.cache.message[chid][mid]
+    if m then
+        local rid = reaction.processor.emoji(event, client)
+        local r = m.reactions[rid] or reaction.upsert(client, {
+             emoji = event.emoji
+            ,count = 1
+            ,me = uid == client.app.id
+        })
+        r.count = r.count-1
+        return client.events.MESSAGE_REACTION_REMOVE:emit(ctx{g, ch, u, nil, m; reaction = r})
+    else
+        return client.events.MESSAGE_REACTION_REMOVE:emit(
+        ctx{g, ch, u, nil, nil;
+             reaction = event
+            ,uncached = true
+        })
+    end
+end
+
+local function zero_count(r)
+    r.count = 0
+end
+
+function MESSAGE_REACTION_REMOVE_ALL(client, shard, _, event)
+    local chid = util.uint(event.channel_id)
+    local ch = client.cache.channel[chid]
+    local uid = util.uint(event.user_id)
+    local u = client.cache.user[uid]
+    local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
+
+    local mid = util.uint(event.message_id)
+    local m = client.cache.message[chid] and client.cache.message[chid][mid]
+    if m == nil then
+        client.events.MESSAGE_REACTION_REMOVE_ALL:emit(ctx{g, ch, u, nil, nil; uncached = true})
+    else
+        list.each(zero_count, m.reactions)
+        m.reactions = {}
+        client.events.MESSAGE_REACTION_REMOVE_ALL:emit(ctx(g, ch, u, nil, m))
+    end
+end
+
+function CHANNEL_PINS_UPDATE(client, shard, _, event)
+    local chid = util.uint(event.channel_id)
+    local ch = client.cache.channel[chid]
+    if ch then
+        return client.events.CHANNEL_PINS_UPDATE:emit(ctx(ch.guild, ch, nil, nil, nil))
+    else
+        return client.events.CHANNEL_PINS_UPDATE:emit(ctx{nil, event, uncached = true})
+    end
+end
 
 --end-module--
 return _ENV

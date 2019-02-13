@@ -7,7 +7,7 @@ return function (_ENV, modifier)
         local state = running():novus()
         local success, data, err = modifier(state.api, snowflake[1], by)
         if success and data then
-            return new_from(state, data, snowflake)
+            return update_from(state, snowflake, data)
         else
             return false, err
         end

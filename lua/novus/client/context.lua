@@ -4,11 +4,14 @@
 -- @alias _ENV
 
 --imports--
+local util = require"novus.util"
 local snowflake = require"novus.snowflakes"
+local promise = require"cqueues.promise"
 local unpack = table.unpack
 local setmetatable = setmetatable
 local type = type
 local pairs = pairs
+local assert = assert
 --start-module--
 local _ENV = {}
 
@@ -57,19 +60,36 @@ context = {properties={}}
 function __index (ctx, key)
     if context[key] then
         return context[key]
+    elseif ctx.promised[key] then
+        local p = ctx.promised[key]
+        ctx.promised[key] = nil
+        local success, value = assert(p())
+        util.info("%s, %s", success, value)
+        return  success and value
     elseif context.properties[key] then
         return context.properties[key](ctx)
     end
 end
 
 function with_args(guild, channel, user, role, msg)
+    local pc, pu, pr, pm =
+         promise.type(channel)
+        ,promise.type(user)
+        ,promise.type(role)
+        ,promise.type(msg)
     return setmetatable({
          guild = guild
-        ,channel = channel
-        ,user = user and user.kind == "user" and user
-        ,member = user and user.kind == "member" and user
-        ,role = role
-        ,msg = msg
+        ,channel = not pc and channel or nil
+        ,user = not pu and user and user.kind == "user" and user or nil
+        ,member = not pu and user and user.kind == "member" and user or nil
+        ,role = not pr and role or nil
+        ,msg = not pm and msg or nil
+        ,promised = {
+             channel = pc and channel or nil
+            ,user = pu and user or nil
+            ,role = pr and role or nil
+            ,msg = pm and msg or nil
+        }
     }, _ENV)
 end
 
@@ -79,6 +99,7 @@ end
 -- @param value
 function context.add_extra(ctx, field, value)
     if ctx[field] ~= nil then return ctx
+    elseif ctx[field] == nil and promise.type(value) then ctx.promised[field] = value return ctx
     else ctx[field] = value return ctx
     end
 end

@@ -132,5 +132,7 @@ function copy(t)
     return new(t, identity)
 end
 
+__name = "view"
+
 --end-module--
 return _ENV

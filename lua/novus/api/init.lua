@@ -13,10 +13,12 @@ local json = require"cjson"
 local util = require"novus.util"
 local const = require"novus.const"
 local mutex = require"novus.util.mutex".new
+local list = require"novus.util.list"
 local lpeg = util.lpeg
 local patterns = util.patterns
 local Date = util.Date
 local JSON = "application/json"
+local tostring = tostring
 local difftime = os.difftime
 local insert, concat = table.insert, table.concat
 local next, tonumber = next, tonumber
@@ -144,8 +146,9 @@ function request(state, method, endpoint, payload, query, files)
     end
     local url = URL .. endpoint
     if query and next(query) then
-        url = ("%s?%s"):format(url, httputil.dict_to_query(query))
+        url = ("%s?%s"):format(url, httputil.dict_to_query(list.map(tostring, query)))
     end
+    url = httputil.encodeURI(url)
     local req = newreq.new_from_uri(url)
     req.headers:upsert(":method", method)
     req.headers:upsert("user-agent", USER_AGENT)

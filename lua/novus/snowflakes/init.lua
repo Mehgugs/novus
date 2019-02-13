@@ -6,11 +6,13 @@
 --imports--
 local util = require"novus.snowflakes.helpers"
 local const = require"novus.const"
+local cache = require"novus.cache"
 local cqueues = require"cqueues"
 local gettime = cqueues.monotime
 local lifetimes = const.lifetimes
 local next = next
 local type = type
+local min = math.min
 local running = cqueues.running
 --start-module--
 local _ENV = util.snowflake_root()
@@ -70,13 +72,14 @@ function __gc(snowflake)
     if snowflake[3] and gettime() - snowflake[2] <= lifetimes[snowflake.__name] then
         return snowflake[3](snowflake)
     end
+    cache.counts[snowflake.kind] = min((cache.counts[snowflake.kind] or 0)-1, 0)
 end
 
 --- tostring metamethod.
 -- @tparam snowflake snowflake
 -- @treturn string A string representation of the snowflake.
 function __tostring(snowflake)
-    return ("%s: %u"):format(snowflake.kind, snowflake[1])
+    return ("%s: %s"):format(snowflake.kind, not snowflake.virtual and util.uint.tostring(snowflake[1]) or "un-identified")
 end
 
 local function snowflake_iter(invar, state)
@@ -105,6 +108,10 @@ end
 function destroy(snowflake)
     return destroy_from(running():novus(), snowflake)
 end
+
+-- function methods.cache(snowflake)
+--     util.warn("cache called on a snowflake without a cacher (%s)", snowflake)
+-- end
 
 constants.cachable = true
 constants.virtual = false

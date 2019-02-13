@@ -7,6 +7,7 @@ local snowflake = require"novus.snowflakes"
 local modifiable = require"novus.snowflakes.mixins.modifiable"
 local cqueues = require"cqueues"
 local perms = require"novus.util.permission"
+local view = require"novus.cache.view"
 local setmetatable = setmetatable
 local gettime = cqueues.monotime
 local running = cqueues.running
@@ -15,6 +16,7 @@ local insert, sort = table.insert, table.sort
 local huge = math.huge
 local should_debug = _G.NOVUS_DEBUG or os.getenv"NOVUS_DEBUG"
 local debugger = debug.debug
+local pairs, ipairs = pairs, ipairs
 --start-module--
 local _ENV = snowflake "member"
 
@@ -48,8 +50,9 @@ function new_from(state, payload, old)
     local method = state.cache.methods.member[guild_id]
     if mycache == nil then
         mycache = util.cache()
-        state.cache.message[guild_id] = mycache
+        state.cache.member[guild_id] = mycache
         method = cache.inserter(mycache)
+        state.cache.methods.member[guild_id] = method
     end
 
 
@@ -156,9 +159,9 @@ function methods.get_permissions(member, channel)
     end
 
     local ret = perms.new(guild.default_role.permissions)
-    local overwrites = channel[11]
+    local overwrites = channel and channel[11] or {}
     local used_overwrites = {perms.new(),perms.new()}
-    for id, role in pairs(member.role_objects) do
+    for id, role in pairs(member:role_objects()) do
         ret:union(role[9])
         if overwrites[id] and id ~= guild[1] then
             used_overwrites[1]:union(overwrites[id].allow)
@@ -255,6 +258,13 @@ function get_from(state, guild_id, id)
         else
             return nil, err
         end
+    end
+end
+
+function destroy_from(state, member)
+    state.cache.member[member.guild_id][member.id] = nil
+    if member.cache then
+        member.cache = nil
     end
 end
 

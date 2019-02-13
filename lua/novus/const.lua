@@ -56,6 +56,7 @@ lifetimes = setmetatable({}, {__index = function(l) return l.default end})
 
 lifetimes.default = 60 * 60
 lifetimes.guild = -1
+lifetimes.message = 0
 
 --end-module--
 return _ENV

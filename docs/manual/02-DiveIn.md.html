@@ -40,7 +40,7 @@
 <li><a href="#Recap">Recap </a></li>
 <li><a href="#Listening_for_incoming_messages">Listening for incoming messages </a></li>
 <li><a href="#Parsing_and_propagating">Parsing and propagating </a></li>
-<li><a href="#Recap_2">Recap 2 </a></li>
+<li><a href="#Adding_it_all_together">Adding it all together </a></li>
 </ul>
 
 
@@ -320,9 +320,9 @@ we will emit an event to <code>command_parsed</code>. The concept of chaining ev
 <p>So this function will use the grammar to parse a string: returning <code>true</code>
 and our updated context on success; or false on failure.</p>
 
-<p><a name="Recap_2"></a></p>
+<p><a name="Adding_it_all_together"></a></p>
 
-<h3>Recap 2</h3>
+<h3>Adding it all together</h3>
 
 <p>Let&rsquo;s use our new event and parse some new commands.</p>
 
@@ -384,7 +384,8 @@ command_parsed:listen(<span class="keyword">function</span>(ctx)
 </pre>
 
 
-<p>This will lookup the function in <code>commands</code> and call it with the context.</p>
+<p>This will lookup the function in <code>commands</code> and call it with the context.
+If we return values from the handler we pass them to reply, useful.</p>
 
 <p>Now our ping command looks like this:</p>
 
@@ -439,11 +440,29 @@ command_parsed:listen(<span class="keyword">function</span>(ctx)
   <span class="keyword">end</span>
 <span class="keyword">end</span>)
 
-commands[<span class="string">"!ping"</span>] = <span class="keyword">function</span>() <span class="keyword">return</span> <span class="string">"Pong!"</span> <span class="keyword">end</span>
+commands[<span class="string">"!ping"</span>] = <span class="keyword">function</span>(ctx) <span class="keyword">return</span> <span class="string">"Pong!"</span> <span class="keyword">end</span>
 
 myclient:run()
 </pre>
 
+
+<p>Please feel free to play around and add some more commands!
+You will get a list of arguments in <code>ctx.command.args</code>.</p>
+
+<pre>
+!ping foo bar <span class="string">"a full string of text"</span>
+{prefix = <span class="string">"!"</span>, name = <span class="string">"ping"</span>, args = {<span class="string">"foo"</span>, <span class="string">"bar"</span>, <span class="string">"a full string of text"</span>}}
+</pre>
+
+
+<p>You can add this to the client to make it feel official if you like.</p>
+
+<pre>
+client.events.COMMAND = command_parsed
+</pre>
+
+
+<h4><a href="../manual/01-Introduction.md.html#">What to do next?</a></h4>
 
 
 </div> <!-- id="content" -->

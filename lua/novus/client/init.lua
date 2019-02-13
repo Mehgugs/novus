@@ -22,6 +22,8 @@ local pairs = pairs
 local gettime = cqueues.monotime
 local setmetatable = setmetatable
 local huge = math.huge
+local should_debug = _G.NOVUS_DEBUG or os.getenv"NOVUS_DEBUG"
+local debugger = debug.debug
 --start-module--
 local _ENV = {}
 
@@ -61,13 +63,22 @@ cqueues.interpose('novus_start', function(self, id)
 end)
 
 cqueues.interpose('novus_dispatch', function(self, s, E, ...)
-    return clients[self].dispatch[E] and clients[self].dispatch[E](clients[self], s, E, ...)
+    local cli = clients[self]
+    local ev = cli and cli.dispatch[E]
+    return ev and self:wrap(ev, cli, s, E, ...)
 end)
+
+local function err_handler(...)
+    if should_debug then
+        debugger()
+    end
+    return traceback(...)
+end
 
 local old_wrap
 old_wrap = cqueues.interpose('wrap', function(self, ...)
     return old_wrap(self, function(fn, ...)
-        local s, e = xpcall(fn, traceback, ...)
+        local s, e = xpcall(fn, err_handler, ...)
         if not s then
             util.error(e)
         end
@@ -131,10 +142,10 @@ function create(options)
     client.id_mutex = mutex()
     client._readies = 0
     client.events = make_events()
-    client.dispatch = util.default(function(_, _, t)
-        util.info("Got %q", t)
-    end)
-    client.dispatch = util.mergewith(client.dispatch, dispatch)
+    -- client.dispatch = util.default(function(_, _, t)
+    --     util.info("Got %q", t)
+    -- end)
+    client.dispatch = util.mergewith({}, dispatch)
     function client.dispatch.SHARD_READY(self, s, _)
         util.info("Client-%s Shard-%s online.", self.id, s.options.id)
         self._readies = self._readies + 1

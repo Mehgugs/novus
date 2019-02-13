@@ -74,6 +74,7 @@ function init(options, idmutex)
     state.stop_heart = cond.new()
     state.identify_wait = cond.new()
     state.is_ready = promise.new()
+    state.raw_ready = nil
     state.to_load = -1
     state.loaded = 0
     state.beats = 0
@@ -106,7 +107,7 @@ function connect(state)
     else
         util.info("Shard-%s has connected.", state.options.id)
         state.connected = true --+
-
+        state.raw_ready = promise.new()
         if state.options.transport_compression then
             state.transport_infl = zlib.inflate()
             state.transport_buffer = {}
@@ -215,25 +216,19 @@ function messages(state)
     local rec_timeout = state.options.receive_timeout or 60
     local err
     repeat
-        local success, message, op, code = xpcall(state.socket.receive, inspector, state.socket)
+        local success, message, op, code = xpcall(state.socket.receive, inspector, state.socket, rec_timeout)
         if success and message ~= nil then
             local payload, cont = read_message(state, message, op)
             if cont then goto continue end
             if payload then
-                local s = payload.s
-                local t = payload.t
-                local d = payload.d
-
-                local dop, opcode = ops[payload.op], payload.op
+                local dop = ops[payload.op]
                 if _ENV[dop] then
-                    _ENV[dop](state, opcode, d, t, s)
+                    _ENV[dop](state, payload.op, payload.d, payload.t, payload.s)
                 end
             else
                 disconnect(state, 4000, 'could not decode payload')
             break end
         elseif success and message == nil then
-            util.warn("%s", code and errno.strerror(code))
-            util.warn("%s %s %s", success, message, op)
             err = op
         elseif not success then
             err = message
@@ -251,11 +246,12 @@ function messages(state)
         cqueues.monotime() - state.loop:novus().begin
     )
 
-    if state.is_ready:status() == 'pending' then
+    local reconnect = should_reconnect(state, state.socket.got_close_code)
+
+    if state.is_ready:status() == 'pending' and not reconnect then
         state.is_ready:set(false)
     end
 
-    local reconnect = should_reconnect(state, state.socket.got_close_code)
     util.warn("Shard-%s %s reconnect.", state.options.id, reconnect and "will" or "will not")
 
     if reconnect and state.reconnect then

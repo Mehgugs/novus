@@ -102,10 +102,10 @@ setmetatable(mentions, {__call = mention_iterate})
 --- Matches a codeblock.
 -- @tparam lpeg-pattern codeblock
 -- @within Patterns
-codeblock = re.compile[[("```" (!"```" .)* "```")]]
+codeblock = re.compile[[("```" {(!"```" .)*} "```")]]
 
-codesnip = re.compile[[("`" (!"`" .)+ "`")]]
-doublesnip = re.compile[[("``" (!"``" .)+ "``")]]
+codesnip = re.compile[[("`" {(!"`" .)+} "`")]]
+doublesnip = re.compile[[("``" {(!"``" .)+} "``")]]
 
 --- Matches a code snippet.
 -- @tparam lpeg-pattern codesnippet

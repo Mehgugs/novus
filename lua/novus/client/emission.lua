@@ -14,6 +14,8 @@ local cqueues = require"cqueues"
 local cond = require"cqueues.condition"
 local promise = require"cqueues.promise"
 local queue = require"novus.util.queue"
+local list = require"novus.util.list"
+local func = require"novus.util.func"
 local setmetatable = setmetatable
 local running = cqueues.running
 local poll = cqueues.poll
@@ -21,6 +23,7 @@ local print = print
 local type = type
 local assert = assert
 local sleep = cqueues.sleep
+local insert, tremove = table.insert, table.remove
 --start-module--
 local _ENV = {}
 
@@ -147,12 +150,15 @@ end
 -- end
 
 local function shift_one(em, f)
-    em._map = f
+    em._map = em._map or {}
+    insert(em._map, f)
     return em
 end
 
 local function shift_two(em, it)
-    local f = em._map; em._map = nil
+    local _f = tremove(em._map)
+    local fs = list.reverse(em._map); em._map = nil
+    local f = #fs > 0 and list.fold(func.compose, _f, fs) or _f
     local function call(ctx)
         local send, ntx = f(ctx)
         if send then
@@ -163,15 +169,49 @@ local function shift_two(em, it)
     return em
 end
 
+function __add(A, B)
+    return {fork = true, A, B}
+end
+
+local function shift_three(em, fork)
+    fork[1]:listen(em)
+    fork[2]:listen(em)
+    return em
+end
+
 function __shl(A, B)
     if type(A) == 'table' and type(B) == 'function' then
         return shift_one(A, B)
+    elseif B.fork then
+        return shift_three(A, B)
     else
         return shift_two(A, B)
     end
 end
 
-function __shr(A, B) return A:listen(B) end
+local function shift_two_right(it, em)
+    local _f = tremove(it._map, 1)
+    local fs = it._map it._map = nil
+    local f = #fs > 0 and list.fold(func.compose, _f, fs) or _f
+    local function call(ctx)
+        local ntx, send = f(ctx)
+        if send then
+            em:emit(ntx)
+        end
+    end
+    it:listen(call)
+    return em
+end
+
+function __shr(A, B)
+    if type(A) == 'table' and type(B) == 'function' then
+        return shift_one(A, B)
+    elseif A.fork then
+        return shift_three(B, A)
+    else
+        return shift_two_right(A, B)
+    end
+end
 
 --- An emitter object. Set callbacks with `listen` and emit events with `emit`.
 --  All functions which take a emitter as their first argument can be called from the emitter in method form.

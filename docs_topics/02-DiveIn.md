@@ -214,7 +214,7 @@ end
 So this function will use the grammar to parse a string: returning `true`
 and our updated context on success; or false on failure.
 
-### Recap 2
+### Adding it all together
 
 Let's use our new event and parse some new commands.
 
@@ -275,6 +275,7 @@ end)
 ```
 
 This will lookup the function in `commands` and call it with the context.
+If we return values from the handler we pass them to reply, useful.
 
 Now our ping command looks like this:
 
@@ -328,7 +329,23 @@ command_parsed:listen(function(ctx)
   end
 end)
 
-commands["!ping"] = function() return "Pong!" end
+commands["!ping"] = function(ctx) return "Pong!" end
 
 myclient:run()
 ```
+
+Please feel free to play around and add some more commands!
+You will get a list of arguments in `ctx.command.args`.
+
+```
+!ping foo bar "a full string of text"
+{prefix = "!", name = "ping", args = {"foo", "bar", "a full string of text"}}
+```
+
+You can add this to the client to make it feel official if you like.
+
+```lua
+client.events.COMMAND = command_parsed
+```
+
+#### @{01-Introduction.md|What to do next?}

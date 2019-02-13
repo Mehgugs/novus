@@ -131,7 +131,7 @@ function processor.members(mems, state, object)
     local out = {}
     for i, m in ipairs(mems) do
         local mid = util.uint(m.id)
-        m.guild_id = object[1]
+        m.guild_id = object.id
         if not state.cache.member[mid] then
             snowflakes.member.new(m)
         end
@@ -177,9 +177,9 @@ local function new_from_available(state, payload)
     local gid = util.uint(payload.id)
     local old = state.cache.guild[gid] or {}
     local object = setmetatable(util.mergewith(old, {
-         nil
-        ,nil
-        ,nil
+         gid
+        ,old[2] or gettime()
+        ,state.cache.methods.guild
         ,false
         ,payload.name
         ,payload.icon
@@ -562,8 +562,8 @@ function methods.delete(guild)
     end
 end
 
-function methods.kick(guild, member, reason)
-    local id = snowflake.id(member)
+function methods.kick(guild, mem, reason)
+    local id = snowflake.id(mem)
     if id then
         local query = reason and {reason = reason} or nil
         local state = running():novus()

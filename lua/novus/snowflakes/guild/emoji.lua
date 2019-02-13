@@ -22,12 +22,12 @@ schema {
     ,"animated"
 }
 
-function processor.user(payload, state)
+function processor.user(user, state)
     local uid
-    if payload.user then
-        uid = util.uint(payload.user.id)
+    if user then
+        uid = util.uint(user.id)
         if not state.cache.user[uid] then
-            snowflakes.user.new_from(state, payload.user, state.cache.methods.user)
+            snowflakes.user.new_from(state, user)
         end
     end
     return uid, "user_id"
@@ -41,7 +41,7 @@ function new_from(state, payload)
         ,payload.guild_id
         ,payload.name
         ,payload.roles or {}
-        ,processor.user(payload, state)
+        ,processor.user(payload.user, state)
         ,payload.require_colons
         ,payload.managed
         ,payload.animated
@@ -52,7 +52,7 @@ function modify(emoji, by)
     local state = running():novus()
     local success, data, err = api.modify_guild_emoji(state.api, emoji[4], emoji[1], by)
     if success and data then
-        return new_from(state, data, emoji)
+        return update_from(state, emoji, data)
     else
         return false, err
     end

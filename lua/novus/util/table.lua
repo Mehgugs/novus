@@ -159,5 +159,16 @@ function weak() return setmetatable({}, {__mode = "k"}) end
 -- @treturn table
 function cache() return setmetatable({}, {__mode = "v"}) end
 
+--- Checks if a value is within a table.
+-- @tab t
+-- @param v the value to look for.
+-- @treturn boolean
+function includes(t, v)
+    for _, val in pairs(t) do
+        if val == v then return true end
+    end
+    return false
+end
+
 --end-module--
 return _ENV

@@ -3,6 +3,7 @@ local util = require"novus.util"
 local tab  = require"novus.util.table"
 local warn = util.warn
 local running = require"cqueues".running
+local inserter = require"novus.cache".inserter
 local setmetatable = setmetatable
 local ipairs = ipairs
 local set = rawset
@@ -40,6 +41,51 @@ end
 function makenew(_ENV) --luacheck:ignore
     return function (...) return new_from(running():novus(), ...) end
 end
+
+function makeupdatefrom(_ENV) --luacheck:ignore
+    return function(state, snowflake, payload)
+        for k, v in ipairs(payload) do
+            if processor[k] or (schema[k] and schema[k] >= 4) then
+                local proc = processor[k]
+                if proc then
+                    local value, key = proc(v, state, snowflake)
+                    key = key or k
+                    snowflake[schema[key]] = value
+                else
+                    snowflake[schema[k]] = v
+                end
+            end
+        end
+        return snowflake
+    end
+end
+
+function makeupdate(_ENV) --luacheck:ignore
+    return function(...)
+        return update_from(running():novus(), ...)
+    end
+end
+
+function makeupsert(_ENV)
+    return function(client, payload, guild_id)
+        local id = util.uint(payload.id)
+        local cached = client.cache[__name]
+        if cached then
+            local mycache = guild_id and cached[guild_id] or cached
+            if mycache == nil and guild_id then
+                mycache = util.cache()
+                client.cache[__name][guild_id] = mycache
+                client.cache[__name].methods[guild_id] = inserter(mycache)
+            end
+            local obj = mycache[id]
+            return obj and update_from(client, obj, payload) or new_from(client, payload)
+        else
+            return new_from(client, payload)
+        end
+    end
+end
+
+
 
 function new_schema ()
     local len = {}
@@ -79,6 +125,9 @@ function snowflake_inherit(self, base, name)
     next.constants.kind = name
     next.get = makeget(next)
     next.new = makenew(next)
+    next.update_from = makeupdatefrom(next)
+    next.update = makeupdate(next)
+    next.upsert = makeupsert(next)
     self.snowflakes[name] = next
     return setmetatable(next, {
          __name = "%s-behaviour" % name

@@ -1,29 +1,40 @@
 --imports--
 local util = require"novus.snowflakes.helpers"
+local cache = require"novus.cache"
 local snowflake = require"novus.snowflakes"
 local cqueues = require"cqueues"
 local view = require"novus.cache.view"
 local api = require"novus.api"
-local channel = require"novus.snowflakes.channel"
+local base_channel = require"novus.snowflakes.channel"
 local running = cqueues.running
 local setmetatable = setmetatable
 local snowflakes = snowflake.snowflakes
 local type = type
 local ipairs = ipairs
 local insert, concat = table.insert, table.concat
+local tostring = tostring
 --start-module--
-local _ENV =  channel("textchannel")
+local _ENV =  base_channel("textchannel")
 
 schema {
      "last_message_id" --5
     ,"messages" --6
 }
 
-local base = channel.newer_from
-function newer_from(_ENV, state, payload, cache) --luacheck: ignore
+local base = base_channel.newer_from
+function newer_from(_ENV, state, payload) --luacheck: ignore
     local object = base(_ENV, state, payload, cache)
     object[5] = util.uint(payload.last_message_id)
     object[6] = view.copy(state.cache.message[object[1]])
+
+    state.cache.message[object[1]] =
+        state.cache.message[object[1]]
+    or  cache.new()
+
+    state.cache.methods.message[object[1]] =
+        state.cache.methods.message[object[1]]
+    or  cache.inserter(state.cache.message[object[1]])
+
     return object
 end
 
@@ -58,13 +69,8 @@ end
 local function get_messages(channel, query)
     local state = running():novus()
     local success, data, err = api.get_channel_messages(state.api, channel[1], query)
-    local chid = channel[1]
     if success then
-        return setmetatable({}, {__index = function(t, i)
-            local m = snowflakes.message.get(chid, data[i])
-            t[i] = m
-            return m
-        end})
+        return data
     else
         return false, err
     end

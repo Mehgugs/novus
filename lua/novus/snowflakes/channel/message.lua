@@ -4,6 +4,7 @@ local util = require"novus.snowflakes.helpers"
 local cache = require"novus.cache"
 local snowflake = require"novus.snowflakes"
 local modifiable = require"novus.snowflakes.mixins.modifiable"
+local reaction = require"novus.snowflakes.channel.reaction"
 local view = require"novus.cache.view"
 local cqueues = require"cqueues"
 local json = require"cjson"
@@ -16,6 +17,8 @@ local patterns = util.patterns
 local ipairs = ipairs
 local insert = table.insert
 local includes = util.includes
+local getmetatable = getmetatable
+local type = type
 --start-module--
 local _ENV = snowflake "message"
 --[[
@@ -83,37 +86,41 @@ function processor.mentions(payload, state)
 end
 
 function processor.reactions(payload, state)
+    local out = {}
     if payload.reactions then
+        out = {}
         for _, r in ipairs(payload.reactions) do
-            if r.emoji.id ~= null then
-                snowflakes.emoji.new_from(state, r.emoji)
-            end
+            local new = reaction.new_from(state, r)
+            out[new.emoji_id] = new
         end
     end
-    return payload.reactions
+    return out
 end
 
 function processor.author(payload, state)
     local user = payload.author
-    local uid = util.uint(user.id)
-    if not state.cache.user[uid] then
-        snowflakes.user.new_from(state, user, state.cache.methods.user)
+    if user then
+        local uid = util.uint(user.id)
+        if not state.cache.user[uid] then
+            snowflakes.user.new_from(state, user, state.cache.methods.user)
+        end
+        return uid
     end
-    return uid
 end
 
 function new_from(state, payload)
     local channel_id, guild_id =
      util.uint(payload.channel_id)
     ,util.uint(payload.guild_id)
-
-    local mycache = state.cache.message[channel_id]
-    local method = state.cache.methods.message[channel_id]
-    if mycache == nil then
-        mycache = util.cache()
-        state.cache.message[channel_id] = mycache
-        method = cache.inserter(mycache)
-        state.cache.methods.message[channel_id] = method
+    if state.options.cache_messages then
+        local mycache = state.cache.message[channel_id]
+        local method = state.cache.methods.message[channel_id]
+        if mycache == nil then
+            mycache = util.cache()
+            state.cache.message[channel_id] = mycache
+            method = cache.inserter(mycache)
+            state.cache.methods.message[channel_id] = method
+        end
     end
 
     return setmetatable({
@@ -291,7 +298,7 @@ function properties.mentioned(message)
 end
 
 function properties.author(message)
-    return snowflakes.user.get(message[6])
+    return message[6] and snowflakes.user.get(message[6])
 end
 
 function properties.channel(message)
@@ -315,8 +322,8 @@ function properties.link(message)
 end
 
 function get_from(state, channel_id, id)
-    local mcache = state.cache[__name][channel_id]
-    if mcache[id] then return mcache[id]
+    local mcache = state.cache.message[channel_id]
+    if mcache and mcache[id] then return mcache[id]
     else
         local success, data, err = api.get_channel_message(state.api, channel_id, id)
         if success then
@@ -324,6 +331,13 @@ function get_from(state, channel_id, id)
         else
             return nil, err
         end
+    end
+end
+
+function destroy_from(state, msg)
+    state.cache.message[msg.channel_id][msg.id] = nil
+    if msg.cache then
+        msg.cache = nil
     end
 end
 
