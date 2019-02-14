@@ -163,7 +163,7 @@ end
 
 local command_parsed = emission.new()
 myclient.events.MESSAGE_CREATE:listen(function(ctx)
-  local success, nxt = parse_command(ctx)
+  local nxt, success = parse_command(ctx)
   if success then
     command_parsed:emit(ntx)
   end
@@ -178,10 +178,13 @@ local function parse_command()
   --TODO
 end
 
-local command_parsed = emission.new() << parse_command << myclient.events.MESSAGE_CREATE
+local command_parsed =  myclient.events.MESSAGE_CREATE
+  >> parse_command
+  >> emission.new()
 ```
 
-You can use either one, they're equivalent.
+Using the `>>` notation is better because we can chain multiple transforming functions
+as we will see in later examples.
 
 Now onto `parse_command`. I'm just going to give you the grammar we're going to use and not explain it in detail; you should read the @{0x-LPeg.md|LPeg Cookbook} for information.
 
@@ -202,9 +205,10 @@ local grammar = re.compile[[
 local function parse_command(ctx)
   local result = grammar:match(ctx.msg.content)
   if result then
-    return true, ctx
+    return ctx
     :add_extra('cmd', result.prefix .. result.name)
     :add_extra('command', result)
+    ,true
   else
     return false
   end
@@ -243,15 +247,18 @@ local grammar = re.compile[[
 local function parse_command(ctx)
   local result = grammar:match(ctx.msg.content)
   if result then
-    return true, ctx
+    return ctx
     :add_extra('cmd', result.prefix .. result.name)
     :add_extra('command', result)
+    ,true
   else
     return false
   end
 end
 
-local command_parsed = emission.new() << parse_command << myclient.events.MESSAGE_CREATE
+local command_parsed =  myclient.events.MESSAGE_CREATE
+  >> parse_command
+  >> emission.new()
 
 command_parsed:listen(function(ctx)
   if ctx.cmd == "!ping" then ctx.msg:reply"Pong!" end
@@ -310,15 +317,18 @@ local grammar = re.compile[[
 local function parse_command(ctx)
   local result = grammar:match(ctx.msg.content)
   if result then
-    return true, ctx
+    return ctx
     :add_extra('cmd', result.prefix .. result.name)
     :add_extra('command', result)
+    ,true
   else
     return false
   end
 end
 
-local command_parsed = emission.new() << parse_command << myclient.events.MESSAGE_CREATE
+local command_parsed =  myclient.events.MESSAGE_CREATE
+  >> parse_command
+  >> emission.new()
 
 local commands = {}
 command_parsed:listen(function(ctx)

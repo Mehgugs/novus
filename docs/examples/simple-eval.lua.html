@@ -37,8 +37,8 @@
 <ul class="nowrap">
   <li><a href="../examples/commandline.lua.html">commandline.lua</a></li>
   <li><a href="../examples/divein-permissions.lua.html">divein-permissions.lua</a></li>
-  <li><strong>divein.lua</strong></li>
-  <li><a href="../examples/simple-eval.lua.html">simple-eval.lua</a></li>
+  <li><a href="../examples/divein.lua.html">divein.lua</a></li>
+  <li><strong>simple-eval.lua</strong></li>
 </ul>
 <h2>Libraries</h2>
 <ul class="nowrap">
@@ -82,12 +82,14 @@
 
 <div id="content">
 
-    <h2>divein.lua</h2>
+    <h2>simple-eval.lua</h2>
 <pre>
 <span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
 <span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span>
 <span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span>
 <span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span>
+<span class="keyword">local</span> lpeg = <span class="global">require</span><span class="string">"novus.util.lpeg"</span>
+<span class="keyword">local</span> patterns = <span class="global">require</span><span class="string">"novus.util.patterns"</span>
 
 <span class="keyword">local</span> myclient = client.create{token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>}
 
@@ -108,7 +110,7 @@ myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
 ]]</span>
 
 <span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
-  <span class="keyword">local</span> result = ctx <span class="keyword">and</span> grammar:match(ctx.msg.content)
+  <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
   <span class="keyword">if</span> result <span class="keyword">then</span>
     <span class="keyword">return</span> ctx
     :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
@@ -119,25 +121,73 @@ myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
   <span class="keyword">end</span>
 <span class="keyword">end</span>
 
+<span class="keyword">local</span> <span class="keyword">function</span> is_human(ctx)
+    <span class="keyword">if</span> ctx <span class="keyword">and</span> <span class="keyword">not</span> ctx.user.bot <span class="keyword">then</span> <span class="keyword">return</span> ctx, <span class="keyword">true</span>  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
 <span class="comment">-- Creating an emitter with &gt;&gt; syntax --
 </span>
 <span class="keyword">local</span> command_parsed =  myclient.events.MESSAGE_CREATE
+  &gt;&gt; is_human
   &gt;&gt; parse_command
   &gt;&gt; emission.new()
+
+<span class="comment">-- Custom emitter for eval --
+</span>
+<span class="keyword">local</span> <span class="keyword">function</span> command_called(name)
+  <span class="keyword">return</span> <span class="keyword">function</span>(ctx) <span class="keyword">if</span> ctx <span class="keyword">and</span> ctx.cmd == name <span class="keyword">then</span> <span class="keyword">return</span> ctx, <span class="keyword">true</span> <span class="keyword">end</span> <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> codeblock = lpeg.space^<span class="number">0</span> * patterns.codeblock
+
+<span class="keyword">local</span> <span class="keyword">function</span> has_codeblock(ctx)
+  <span class="keyword">if</span> ctx <span class="keyword">then</span>
+    <span class="keyword">local</span> block = codeblock:match(ctx.msg.content:suffix<span class="string">"\\eval"</span>)
+    <span class="keyword">if</span> block <span class="keyword">then</span>
+      ctx.command.block = block:suffix(<span class="string">"lua"</span>)
+      <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> is_owner(ctx)
+  <span class="keyword">if</span> ctx <span class="keyword">and</span> ctx.msg.author.id == myclient:owner().id <span class="keyword">then</span>
+    <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> got_eval = command_parsed
+  &gt;&gt; is_owner
+  &gt;&gt; command_called<span class="string">"\\eval"</span> <span class="comment">-- check if the name is verbatim \eval
+</span>  &gt;&gt; has_codeblock <span class="comment">-- plucks the codeblock out of the message content
+</span>  &gt;&gt; emission.new()
 
 
 <span class="comment">-- Definining commands --
 </span>
-<span class="keyword">local</span> commands = {}
-command_parsed:listen(<span class="keyword">function</span>(ctx)
-  <span class="keyword">local</span> handler = commands[ctx.cmd]
-  <span class="keyword">if</span> handler <span class="keyword">then</span>
-    <span class="keyword">local</span> reply = <span class="global">table</span>.pack(handler(ctx))
-    <span class="keyword">if</span> reply.n &gt; <span class="number">0</span> <span class="keyword">then</span> ctx.msg:reply(<span class="global">table</span>.unpack(reply, <span class="number">1</span>, reply.n)) <span class="keyword">end</span>
+<span class="keyword">local</span> <span class="keyword">function</span> runner(ctx, code)
+    <span class="keyword">local</span> ret = <span class="global">table</span>.pack(<span class="global">pcall</span>(code))
+    <span class="keyword">if</span> <span class="keyword">not</span> ret[<span class="number">1</span>] <span class="keyword">then</span>
+        <span class="keyword">return</span> ctx.msg:add_reaction<span class="string">"⛔"</span> <span class="keyword">and</span> ctx.msg:reply(<span class="string">"Runtime Error: %s"</span>, ret[<span class="number">2</span>])
+    <span class="keyword">elseif</span> ret[<span class="number">1</span>] <span class="keyword">and</span> ret[<span class="number">2</span>] ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+        <span class="keyword">return</span> ctx.msg:add_reaction<span class="string">"✅"</span> <span class="keyword">and</span> ctx.msg:reply(<span class="string">"```lua\n%s```"</span>, <span class="global">table</span>.concat(ret, <span class="number">2</span>, ret.n))
+    <span class="keyword">else</span>
+        ctx.msg:add_reaction<span class="string">"👍"</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+got_eval:listen(<span class="keyword">function</span>(ctx)
+  <span class="keyword">local</span> env = util.inherit(_ENV)
+  env.client = myclient
+  env.ctx = ctx
+  <span class="keyword">local</span> success, code = <span class="global">pcall</span>(<span class="global">load</span>, ctx.command.block, <span class="string">"\\eval"</span>, <span class="string">"t"</span>, env)
+  <span class="keyword">if</span> <span class="keyword">not</span> success <span class="keyword">then</span>
+    ctx.msg:reply(<span class="string">"Syntax error: %s"</span>, code)
   <span class="keyword">end</span>
+  myclient:wrap(runner)
 <span class="keyword">end</span>)
 
-commands[<span class="string">"!ping"</span>] = <span class="keyword">function</span>() <span class="keyword">return</span> <span class="string">"Pong!"</span> <span class="keyword">end</span>
+
 
 myclient:run()</pre>
 

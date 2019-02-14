@@ -170,7 +170,7 @@ local function shift_two(em, it)
 end
 
 function __add(A, B)
-    return {fork = true, A, B}
+    return {both = true, A, B}
 end
 
 local function shift_three(em, fork)
@@ -179,11 +179,25 @@ local function shift_three(em, fork)
     return em
 end
 
+function __div(A, B)
+    return {fork = true, A, B}
+end
+
+local function decide(em, fork)
+    local A, B = fork[1], fork[2]
+    em:listen(function(ctx)
+        A:emit(ctx)
+        B:emit(ctx)
+    end)
+end
+
 function __shl(A, B)
     if type(A) == 'table' and type(B) == 'function' then
         return shift_one(A, B)
-    elseif B.fork then
+    elseif B.both then
         return shift_three(A, B)
+    elseif A.fork then
+        return decide(A, B)
     else
         return shift_two(A, B)
     end
@@ -206,8 +220,10 @@ end
 function __shr(A, B)
     if type(A) == 'table' and type(B) == 'function' then
         return shift_one(A, B)
-    elseif A.fork then
+    elseif A.both then
         return shift_three(B, A)
+    elseif A.fork then
+        return decide(B, A)
     else
         return shift_two_right(A, B)
     end

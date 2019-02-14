@@ -50,6 +50,8 @@
 </a></li>
   <li><strong>The First Example
 </strong></li>
+  <li><a href="../manual/03-Permissions.md.html">Using Permissions
+</a></li>
 </ul>
 <h2>Libraries</h2>
 <ul class="nowrap">
@@ -81,7 +83,10 @@
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
+  <li><a href="../examples/commandline.lua.html">commandline.lua</a></li>
+  <li><a href="../examples/divein-permissions.lua.html">divein-permissions.lua</a></li>
   <li><a href="../examples/divein.lua.html">divein.lua</a></li>
+  <li><a href="../examples/simple-eval.lua.html">simple-eval.lua</a></li>
 </ul>
 
 </div>
@@ -266,7 +271,7 @@ which is fired when the bot receives a command.</p>
 
 <span class="keyword">local</span> command_parsed = emission.new()
 myclient.events.MESSAGE_CREATE:listen(<span class="keyword">function</span>(ctx)
-  <span class="keyword">local</span> success, nxt = parse_command(ctx)
+  <span class="keyword">local</span> nxt, success = parse_command(ctx)
   <span class="keyword">if</span> success <span class="keyword">then</span>
     command_parsed:emit(ntx)
   <span class="keyword">end</span>
@@ -282,11 +287,14 @@ we will emit an event to <code>command_parsed</code>. The concept of chaining ev
   <span class="comment">--TODO
 </span><span class="keyword">end</span>
 
-<span class="keyword">local</span> command_parsed = emission.new() &lt;&lt; parse_command &lt;&lt; myclient.events.MESSAGE_CREATE
+<span class="keyword">local</span> command_parsed =  myclient.events.MESSAGE_CREATE
+  &gt;&gt; parse_command
+  &gt;&gt; emission.new()
 </pre>
 
 
-<p>You can use either one, they're equivalent.</p>
+<p>Using the <code>&gt;&gt;</code> notation is better because we can chain multiple transforming functions
+as we will see in later examples.</p>
 
 <p>Now onto <code>parse_command</code>. I'm just going to give you the grammar we're going to use and not explain it in detail; you should read the ??? for information.</p>
 
@@ -307,9 +315,10 @@ we will emit an event to <code>command_parsed</code>. The concept of chaining ev
 <span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
   <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
   <span class="keyword">if</span> result <span class="keyword">then</span>
-    <span class="keyword">return</span> <span class="keyword">true</span>, ctx
+    <span class="keyword">return</span> ctx
     :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
     :add_extra(<span class="string">'command'</span>, result)
+    ,<span class="keyword">true</span>
   <span class="keyword">else</span>
     <span class="keyword">return</span> <span class="keyword">false</span>
   <span class="keyword">end</span>
@@ -351,15 +360,18 @@ myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
 <span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
   <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
   <span class="keyword">if</span> result <span class="keyword">then</span>
-    <span class="keyword">return</span> <span class="keyword">true</span>, ctx
+    <span class="keyword">return</span> ctx
     :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
     :add_extra(<span class="string">'command'</span>, result)
+    ,<span class="keyword">true</span>
   <span class="keyword">else</span>
     <span class="keyword">return</span> <span class="keyword">false</span>
   <span class="keyword">end</span>
 <span class="keyword">end</span>
 
-<span class="keyword">local</span> command_parsed = emission.new() &lt;&lt; parse_command &lt;&lt; myclient.events.MESSAGE_CREATE
+<span class="keyword">local</span> command_parsed =  myclient.events.MESSAGE_CREATE
+  &gt;&gt; parse_command
+  &gt;&gt; emission.new()
 
 command_parsed:listen(<span class="keyword">function</span>(ctx)
   <span class="keyword">if</span> ctx.cmd == <span class="string">"!ping"</span> <span class="keyword">then</span> ctx.msg:reply<span class="string">"Pong!"</span> <span class="keyword">end</span>
@@ -421,15 +433,18 @@ myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
 <span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
   <span class="keyword">local</span> result = grammar:match(ctx.msg.content)
   <span class="keyword">if</span> result <span class="keyword">then</span>
-    <span class="keyword">return</span> <span class="keyword">true</span>, ctx
+    <span class="keyword">return</span> ctx
     :add_extra(<span class="string">'cmd'</span>, result.prefix .. result.name)
     :add_extra(<span class="string">'command'</span>, result)
+    ,<span class="keyword">true</span>
   <span class="keyword">else</span>
     <span class="keyword">return</span> <span class="keyword">false</span>
   <span class="keyword">end</span>
 <span class="keyword">end</span>
 
-<span class="keyword">local</span> command_parsed = emission.new() &lt;&lt; parse_command &lt;&lt; myclient.events.MESSAGE_CREATE
+<span class="keyword">local</span> command_parsed =  myclient.events.MESSAGE_CREATE
+  &gt;&gt; parse_command
+  &gt;&gt; emission.new()
 
 <span class="keyword">local</span> commands = {}
 command_parsed:listen(<span class="keyword">function</span>(ctx)

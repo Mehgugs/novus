@@ -36,8 +36,8 @@
 <h2>Examples</h2>
 <ul class="nowrap">
   <li><a href="../examples/commandline.lua.html">commandline.lua</a></li>
-  <li><a href="../examples/divein-permissions.lua.html">divein-permissions.lua</a></li>
-  <li><strong>divein.lua</strong></li>
+  <li><strong>divein-permissions.lua</strong></li>
+  <li><a href="../examples/divein.lua.html">divein.lua</a></li>
   <li><a href="../examples/simple-eval.lua.html">simple-eval.lua</a></li>
 </ul>
 <h2>Libraries</h2>
@@ -82,12 +82,13 @@
 
 <div id="content">
 
-    <h2>divein.lua</h2>
+    <h2>divein-permissions.lua</h2>
 <pre>
 <span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
 <span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span>
 <span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span>
 <span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span>
+<span class="keyword">local</span> perms = <span class="global">require</span><span class="string">"novus.util.permission"</span>
 
 <span class="keyword">local</span> myclient = client.create{token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>}
 
@@ -119,11 +120,31 @@ myclient.events.READY :listen (<span class="keyword">function</span>(ctx)
   <span class="keyword">end</span>
 <span class="keyword">end</span>
 
+<span class="comment">-- Permissions and other predicates --
+</span>
+<span class="keyword">local</span> <span class="keyword">function</span> in_guild(ctx)
+    <span class="keyword">if</span> ctx <span class="keyword">and</span> ctx.guild <span class="keyword">then</span>
+        <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> required_perms = {}
+<span class="keyword">local</span> <span class="keyword">function</span> has_perms(ctx)
+    <span class="keyword">if</span> ctx <span class="keyword">then</span>
+        <span class="keyword">local</span> member = ctx.msg.member
+        <span class="keyword">local</span> perms = member:getPermissions(ctx.channel)
+        <span class="keyword">if</span> perms:has(required_perms[ctx.cmd] <span class="keyword">or</span> perms.NONE) <span class="keyword">then</span>
+            <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
 <span class="comment">-- Creating an emitter with &gt;&gt; syntax --
 </span>
-<span class="keyword">local</span> command_parsed =  myclient.events.MESSAGE_CREATE
-  &gt;&gt; parse_command
-  &gt;&gt; emission.new()
+<span class="keyword">local</span> command_parsed = myclient.events.MESSAGE_CREATE
+    &gt;&gt; in_guild
+    &gt;&gt; parse_command
+    &gt;&gt; has_perms
 
 
 <span class="comment">-- Definining commands --
@@ -137,6 +158,7 @@ command_parsed:listen(<span class="keyword">function</span>(ctx)
   <span class="keyword">end</span>
 <span class="keyword">end</span>)
 
+required_perms[<span class="string">"!ping"</span>] = perms(<span class="string">'sendMessages'</span>, <span class="string">'manageChannels'</span>)
 commands[<span class="string">"!ping"</span>] = <span class="keyword">function</span>() <span class="keyword">return</span> <span class="string">"Pong!"</span> <span class="keyword">end</span>
 
 myclient:run()</pre>

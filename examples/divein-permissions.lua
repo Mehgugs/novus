@@ -2,6 +2,7 @@ local util = require"novus.util"
 local client = require"novus.client"
 local emission = require"novus.client.emission"
 local re = require"novus.util.relabel"
+local perms = require"novus.util.permission"
 
 local myclient = client.create{token = "Bot "..os.getenv"TOKEN"}
 
@@ -33,11 +34,31 @@ local function parse_command(ctx)
   end
 end
 
+-- Permissions and other predicates --
+
+local function in_guild(ctx)
+    if ctx and ctx.guild then
+        return ctx, true
+    end
+end
+
+local required_perms = {}
+local function has_perms(ctx)
+    if ctx then
+        local member = ctx.msg.member
+        local perms = member:getPermissions(ctx.channel)
+        if perms:has(required_perms[ctx.cmd] or perms.NONE) then
+            return ctx, true
+        end
+    end
+end
+
 -- Creating an emitter with >> syntax --
 
-local command_parsed =  myclient.events.MESSAGE_CREATE
-  >> parse_command
-  >> emission.new()
+local command_parsed = myclient.events.MESSAGE_CREATE
+    >> in_guild
+    >> parse_command
+    >> has_perms
 
 
 -- Definining commands --
@@ -51,6 +72,7 @@ command_parsed:listen(function(ctx)
   end
 end)
 
+required_perms["!ping"] = perms('sendMessages', 'manageChannels')
 commands["!ping"] = function() return "Pong!" end
 
 myclient:run()

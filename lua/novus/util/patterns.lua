@@ -115,18 +115,18 @@ codesnippet = doublesnip + codesnip
 --- Matches a italic text.
 -- @tparam lpeg-pattern italic
 -- @within Patterns
-italic = re.compile[["*" {((!("*"[^*]).)/"**")*} "*"]]
-       + re.compile[["_" {((!("_"[^_]).)/"__")*} "_"]]
+italic = re.compile[[("*" {(!"*" .)+} "*")]]
+       + re.compile[[("_" {(!"_" .)+} "_")]]
 
 --- Matches a bold text.
 -- @tparam lpeg-pattern bold
 -- @within Patterns
-bold = re.compile[["**"{ ((!("**"[^*]).)/"****")* }"**"]]
+bold = re.compile[[("**" {(!"**" .)+} "**")]]
 
 --- Matches a underlined text.
 -- @tparam lpeg-pattern underline
 -- @within Patterns
-underline = re.compile[["__"{ ((!("__"[^_]).)/"____")* }"__"]]
+underline = re.compile[[("__" {(!"__" .)+} "__")]]
 
 --- Matches spoilered text.
 -- @tparam lpeg-pattern spoiler
@@ -141,6 +141,8 @@ spoiler = re.compile[[
 strikethrough = re.compile[[
     strikethrough <- {"~~" ((!"~" .) / strikethrough)+ "~~"}
 ]]
+
+format = codeblock + codesnippet + bold + underline + italic + spoiler + strikethrough
 
 --end-module--
 return _ENV

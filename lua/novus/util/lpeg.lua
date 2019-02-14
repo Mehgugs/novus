@@ -6,7 +6,7 @@
 --imports--
 local _lpeg = require"lpeglabel"
 local setmetatable = setmetatable
-local P, Cc, V = _lpeg.P, _lpeg.Cc, _lpeg.V
+local P, Cc, V, Cs, C, Ct = _lpeg.P, _lpeg.Cc, _lpeg.V, _lpeg.Cs, _lpeg.C, _lpeg.Ct
 local ipairs, next = ipairs, next
 local select = select
 --start-module--
@@ -103,5 +103,19 @@ function callable(p)
         return p:match(...)
     end
 end
+
+function gsub (s, patt, repl)
+    patt = P(patt)
+    patt = Cs((patt / repl + 1)^0)
+    return patt:match(s)
+end
+
+function split (s, sep)
+    sep = P(sep)
+    local elem = C((1 - sep)^0)
+    local p = Ct(elem * (sep * elem)^0)   -- make a table capture
+    return p:match(s)
+end
+
 --end-module--
 return _ENV

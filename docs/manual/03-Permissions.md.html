@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Nomenclature">Nomenclature </a></li>
+<li><a href="#How_do_permissions_work_in_novus_">How do permissions work in novus? </a></li>
+<li><a href="#Using_a_permission_value">Using a permission value </a></li>
+<li><a href="#Difference_between__has__and__contains_">Difference between `has` and `contains` </a></li>
+</ul>
+
+
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><a href="../manual/02-DiveIn.md.html">The First Example
+</a></li>
+  <li><strong>Using Permissions
+</strong></li>
+</ul>
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
+  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
+  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/commandline.lua.html">commandline.lua</a></li>
+  <li><a href="../examples/divein-permissions.lua.html">divein-permissions.lua</a></li>
+  <li><a href="../examples/divein.lua.html">divein.lua</a></li>
+  <li><a href="../examples/simple-eval.lua.html">simple-eval.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>Using Permissions</h2>
+
+<p>Novus permissions come in two flavours: the numerical, and the placeholder.</p>
+
+<p><a name="Nomenclature"></a></p>
+
+<h3>Nomenclature</h3>
+
+<ul>
+<li><strong>permissions</strong> are the singular enumeration values like: <code>&apos;sendMessages&apos;</code> or <code>0x8</code>.</li>
+<li><strong>permission integers</strong> are the singular numerical enumeration values.</li>
+<li><strong>permission names</strong> are the singular string enumeration values.</li>
+<li><strong>permission values</strong> are bit fields of permission values (this sort of includes placeholders since they pretend to be numbers in the permission code).</li>
+<li><strong>placeholders</strong> are stateful permission values which can be mutated.</li>
+</ul>
+
+
+<p><a name="How_do_permissions_work_in_novus_"></a></p>
+
+<h3>How do permissions work in novus?</h3>
+
+<p>In novus there are two ways to operate on permissions. You can use the <em>permission values</em>
+directly, using helper methods or raw bitwise operations. You can also use a <em>placeholder</em>
+object and call methods on it, this is similar to what some other libraries provide. Both kinds of
+permission representation can be used interchangeably in the permission utility module.</p>
+
+<p><a name="Using_a_permission_value"></a></p>
+
+<h3>Using a permission value</h3>
+
+<p><strong>If you've not seen <a href="../manual/02-DiveIn.md.html#">The First Example</a> section you should read it first.</strong></p>
+
+<p>Building on the initial example, we can write functions to check the permissions of a
+given context. <code>member:has_permissions</code> will return a <em>placeholder</em> so we can use methods
+to check if it&rsquo;s a valid set of permissions.</p>
+
+<pre>
+<span class="comment">---Add this to your requires at the top---
+</span><span class="keyword">local</span> perms = <span class="global">require</span><span class="string">"novus.util.permission"</span>
+<span class="comment">------------------------------------------
+</span>
+<span class="comment">-- We need to be inside a guild for member permissions to be available.
+</span><span class="keyword">local</span> <span class="keyword">function</span> in_guild(ctx)
+    <span class="keyword">if</span> ctx <span class="keyword">and</span> ctx.guild <span class="keyword">then</span>
+        <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> has_perms(ctx)
+    <span class="keyword">if</span> ctx <span class="keyword">then</span>
+        <span class="keyword">local</span> member = ctx.msg.member
+        <span class="keyword">local</span> perms = member:getPermissions(ctx.channel)
+        <span class="keyword">if</span> perms:contains(<span class="string">'administrator'</span>) <span class="keyword">then</span>
+            <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">--- re-wiring our emitter
+</span><span class="keyword">local</span> command_parsed = myclient.events.MESSAGE_CREATE
+    &gt;&gt; in_guild
+    &gt;&gt; parse_command
+    &gt;&gt; has_perms
+</pre>
+
+
+<p>Okay, so now only server administrators can use commands. Typically you usually want
+to associate a permission value with a command, we can do that with a table:</p>
+
+<pre>
+<span class="keyword">local</span> required_perms = {}
+
+required_perms[<span class="string">'!ping'</span>] = perms(<span class="string">'sendMessages'</span>, <span class="string">'manageChannels'</span>)
+</pre>
+
+
+<p>Now rebuilding our example to use both:</p>
+
+<pre>
+<span class="keyword">local</span> required_perms = {}
+<span class="keyword">local</span> <span class="keyword">function</span> has_perms(ctx)
+    <span class="keyword">if</span> ctx <span class="keyword">then</span>
+        <span class="keyword">local</span> member = ctx.msg.member
+        <span class="keyword">local</span> perms = member:getPermissions(ctx.channel)
+        <span class="keyword">if</span> perms:has(required_perms[ctx.cmd] <span class="keyword">or</span> perms.NONE) <span class="keyword">then</span>
+            <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+
+
+<p>See the completed example with permissions <a href="../examples/divein-permissions.lua.html#">here</a></p>
+
+<p><a name="Difference_between__has__and__contains_"></a></p>
+
+<h3>Difference between <code>has</code> and <code>contains</code></h3>
+
+<p>You may have noticed that, between our first has_perms and the final version,
+we swapped from using <a href="../libraries/novus.util.permission.html#contains">perms:contains</a>
+and <a href="../libraries/novus.util.permission.html#has">perms:has</a>. This is because when you want to
+see if a <em>permission value</em> has all the permissions another <em>has</em> you use
+<a href="../libraries/novus.util.permission.html#has">perms:has</a>. If you want to see which <em>permissions</em> are <em>contained</em> in a
+<em>permission value</em> you use <a href="../libraries/novus.util.permission.html#contains">perms:contains</a>.</p>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

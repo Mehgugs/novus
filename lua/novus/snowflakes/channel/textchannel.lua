@@ -38,8 +38,8 @@ function newer_from(_ENV, state, payload) --luacheck: ignore
     return object
 end
 
-function methods.get(channel, id)
-    return snowflakes.message.get_from(channel[1], id)
+function methods.get_message(channel, id)
+    return snowflakes.message.get_from(running():novus(), channel[1], id)
 end
 
 function methods.first_message(channel)

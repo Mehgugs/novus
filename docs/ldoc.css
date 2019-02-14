@@ -58,11 +58,13 @@
         padding: 10px;
         margin: 10px 0 10px 0;
         overflow: auto;
+        /* width: 150%; */
         font-family: Consolas,monaco,monospace;;
     }
 
     pre.example {
         font-size: .85em;
+        width: auto;
     }
 
     table.index { border: 1px #E95378; }

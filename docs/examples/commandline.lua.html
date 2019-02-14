@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><strong>commandline.lua</strong></li>
+  <li><a href="../examples/divein-permissions.lua.html">divein-permissions.lua</a></li>
+  <li><a href="../examples/divein.lua.html">divein.lua</a></li>
+  <li><a href="../examples/simple-eval.lua.html">simple-eval.lua</a></li>
+</ul>
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/novus.api.html">novus.api</a></li>
+  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
+  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
+  <li><a href="../libraries/novus.client.html">novus.client</a></li>
+  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
+  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
+  <li><a href="../libraries/novus.const.html">novus.const</a></li>
+  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
+  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
+  <li><a href="../libraries/novus.util.html">novus.util</a></li>
+  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
+  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
+  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
+  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
+  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
+  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
+  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
+  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
+  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
+  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
+  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
+  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
+  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
+  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><a href="../manual/02-DiveIn.md.html">The First Example
+</a></li>
+  <li><a href="../manual/03-Permissions.md.html">Using Permissions
+</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>commandline.lua</h2>
+<pre>
+<span class="comment">--[[
+    Simple example using a more complicated grammar to parse
+    command line like expressions:
+    name -flags --switches on arg1 arg1...
+    command -flags --switches on arg1 arg2 | command2 ...
+--]]</span>
+
+<span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
+<span class="keyword">local</span> client = <span class="global">require</span><span class="string">"novus.client"</span>
+<span class="keyword">local</span> emission = <span class="global">require</span><span class="string">"novus.client.emission"</span>
+<span class="keyword">local</span> re = <span class="global">require</span><span class="string">"novus.util.relabel"</span>
+<span class="keyword">local</span> func = <span class="global">require</span><span class="string">"novus.util.func"</span>
+<span class="keyword">local</span> promise = <span class="global">require</span><span class="string">"cqueues.promise"</span>
+<span class="keyword">local</span> snowflake = <span class="global">require</span><span class="string">"novus.snowflakes"</span>
+<span class="keyword">local</span> lpeg =<span class="global">require</span><span class="string">"novus.util.lpeg"</span>
+<span class="keyword">local</span> patterns = <span class="global">require</span><span class="string">"novus.util.patterns"</span>
+
+<span class="keyword">local</span> pack, unpack = <span class="global">table</span>.pack, <span class="global">table</span>.unpack
+
+<span class="keyword">local</span> myclient = client.create{token = <span class="string">"Bot "</span>..<span class="global">os</span>.getenv<span class="string">"TOKEN"</span>}
+
+myclient.events.READY:listen(<span class="keyword">function</span>(ctx)
+  util.info (<span class="string">"Bot %s online!"</span>, myclient:me().tag)
+<span class="keyword">end</span>)
+
+<span class="comment">-- Parsing --
+</span>
+<span class="comment">-- Parsing a cmdline-like command --
+</span><span class="keyword">local</span> trnf = {}
+
+<span class="keyword">function</span> trnf.hash(tbl)
+    <span class="keyword">local</span> out = {}
+    <span class="keyword">for</span> i, pair <span class="keyword">in</span> <span class="global">ipairs</span>(tbl) <span class="keyword">do</span>
+        out[pair.switch] = pair.value <span class="keyword">or</span> <span class="keyword">true</span>
+        out[i] = pair.switch
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> out
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> trnf.hash_flags(tbl)
+    <span class="keyword">local</span> out = {}
+    <span class="keyword">for</span> _, chunk <span class="keyword">in</span> <span class="global">ipairs</span>(tbl) <span class="keyword">do</span>
+        <span class="keyword">for</span> _, cp <span class="keyword">in</span> utf8.codes(chunk) <span class="keyword">do</span>
+            out[utf8.char(cp)] = <span class="keyword">true</span>
+            <span class="global">table</span>.insert(out, utf8.char(cp))
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> out
+<span class="keyword">end</span>
+
+
+<span class="keyword">local</span> grammar = re.compile(<span class="string">[[
+    expr &lt;- (pipeline / simple) %s* !.
+        reserved &lt;- [|]
+        simple &lt;- {|{:type: ''-&gt; "command":} command|}
+        pipeline &lt;- {| {:type: ''-&gt;"pipe":} command (%s* '|' %s* command)+ |}
+            command &lt;- {| {:name: name :} %s* post %s* arglist |}
+                post &lt;- flags %s* switches
+                    flags &lt;- {:flags: {|(flag (%s* flag)*)?|} -&gt; hash_flags  :}
+                        flag   &lt;- '-'(!'-'name)
+                    switches &lt;- {:switches: {|(switch (%s* switch)*)?|} -&gt; hash :}
+                        switch &lt;- '-''-'{| {:switch: name:} %s* {:value: arg:}? |}
+                arglist &lt;- {:args: {|(arg (%s* arg)*)?|} :}
+                    arg &lt;- string / {!reserved %S+}
+                        string &lt;- ('"' qqbody '"') / ("'" qbody "'")
+                            qqbody &lt;- {~ (('\"' -&gt; '"') / (!'"' .))* ~}
+                            qbody  &lt;- {~ (("\'" -&gt; "'") / (!"'" .))* ~}
+                name &lt;- {alpha alphanum*}
+                    alpha &lt;- [a-zA-Z_-]
+                    alphanum &lt;- alpha / [0-9]
+]]</span>, trnf)
+
+<span class="comment">-- Two cases pipeline of commands, or a single command. --
+</span>
+<span class="keyword">local</span> received_pipeline = emission.new()
+<span class="keyword">local</span> received_command  = emission.new()
+
+<span class="comment">-- Receive a message_create and pull out the command --
+</span>
+<span class="keyword">local</span> <span class="keyword">function</span> parse_command(ctx)
+    <span class="keyword">local</span> content = ctx <span class="keyword">and</span> ctx.msg.content <span class="comment">-- you could make this simple gsub more sanitized
+</span>        :gsub(<span class="string">"@everyone"</span>, <span class="string">"@\u{002b}everyone"</span>)
+        :gsub(<span class="string">"@here"</span>, <span class="string">"@\u{002b}here"</span>)
+
+    <span class="keyword">local</span> result = ctx <span class="keyword">and</span> grammar:match(content)
+    <span class="keyword">if</span> result <span class="keyword">then</span>
+        ctx:add_extra(<span class="string">'command'</span>, result)
+        <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> is_owner(ctx)
+  <span class="keyword">if</span> ctx <span class="keyword">and</span> ctx.msg.author.id == myclient:owner().id <span class="keyword">then</span>
+    <span class="keyword">return</span> ctx, <span class="keyword">true</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">-- wire up parse command --
+</span>
+<span class="keyword">local</span> command_parsed = myclient.events.MESSAGE_CREATE
+    &gt;&gt; is_owner
+    &gt;&gt; parse_command
+    &gt;&gt; emission.new()
+
+
+<span class="comment">-- Emit to corresponding receiver --
+</span>
+command_parsed:listen(<span class="keyword">function</span>(ctx)
+    <span class="keyword">if</span> ctx.command.<span class="global">type</span> == <span class="string">'command'</span> <span class="keyword">then</span> received_command:emit(ctx)
+    <span class="keyword">elseif</span> ctx.command.<span class="global">type</span> == <span class="string">'pipe'</span> <span class="keyword">then</span> received_pipeline:enqueue(ctx)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>)
+
+<span class="comment">-- keep commands in here --
+</span><span class="keyword">local</span> defs = {}
+
+<span class="comment">-- collect returns and reply --
+</span>
+<span class="keyword">local</span> <span class="keyword">function</span> display(ctx, ret)
+    <span class="global">require</span><span class="string">"pl.pretty"</span>.dump(ret)
+    <span class="keyword">if</span> <span class="keyword">not</span> ret[<span class="number">1</span>] <span class="keyword">then</span>
+        <span class="keyword">return</span> ctx.msg:add_reaction<span class="string">"⛔"</span> <span class="keyword">and</span> ctx.msg:reply(<span class="string">"```lua\nRuntime Error: %s```"</span>, ret[<span class="number">2</span>])
+    <span class="keyword">elseif</span> ret[<span class="number">1</span>] <span class="keyword">and</span> ret[<span class="number">2</span>] ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+        <span class="keyword">return</span> ctx.msg:add_reaction<span class="string">"✅"</span> <span class="keyword">and</span> ctx.msg:reply(<span class="string">"%s"</span>, <span class="global">table</span>.concat(ret, <span class="string">"  "</span>, <span class="number">2</span>, ret.n))
+    <span class="keyword">else</span>
+        ctx.msg:add_reaction<span class="string">"👍"</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> do_command(ctx) <span class="comment">--calls a single command
+</span>    <span class="keyword">local</span> cmd = ctx.command[<span class="number">1</span>]
+    <span class="keyword">local</span> func = defs [cmd.name]
+    <span class="keyword">if</span> func <span class="keyword">then</span>
+        <span class="keyword">local</span> ret = {<span class="global">pcall</span>(func, ctx, cmd.flags, cmd.switches, unpack(cmd.args))}
+        <span class="keyword">return</span> display(ctx, ret)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> helper(f, arg, n, a, ...)
+  <span class="keyword">if</span> n == <span class="number">0</span> <span class="keyword">then</span> <span class="keyword">return</span> f(arg) <span class="keyword">end</span>
+  <span class="keyword">return</span> a, helper(f, arg, n-<span class="number">1</span>, ...)
+<span class="keyword">end</span>
+<span class="keyword">local</span> <span class="keyword">function</span> combine(f, a, ...) <span class="comment">-- this combines two varargs into one f is the source of the next vararg
+</span>  <span class="keyword">local</span> n = <span class="global">select</span>(<span class="string">'#'</span>, ...)
+  <span class="keyword">return</span> helper(f, a, n, ...)
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> do_pipe(ctx, i, ...) <span class="comment">-- recursively call a pipeline of commands
+</span>    i = i <span class="keyword">or</span> <span class="number">1</span>
+    <span class="keyword">local</span> cmd = ctx.command[i]
+    <span class="keyword">if</span> cmd <span class="keyword">and</span> defs[cmd.name] <span class="keyword">then</span>
+        <span class="keyword">if</span> i == <span class="number">1</span> <span class="keyword">then</span>
+            <span class="keyword">local</span> ret = {
+                <span class="global">pcall</span>(
+                     do_pipe
+                    ,ctx
+                    ,i+<span class="number">1</span>
+                    ,defs[cmd.name](
+                         ctx
+                        ,cmd.flags
+                        ,cmd.switches
+                        ,combine(unpack, cmd.args, ...)
+                    )
+                )
+            }
+            <span class="keyword">return</span> display(ctx, ret)
+        <span class="keyword">else</span>
+            <span class="keyword">return</span> do_pipe(
+                ctx
+               ,i+<span class="number">1</span>
+               ,defs[cmd.name](
+                    ctx
+                   ,cmd.flags
+                   ,cmd.switches
+                   ,combine(unpack, cmd.args, ...)
+               )
+           )
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> ...
+<span class="keyword">end</span>
+
+received_command:listen(do_command)
+
+received_pipeline:listen(do_pipe)
+
+<span class="keyword">function</span> defs.echo(ctx, flags, switches, ...)
+    <span class="keyword">return</span> ...
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> defs.upper(ctx, flags, switches, ...)
+    <span class="keyword">return</span> func.vmap(<span class="global">string</span>.upper, ...)
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> yes_version = <span class="string">[[yes (coreutils) 1.0
+Copyright (C) 2019 Magicks.
+License MIT: &lt;https://opensource.org/licenses/MIT&gt;.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Magicks]]</span>
+
+<span class="keyword">local</span> yes_man = <span class="string">[[Usage: yes [STRING]...
+or:  yes OPTION
+Repeatedly output a line with all specified STRING(s), or 'y'.
+
+    --help     display this help and exit
+    --version  output version information and exit
+
+Report yes bugs to Magicks]]</span>
+
+<span class="keyword">local</span> yesses = {}
+
+<span class="keyword">local</span> <span class="keyword">function</span> do_yes(ctx, str)
+    <span class="keyword">local</span> chid = ctx.channel.id
+    <span class="keyword">local</span> current = yesses[chid]
+    <span class="keyword">if</span> current <span class="keyword">then</span> current:set(<span class="keyword">true</span>, <span class="keyword">true</span>) <span class="keyword">end</span>
+    <span class="keyword">if</span> str ~= <span class="string">""</span> <span class="keyword">then</span>
+        <span class="keyword">local</span> stat = promise.new()
+        yesses[chid] = stat
+        <span class="keyword">return</span> <span class="keyword">function</span>()
+            <span class="keyword">repeat</span> ctx.channel:send(str) <span class="keyword">until</span> stat:status() ~= <span class="string">"pending"</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> defs.yes(ctx, flags, switches, str)
+    <span class="keyword">if</span> switches.version <span class="keyword">or</span> flags.v <span class="keyword">then</span>
+        <span class="keyword">return</span> <span class="string">"```\n%s```"</span> % yes_version
+    <span class="keyword">elseif</span> switches.help <span class="keyword">or</span> flags.h <span class="keyword">then</span>
+        <span class="keyword">return</span> <span class="string">"```\n%s```"</span> % yes_man
+    <span class="keyword">else</span>
+        str = str <span class="keyword">or</span> <span class="string">'y'</span>
+        <span class="keyword">local</span> runner = do_yes(ctx, str)
+        <span class="keyword">if</span> runner <span class="keyword">then</span> myclient:wrap(runner) <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> unfurler = lpeg.anywhere(patterns.format)
+
+<span class="keyword">local</span> <span class="keyword">function</span> unfurl(str)
+    <span class="keyword">while</span> unfurler:match(str) <span class="keyword">do</span>
+        str = lpeg.gsub(str, unfurler, <span class="string">"%1"</span>)
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> str
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> get_msg_content(ch, id, flags)
+    <span class="keyword">local</span> m = ch:get_message(id)
+    <span class="keyword">local</span> content = m <span class="keyword">and</span> m.content
+    <span class="keyword">if</span> content <span class="keyword">and</span> flags.f <span class="keyword">then</span>
+        <span class="keyword">return</span> unfurl(content)
+    <span class="keyword">else</span>
+        <span class="keyword">return</span> content
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> cat_select(ctx, flags) <span class="keyword">return</span> <span class="keyword">function</span>(sid)
+    <span class="keyword">local</span> id = snowflake.id(sid)
+    <span class="keyword">if</span> id <span class="keyword">then</span>
+        <span class="keyword">return</span> promise.new(get_msg_content, ctx.msg.channel, id, flags)
+    <span class="keyword">else</span>
+        <span class="keyword">if</span> flags.f <span class="keyword">then</span> <span class="keyword">return</span> unfurl(sid) <span class="keyword">else</span> <span class="keyword">return</span> sid <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> formatters = {}
+
+<span class="keyword">function</span> formatters.bold(s) <span class="keyword">return</span> (<span class="string">"**%s**"</span>):format(s) <span class="keyword">end</span>
+formatters.b = formatters.bold
+
+<span class="keyword">function</span> formatters.italic(s) <span class="keyword">return</span> (<span class="string">"_%s_"</span>):format(s) <span class="keyword">end</span>
+formatters.i = formatters.italic
+
+<span class="keyword">function</span> formatters.snippet(s) <span class="keyword">return</span> (<span class="string">"``%s``"</span>):format(s) <span class="keyword">end</span>
+formatters.q = formatters.snippet
+
+<span class="keyword">function</span> formatters.codeblock(s) <span class="keyword">return</span> (<span class="string">"```\n%s```"</span>):format(s) <span class="keyword">end</span>
+formatters.c = formatters.codeblock
+
+<span class="keyword">function</span> formatters.spoiler(s) <span class="keyword">return</span> (<span class="string">"||%s||"</span>):format(s) <span class="keyword">end</span>
+formatters.h = formatters.spoiler
+
+<span class="keyword">function</span> formatters.strike(s) <span class="keyword">return</span> (<span class="string">"~~%s~~"</span>):format(s) <span class="keyword">end</span>
+formatters.s = formatters.strike
+
+<span class="keyword">function</span> formatters.underline(s) <span class="keyword">return</span> (<span class="string">"__%s__"</span>):format(s) <span class="keyword">end</span>
+formatters.u = formatters.underline
+
+<span class="keyword">local</span> cat_version = <span class="string">[[cat (coreutils) 1.0
+Copyright (C) 2019 Magicks.
+License MIT: &lt;https://opensource.org/licenses/MIT&gt;.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Magicks]]</span>
+
+<span class="keyword">local</span> cat_man = <span class="string">[[Usage: cat [OPTION]... [FILE]...
+Concatenate FILE(s), or standard input, to standard output.
+
+    --help     display this help and exit
+    --version  output version information and exit
+    --[format] applies a discord format string to the output
+    -n         number all output lines
+    -f         unfurl formatting
+
+Report cat bugs to Magicks]]</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> istr(s)
+    <span class="keyword">return</span> <span class="global">type</span>(s) == <span class="string">'string'</span> <span class="keyword">and</span> s <span class="keyword">or</span> <span class="string">""</span>
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> defs.cat(ctx, flags, switches, ...)
+    <span class="keyword">if</span> switches.version <span class="keyword">or</span> flags.v <span class="keyword">then</span>
+        <span class="keyword">return</span> <span class="string">"```\n%s```"</span> % cat_version
+    <span class="keyword">elseif</span> switches.help <span class="keyword">or</span> flags.h <span class="keyword">then</span>
+        <span class="keyword">return</span> <span class="string">"```\n%s```"</span> % cat_man
+    <span class="keyword">end</span>
+    <span class="keyword">local</span> ids = {func.vmap(cat_select(ctx, flags), ...)}
+    <span class="keyword">local</span> out = {}
+    <span class="keyword">for</span> i, p <span class="keyword">in</span> <span class="global">ipairs</span>(ids) <span class="keyword">do</span>
+        out[i] = promise.<span class="global">type</span>(p) <span class="keyword">and</span> p() <span class="keyword">or</span> p
+    <span class="keyword">end</span>
+    <span class="keyword">local</span> pre, post = istr(switches.pre):gsub(<span class="string">"\n"</span>, <span class="string">""</span>), istr(switches.post):gsub(<span class="string">"\n"</span>, <span class="string">""</span>)
+    <span class="keyword">local</span> output = <span class="global">table</span>.concat(out, (<span class="string">"%s\n%s"</span>):format(pre, post))
+
+    <span class="keyword">if</span> flags.n <span class="keyword">then</span>
+        <span class="keyword">local</span> lines = lpeg.split(output, <span class="string">"\n"</span>)
+        <span class="keyword">local</span> len = #lines
+        <span class="keyword">local</span> justify = <span class="global">math</span>.floor(<span class="global">math</span>.log(len, <span class="number">10</span>)) + <span class="number">1</span>
+        <span class="keyword">for</span> i = <span class="number">1</span>, len <span class="keyword">do</span>
+            <span class="keyword">local</span> bar = i == <span class="number">1</span> <span class="keyword">and</span> <span class="string">'\u{23A4}'</span> <span class="keyword">or</span> <span class="string">'\u{23A5}'</span>
+            lines[i] = (<span class="string">"%%%dd %s  %%s"</span>):format(justify, bar):format(i, lines[i])
+        <span class="keyword">end</span>
+        output = <span class="global">table</span>.concat(lines, <span class="string">"\n"</span>)
+    <span class="keyword">end</span>
+
+
+    <span class="keyword">for</span> _, f <span class="keyword">in</span> <span class="global">ipairs</span>(flags) <span class="keyword">do</span>
+        output = formatters[f] <span class="keyword">and</span> formatters[f](output) <span class="keyword">or</span> output
+    <span class="keyword">end</span>
+    <span class="keyword">for</span> _, f <span class="keyword">in</span> <span class="global">ipairs</span>(switches) <span class="keyword">do</span>
+        output = formatters[f] <span class="keyword">and</span> formatters[f](output) <span class="keyword">or</span> output
+    <span class="keyword">end</span>
+
+    <span class="keyword">return</span> output
+<span class="keyword">end</span>
+
+myclient:run()</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+
