@@ -5,6 +5,7 @@
 
 --imports--
 local setmetatable = setmetatable
+local insert, ipairs = table.insert, ipairs
 --start-module--
 local _ENV = {}
 
@@ -109,12 +110,14 @@ function pop_right(list)
 end
 
 function peek_left(list, places)
+    places = places or 0
     return places >= 0
         and list[list._first + places]
         or  peek_right(list, -places)
 end
 
 function peek_right(list, places)
+    places = places or 0
     return places >= 0
         and list[list._last - places]
         or  peek_left(list, -places)
@@ -267,6 +270,18 @@ function mapped(list, m, ...)
     return out
 end
 
+--- Returns a plain table array containing the elements of the queue.
+--  This operates from left to right.
+--  @tparam queue list The queue.
+--  @treturn table An array of the elements.
+function to_table(list)
+    local out = {}
+    for _, v in ipairs(list) do
+        insert(out, v)
+    end
+    return out
+end
+
 
 function __index(list, key)
     if key == 'first' then
@@ -288,6 +303,13 @@ function __len(list)
     return  list._last - list._first +1
 end
 
+--- `ipairs` iterator.
+--  Returns `from_left`
+--  @tparam queue list The queue.
+--  @usage
+--   for _, item in ipairs(queue) do
+--     ..
+--   end
 function __ipairs(list)
     if list.parity == "left" then
         return from_left(list)
