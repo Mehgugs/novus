@@ -23,7 +23,7 @@ local setmetatable = setmetatable
 --start-module--
 local _ENV = {}
 
-version = "0.0.4"
+version = "0.0.5"
 homepage = "https://github.com/Mehgugs/novus"
 time_unit = "seconds"
 discord_epoch = 1420070400
