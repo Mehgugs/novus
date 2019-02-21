@@ -1,14 +1,15 @@
-This license was taken from "https://raw.githubusercontent.com/sqmedeiros/lpeglabel/master/LICENSE".
 
-This license covers "/lua/novus/util/relabel.lua".
+This license was taken from "https://raw.githubusercontent.com/SinisterRectus/Discordia/master/LICENSE".
 
-The code for "relabel" module is a derivative of the "relabel" module from the "lpeglabel" project.
+This license covers "/lua/novus/util/api.lua".
+
+The functions "parseErrors" and "attachFiles" are based on code from the "discordia" project.
 
 LICENSE START
 
 The MIT License (MIT)
 
-Copyright (c) 2014-2017 Sérgio Medeiros
+Copyright (c) 2016-2018 SinisterRectus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -14,6 +14,7 @@ local util = require"novus.util"
 local const = require"novus.const"
 local mutex = require"novus.util.mutex".new
 local list = require"novus.util.list"
+local re = require"novus.util.relabel"
 local lpeg = util.lpeg
 local patterns = util.patterns
 local Date = util.Date
@@ -28,8 +29,11 @@ local xpcall = xpcall
 local traceback = debug.traceback
 local type = type
 local tostring = tostring
-local ipairs = ipairs
+local ipairs, pairs = ipairs, pairs
 local _VERSION = _VERSION
+local raw_decode = json.decode
+local null = json.null
+local map = list.map
 --start-module--
 local _ENV = {}
 
@@ -66,6 +70,39 @@ local function mutex_cache()
     })
 end
 
+local function remove_null(v)
+    if v == null then return nil else return v end
+end
+
+local function decode(str)
+    return map(remove_null, raw_decode(str))
+end
+
+local next_key = re.compile[[
+    key <- ident / numeral / quoted
+        ident <- (iprefix isuffix*) -> "%s.%s"
+            iprefix <- [a-zA-Z_-]
+            isuffix <- iprefix / %d
+        numeral <- %d+ -> "%s[%d]"
+        quoted <- .+ -> "%s[%q]"
+]]
+
+local function parseErrors(ret, errors, key)
+    for k, v in pairs(errors) do
+        if k == '_errors' then
+            for _, err in ipairs(v) do
+                insert(ret, ('%s in %s : %q'):format(err.code, key or 'payload', err.message))
+            end
+        else
+            if key then
+                parseErrors(ret, v, next_key:match(k):format(key, k))
+            else
+                parseErrors(ret, v, k)
+            end
+        end
+    end
+    return concat(ret, '\n\t')
+end
 
 local check_anywhere = util.compose(lpeg.check , lpeg.anywhere)
 local digits = lpeg.digit^1
@@ -222,7 +259,7 @@ function push(state, req, method,route, retries)
     end
 
     local raw = stream:get_body_as_string()
-    local data = headers:get"content-type" == JSON and json.decode(raw) or raw
+    local data = headers:get"content-type" == JSON and decode(raw) or raw
     if code < 300 then
         return data, nil, delay, global
     else
@@ -231,20 +268,33 @@ function push(state, req, method,route, retries)
             if code == 429 then
                 delay = data.retry_after / 1000
                 global = data.global
+                retry = retries < 5
             elseif code == 502 then
                 delay = delay + util.rand(0 , 2)
+                retry = retries < 5
             end
-            retry = retries < 5
+
             if retry then
                 util.warn("(%i, %q) :  retrying after %fsec : %s%s", code, reason[rawcode], delay, method, route)
                 cqueues.sleep(delay)
                 if global then state.global_lock:unlock() end
                 return push(state, req, method,route, retries+1)
             end
-        else
-            util.error("(%i, %q) : %s%s", code, reason[rawcode], method, route)
-            return nil, data, delay, global
+
+            local msg
+            if data.code and data.message then
+				msg = ('HTTP Error %i : %s'):format(data.code, data.message)
+			else
+				msg = 'HTTP Error'
+			end
+			if data.errors then
+				msg = parseErrors({msg}, data.errors)
+            end
+
+            data = msg
         end
+        util.error("(%i, %q) : %s%s", code, reason[rawcode], method, route)
+        return nil, data, delay, global
     end
 end
 

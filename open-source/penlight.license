@@ -2,6 +2,8 @@ This license was taken from "https://raw.githubusercontent.com/stevedonovan/Penl
 
 This license covers "/lua/novus/util/date.lua" and "/lua/novus/util/plcompat.lua".
 
+The code for the "Date" class and the "plcompat" module are derivatives of modules from the penlight project.
+
 LICENSE START
 
 Copyright (C) 2009-2016 Steve Donovan, David Manura.

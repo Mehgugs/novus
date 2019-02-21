@@ -12,7 +12,7 @@ local gettime = cqueues.monotime
 local lifetimes = const.lifetimes
 local next = next
 local type = type
-local min = math.min
+local max = math.max
 local running = cqueues.running
 --start-module--
 local _ENV = util.snowflake_root()
@@ -69,10 +69,9 @@ __newindex = util.makenewindex(_ENV)
 --- __gc finalizer for caching protocol.
 -- @tparam snowflake snowflake The snowflake object
 function __gc(snowflake)
-    if snowflake[3] and gettime() - snowflake[2] <= lifetimes[snowflake.__name] then
+    if snowflake[3] then
         return snowflake[3](snowflake)
     end
-    cache.counts[snowflake.kind] = min((cache.counts[snowflake.kind] or 0)-1, 0)
 end
 
 --- tostring metamethod.

@@ -29,7 +29,7 @@ function new_from( state, payload )
          util.uint(payload.id)
         ,gettime()
         ,state.cache.methods.role
-        ,payload.guild_id
+        ,util.uint(payload.guild_id)
         ,payload.name
         ,payload.color
         ,payload.hoist
@@ -105,13 +105,8 @@ function get_from(state, guild_id, id)
     local cache = state.cache[__name]
     if cache[id] then return cache[id]
     else
-        local success, data, err = api.get_guild_role(state.api, guild_id, id)
-        if success then
-            data.guild_id = guild_id
-            return new_from(state, data)
-        else
-            return nil, err
-        end
+        local guild = state.cache.guild[guild_id]
+        return guild:loadget_role(id)
     end
 end
 

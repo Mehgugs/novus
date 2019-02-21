@@ -112,16 +112,14 @@ function new_from(state, payload)
     local channel_id, guild_id =
      util.uint(payload.channel_id)
     ,util.uint(payload.guild_id)
-    if state.options.cache_messages then
-        local mycache = state.cache.message[channel_id]
-        local method = state.cache.methods.message[channel_id]
-        if mycache == nil then
-            mycache = util.cache()
-            state.cache.message[channel_id] = mycache
-            method = cache.inserter(mycache)
-            state.cache.methods.message[channel_id] = method
-        end
-    end
+    -- local mycache = state.cache.message[channel_id]
+    -- local method = state.cache.methods.message[channel_id]
+    -- if mycache == nil then
+    --     mycache = util.cache()
+    --     state.cache.message[channel_id] = mycache
+    --     method = cache.inserter(mycache)
+    --     state.cache.methods.message[channel_id] = method
+    -- end
 
     return setmetatable({
         util.uint(payload.id)
@@ -175,7 +173,7 @@ function methods.pin(message)
     local success, data, err = api.add_pinned_channel_message(state.api, message[4], message[1])
     if success and data then
         message[15] = true
-        return true
+        return message
     else
         return false, err
     end
@@ -186,7 +184,7 @@ function methods.unpin(message)
     local success, data, err = api.delete_pinned_channel_message(state.api, message[4], message[1])
     if success and data then
         message[15] = false
-        return true
+        return message
     else
         return false, err
     end
@@ -204,7 +202,7 @@ function methods.add_reaction(message, emoji)
     local state = running():novus()
     local success, data, err = api.create_reaction(state.api, message[4], message[1], emoji)
     if success and data then
-        return true
+        return message
     else
         return false, err
     end
@@ -229,7 +227,7 @@ function methods.remove_reaction(message, emoji, user)
         success, data, err = api.delete_own_reaction(state.api, message[4], message[1], emoji)
     end
     if success and data then
-        return true
+        return message
     else
         return false, err
     end
@@ -239,7 +237,7 @@ function methods.remove_all_reactions(message)
     local state = running():novus()
     local success, data, err = api.delete_all_reactions(state.api, message[4], message[1])
     if success and data then
-        return true
+        return message
     else
         return false, err
     end
@@ -251,7 +249,7 @@ function methods.delete(message)
     if success and data then
         local channel = snowflakes.channel.get_from(state, message[4])
         channel[6] = view.remove(channel[6], message[1])
-        return true
+        return message
     else
         return false, err
     end
@@ -305,19 +303,24 @@ function properties.channel(message)
     return snowflakes.channel.get(message[4])
 end
 
+function properties.guild_id(message)
+    message[5] = message.channel.guild_id
+    return message[5]
+end
+
 function properties.guild(message)
-    return message[5] and snowflakes.guild.get(message[5])
+    return message.guild_id and snowflakes.guild.get(message[5])
 end
 
 function properties.member(message)
-    return message[5] and snowflakes.member.get(message[5], message[6])
+    return  message.guild_id and snowflakes.member.get(message[5], message[6])
 end
 
 function properties.link(message)
     return "https://discordapp.com/channels/%s/%s/%s" % {
-         message[5] or '@me'
-        ,message[4]
-        ,message[1]
+         message.guild_id or '@me'
+        ,message.channel_id
+        ,message.id
     }
 end
 
@@ -340,6 +343,8 @@ function destroy_from(state, msg)
         msg.cache = nil
     end
 end
+
+__gc = nil
 
 
 

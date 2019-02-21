@@ -6,6 +6,8 @@
 local getmetatable = getmetatable
 local setmetatable = setmetatable
 local next = next
+local get = rawget
+local throw = require"novus.util.printf".throw
 --start-module--
 local _ENV = {}
 
@@ -27,6 +29,7 @@ local _ENV = {}
 --  v = view.new({1,2,3}, function(_, x) return 2*x end)
 --  v[1] --> 2
 function new(t, f, a)
+    if t == nil then throw("Cannot view nil!") end
     local d = 1
     if getmetatable(t) == _ENV then
         d = t.__d + 1
@@ -35,9 +38,10 @@ function new(t, f, a)
 end
 
 function __index(view, key)
-    local raw = view.__t[key]
+    local t, f, a = get(view, "__t"), get(view, "__f"), get(view, "__a")
+    local raw = t[key]
     if raw ~= nil then
-        local val = view.__f(key, raw, view.__a)
+        local val = f(key, raw, a)
         return val or nil
     end
 end

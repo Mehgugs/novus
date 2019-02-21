@@ -53,6 +53,7 @@ function READY(client, shard, _, event)
     shard.to_load = #event.guilds
     shard.loading = 0
     for _, g in ipairs(event.guilds) do
+        g.id = util.uint(g.id)
         guild.upsert(client, g)
     end
     if shard.raw_ready:status() == "pending" then shard.raw_ready:set(true, true) end
@@ -195,7 +196,7 @@ function GUILD_MEMBER_REMOVE(client, shard, _, event)
     event.guild_id = util.uint(event.guild_id)
     event.id = util.uint(event.id)
     local g = client.cache.guild[event.guild_id]
-    local m = client.cache.member[event.guild_id][event.id]
+    local m = client.cache.member[event.guild_id] and client.cache.member[event.guild_id][event.id]
     if g and m then
         guild.remove_member(g, m.id)
     end

@@ -7,7 +7,7 @@ source  = {
 
 description = {
      summary = 'A Discord API library written in lua 5.3, for lua 5.3.'
-    ,homepage = source.url
+    ,homepage = "https://github.com/Mehgugs/novus"
     ,license = 'MIT'
     ,maintainer = 'm4gicks@gmail.com'
     ,detailed =

@@ -6,6 +6,7 @@
 --imports--
 local util = require"novus.util"
 local ipairs = ipairs
+local eq = rawequal
 --start-module--
 local _ENV = {}
 
@@ -23,7 +24,7 @@ function inserter(cache)
     return function(object)
         local id = object.id
         local old = cache[id]
-        if old then
+        if old and not eq(old, object) then
             old[3] = nil
         end
         cache[id] = object
@@ -40,6 +41,8 @@ function new()
         cache[v] = new
         cache.methods[v] = inserter(new)
     end
+    cache.guild = {}
+    cache.methods.guild = inserter(cache.guild)
     -- special case for messages & members
     cache.message = {}
     cache.methods.message = {}

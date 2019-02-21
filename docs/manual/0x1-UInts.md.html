@@ -31,8 +31,26 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#The_Lua_integer_subtype">The Lua integer subtype </a></li>
+<li><a href="#What_is_an_unsigned_integer">What is an unsigned integer </a></li>
+<li><a href="#It_s_probably_a_waste_of_time">It's probably a waste of time </a></li>
+<li><a href="#Using_them_in_code">Using them in code </a></li>
+</ul>
 
 
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><a href="../manual/02-DiveIn.md.html">The First Example
+</a></li>
+  <li><a href="../manual/03-Permissions.md.html">Using Permissions
+</a></li>
+  <li><strong>UInts?
+</strong></li>
+</ul>
 <h2>Libraries</h2>
 <ul class="nowrap">
   <li><a href="../libraries/novus.api.html">novus.api</a></li>
@@ -52,7 +70,7 @@
   <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
   <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
   <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
-  <li><strong>novus.util.plcompat</strong></li>
+  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
   <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
   <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
   <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
@@ -60,17 +78,6 @@
   <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
   <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
   <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
-</ul>
-<h2>Manual</h2>
-<ul class="nowrap">
-  <li><a href="../manual/01-Introduction.md.html">Introduction
-</a></li>
-  <li><a href="../manual/02-DiveIn.md.html">The First Example
-</a></li>
-  <li><a href="../manual/03-Permissions.md.html">Using Permissions
-</a></li>
-  <li><a href="../manual/0x1-UInts.md.html">UInts?
-</a></li>
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
@@ -84,16 +91,55 @@
 
 <div id="content">
 
-<h1>Module <code>novus.util.plcompat</code></h1>
-<p>Compatability modules for penlight based dependencies.</p>
-<p>
-</p>
+    <h2>UInts?</h2>
 
+<p>This library uses unsigned integers to represent snowflakes, discord&rsquo;s ID type,
+yet Lua does not have an unsigned integer type?</p>
 
+<p><a name="The_Lua_integer_subtype"></a></p>
 
-<br/>
-<br/>
+<h3>The Lua integer subtype</h3>
 
+<p>Lua 5.3 introduced support for signed 64 bit integer numbers, as a subtype of
+the normal number type. You can check the subtype with <a href="https://www.lua.org/manual/5.3/manual.html#pdf-math.type">math.type</a>.
+This means when we write <code>1</code> it is interpreted as an integer subtype.
+There are some rules about when are where numerals are treated as integers.
+For example <code>1.0</code> is a float/double subtype number.</p>
+
+<p><a name="What_is_an_unsigned_integer"></a></p>
+
+<h3>What is an unsigned integer</h3>
+
+<p>To put it simply, a regular lua integer is 63 bits with 1 sign bit. This means
+we can represent numbers in the range [-2^63 + 1, 2^63 -1]. An unsigned integer with
+64 bits would be in the range [0, 2^64 -1].</p>
+
+<p>This at first seems like the unsigned type is incompatible with Lua but: <em>we can just pretend signed integers are unsigned</em>.
+Lua provides us the <code>&quot;%u&quot;</code> format option to print numbers as unsigned integers, and
+<a href="https://www.lua.org/manual/5.3/manual.html#pdf-math.ult">math.ult</a> to compare them. This allows us to skip using strings to contain snowflakes,
+which is nice. When in the documentation <strong>encoded uint64</strong> is used, it just means that
+the <em>actual</em> type is an int64 but we're pretending it&rsquo;s unsigned.</p>
+
+<p><a name="It_s_probably_a_waste_of_time"></a></p>
+
+<h3>It&rsquo;s probably a waste of time</h3>
+
+<p>I think that the snowflakes will flow into the unsigned range in around 2081,
+which is quite a long way away.</p>
+
+<p><a name="Using_them_in_code"></a></p>
+
+<h3>Using them in code</h3>
+
+<p>Novus internally uses the encoded uint64 for all snowflakes and will convert the
+strings sent by discord. You should use the <a href="../libraries/novus.util.uint.html#">uint</a> module to write down literals.</p>
+
+<pre>
+
+<span class="keyword">local</span> uint = <span class="global">require</span><span class="string">"novus.util.uint"</span>
+
+<span class="keyword">local</span> my_id = uint<span class="string">"92271879783469056"</span>
+</pre>
 
 
 

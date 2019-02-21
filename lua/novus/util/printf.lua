@@ -95,9 +95,8 @@ colors[8] = {
 
 _mode = 0
 
-local function writef(ifd,...)
-    local raw = f(...)
-    local str,n = raw:gsub("($([^;]+);)", function(_, body)
+function paint(str)
+    return str:gsub("($([^;]+);)", function(_, body)
         if body == 'reset' then
             return '\27[0m'
         elseif colors[_mode][body] then
@@ -108,6 +107,11 @@ local function writef(ifd,...)
             return color_code_to_seq(body)
         end
     end)
+end
+
+local function writef(ifd,...)
+    local raw = f(...)
+    local str,n = paint(raw)
     if fd then
         fd:write(raw:gsub("$[^;]+;", ""), "\n")
     end

@@ -113,7 +113,7 @@ end
 function split (s, sep)
     sep = P(sep)
     local elem = C((1 - sep)^0)
-    local p = Ct(elem * (sep * elem)^0)   -- make a table capture
+    local p = Ct(elem * (sep * elem)^0)
     return p:match(s)
 end
 

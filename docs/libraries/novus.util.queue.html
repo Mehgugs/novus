@@ -74,6 +74,8 @@
 </a></li>
   <li><a href="../manual/03-Permissions.md.html">Using Permissions
 </a></li>
+  <li><a href="../manual/0x1-UInts.md.html">UInts?
+</a></li>
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
@@ -160,8 +162,16 @@
 	<td class="summary">Transforms a queue out of place, returning a new queue, from left to right.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#to_table">to_table (list)</a></td>
+	<td class="summary">Returns a plain table array containing the elements of the queue.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#__len">__len (list)</a></td>
 	<td class="summary">Length of the queue.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__ipairs">__ipairs (list)</a></td>
+	<td class="summary"><a href="https://www.lua.org/manual/5.3/manual.html#pdf-ipairs">ipairs</a> iterator.</td>
 	</tr>
 </table>
 <h2><a href="#Objects">Objects</a></h2>
@@ -711,6 +721,34 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
 
 </dd>
     <dt>
+    <a name = "to_table"></a>
+    <strong>to_table (list)</strong>
+    </dt>
+    <dd>
+    Returns a plain table array containing the elements of the queue.
+  This operates from left to right.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        An array of the elements.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "__len"></a>
     <strong>__len (list)</strong>
     </dt>
@@ -740,6 +778,35 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
     <ul>
         <pre class="example">d = queue.new():pushes_left(<span class="number">1</span>,<span class="number">2</span>):pushes_right(<span class="number">3</span>,<span class="number">4</span>)
 #d <span class="comment">--&gt; 4</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "__ipairs"></a>
+    <strong>__ipairs (list)</strong>
+    </dt>
+    <dd>
+    <a href="https://www.lua.org/manual/5.3/manual.html#pdf-ipairs">ipairs</a> iterator.
+  Returns <a href="../libraries/novus.util.queue.html#from_left">from_left</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+         The queue.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">for</span> _, item <span class="keyword">in</span> <span class="global">ipairs</span>(queue) <span class="keyword">do</span>
+  ..
+<span class="keyword">end</span>
+</pre>
     </ul>
 
 </dd>

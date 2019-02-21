@@ -14,13 +14,14 @@ local json = require"cjson"
 local util = require"novus.util"
 local const = require"novus.const"
 local mutex = require"novus.util.mutex".new
+local list = require"novus.util.list"
 local USER_AGENT = require"novus.api".USER_AGENT
 
 local lpeg = util.lpeg
 local patterns = util.patterns
 local me = cqueues.running
 local poll = cqueues.poll
-local encode,decode = json.encode, json.decode
+local encode,raw_decode = json.encode, json.decode
 local identify_delay = const.gateway.identify_delay
 local sleep = cqueues.sleep
 local insert = table.insert
@@ -31,8 +32,17 @@ local xpcall = xpcall
 local toquery = httputil.dict_to_query
 local tostring = tostring
 local null = json.null
+local map = list.map
 --start-module--
 local _ENV = {}
+
+local function remove_null(v)
+    if v == null then return nil else return v end
+end
+
+local function decode(str)
+    return map(remove_null, raw_decode(str))
+end
 
 
 local ZLIB_SUFFIX = '\x00\x00\xff\xff'

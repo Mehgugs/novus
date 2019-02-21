@@ -25,7 +25,6 @@ local base = base_channel.newer_from
 function newer_from(_ENV, state, payload) --luacheck: ignore
     local object = base(_ENV, state, payload, cache)
     object[5] = util.uint(payload.last_message_id)
-    object[6] = view.copy(state.cache.message[object[1]])
 
     state.cache.message[object[1]] =
         state.cache.message[object[1]]
@@ -34,6 +33,8 @@ function newer_from(_ENV, state, payload) --luacheck: ignore
     state.cache.methods.message[object[1]] =
         state.cache.methods.message[object[1]]
     or  cache.inserter(state.cache.message[object[1]])
+
+    object[6] = view.copy(state.cache.message[object[1]])
 
     return object
 end
@@ -141,7 +142,7 @@ function methods.send(channel, content, ...)
             end
         end
         if content then
-            content = concat(mentions, " ") .. content
+            content = concat(mentions, "") .. content
         end
         success, data, err = api.create_message(state.api, channel[1], {
              content = content

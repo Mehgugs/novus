@@ -39,7 +39,7 @@ constants.abstract = true
 
 local snowflake_map = {
      text = 'guildtextchannel'
-    ,private = 'privatetextchannel'
+    ,private = 'privatechannel'
     ,voice = 'guildvoicechannel'
     ,category = 'guildcategorychannel'
     ,group = 'groupchannel'

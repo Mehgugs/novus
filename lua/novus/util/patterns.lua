@@ -112,6 +112,11 @@ doublesnip = re.compile[[("``" {(!"``" .)+} "``")]]
 -- @within Patterns
 codesnippet = doublesnip + codesnip
 
+--- Matches any of the 3 quoting formats
+-- @tparam lpeg-pattern quoted
+-- @within Patterns
+quoted = codeblock + codesnippet
+
 --- Matches a italic text.
 -- @tparam lpeg-pattern italic
 -- @within Patterns
@@ -132,7 +137,7 @@ underline = re.compile[[("__" {(!"__" .)+} "__")]]
 -- @tparam lpeg-pattern spoiler
 -- @within Patterns
 spoiler = re.compile[[
-    spoiler <- {"||" ((!"|" .) / spoiler)* "||"}
+    spoiler <- {"||" (!"|" .)* "||"}
 ]]
 
 --- Matches strikethrough text.

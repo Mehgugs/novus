@@ -142,6 +142,17 @@ function keys(t)
     return out
 end
 
+--- Returns an array of the values of `t`.
+-- @tab t
+-- @treturn table The value array.
+function values(t)
+    local out = {}
+    for _, k in pairs(t) do
+        insert(out, k)
+    end
+    return out
+end
+
 --- Counts the number of pairs contained in `t`
 -- @tab t
 -- @treturn number

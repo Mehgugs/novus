@@ -9,6 +9,7 @@ local const = require"novus.const"
 local enums = require"novus.enums"
 local json = require"cjson"
 local cqueues = require"cqueues"
+local cache = require"novus.cache"
 local setmetatable = setmetatable
 local ipairs = ipairs
 local gettime = cqueues.monotime
@@ -82,7 +83,7 @@ schema{
     ,"verification_level"
     ,"default_message_notifications"
     ,"explicit_content_filter"
-    ,"roles_ids"
+    ,"role_ids"
     ,"emoji_ids"
     ,"features"
     ,"mfa_level"
@@ -103,24 +104,26 @@ schema{
     ,"roles"
 }
 
-function processor.roles(roles, state)
+function processor.roles(roles, state, object)
     local out = {}
     for i, r in ipairs(roles) do
         local rid = util.uint(r.id)
         if not state.cache.role[rid] then
-            snowflakes.role.new(r)
+            r.guild_id = object.id
+            snowflakes.role.new_from(state, r)
         end
         out[i] = rid
     end
     return out, "role_ids"
 end
 
-function processor.emojis(emojis, state)
+function processor.emojis(emojis, state, object)
     local out = {}
     for i, e in ipairs(emojis) do
         local eid = util.uint(e.id)
         if not state.cache.emoji[eid] then
-            snowflakes.emoji.new(e)
+            e.guild_id = object.id
+            snowflakes.emoji.new_from(state, e)
         end
         out[i] = eid
     end
@@ -133,7 +136,7 @@ function processor.members(mems, state, object)
         local mid = util.uint(m.id)
         m.guild_id = object.id
         if not state.cache.member[mid] then
-            snowflakes.member.new(m)
+            snowflakes.member.new_from(state, m)
         end
         out[i] = mid
     end
@@ -144,9 +147,9 @@ function processor.channels(chls, state, object)
     local out = {}
     for i, c in ipairs(chls) do
         local cid = util.uint(c.id)
-        c.guild_id = object[1]
+        c.guild_id = object.id
         if not state.cache.channel[cid] then
-            snowflakes.channel.new(c)
+            snowflakes.channel.new_from(state,c)
         end
         out[i] = cid
     end
@@ -155,6 +158,8 @@ end
 
 local function insert_gid(v, _, id)
     v.guild_id = id
+    v.user_id = util.uint(v.user_id)
+    v.channel_id = util.uint(v.channel_id)
 end
 
 function processor.voice_states(states, _, guild)
@@ -175,7 +180,7 @@ end
 
 local function new_from_available(state, payload)
     local gid = util.uint(payload.id)
-    local old = state.cache.guild[gid] or {}
+    local old = state.cache.guild[gid] or {id = gid}
     local object = setmetatable(util.mergewith(old, {
          gid
         ,old[2] or gettime()
@@ -195,8 +200,8 @@ local function new_from_available(state, payload)
         ,payload.verification_level
         ,payload.default_message_notifications
         ,payload.explicit_content_filter
-        ,processor.roles(payload.roles, state)
-        ,processor.emojis(payload.emojis, state)
+        ,processor.roles(payload.roles, state, old)
+        ,processor.emojis(payload.emojis, state, old)
         ,payload.features
         ,payload.mfa_level
         ,payload.application_id
@@ -217,8 +222,14 @@ local function new_from_available(state, payload)
     if payload.channels then
         object.channel_ids = processor.channels(payload.channels, state, object)
     end
-    if payload.presences then
-        object.presences = payload.presences
+    -- if payload.presences then
+    --     object.presences = payload.presences
+    -- end
+
+    local mycache = state.cache.member[gid]
+    if mycache == nil then
+        state.cache.member[gid] = util.cache()
+        state.cache.methods.member[gid] = cache.inserter(state.cache.member[gid])
     end
 
     object.members  = object.members or view.new(state.cache.member[gid], select_guild_snowflake, gid)
@@ -328,7 +339,7 @@ function methods.get_channel(guild, id)
         if this_channel then
             return this_channel
         else
-            return snowflake.channel.get(guild[1], id)
+            return snowflakes.channel.get(guild[1], id)
         end
     end
 end
@@ -605,7 +616,25 @@ function methods.unban(guild, id, reason)
         if success then
             return true
         else
-            return false, err
+            return nil, err
+        end
+    end
+end
+
+local function new_role(data, _, state, gid)
+    return role.upsert(state, data, gid)
+end
+
+function methods.loadget_role(guild, id)
+    id = snowflake.id(id)
+    if id then
+        local state = running():novus()
+        local success, data, err = api.get_guild_roles(state.api, guild.id)
+        if success then
+            list.each(new_role, data, state, guild.id)
+            return state.cache.role[id]
+        else
+            return nil, err
         end
     end
 end
@@ -665,6 +694,8 @@ function get_from(state, id)
         end
     end
 end
+
+--__gc = nil
 
 --end-module--
 return _ENV

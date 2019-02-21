@@ -17,7 +17,9 @@ The documentation produced by LDoc aims to be a technical reference of the API e
 
 ### Where Do I start?
 
-#### @{02-DiveIn.md|The First Example}
+#### @{02-DiveIn.md|1. The First Example}
+#### @{03-Permissions.md|2. Adding Permissions}
+#### @{0x1-UInts.md| Interlude -- Unsigned integers in lua 5.3}
 
 
 [discord]: https://discordapp.com/developers/docs/intro

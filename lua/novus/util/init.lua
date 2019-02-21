@@ -25,7 +25,7 @@ local _ENV = setmetatable({}, {__index = function(self, k)
     local path = ('novus.util.%s'):format(k)
     local ok, M = pcall(require, path)
     if ok then
-        self.info("novus.util loaded module $white;%s$info; which was found @ $white;%q$info;.", k, path)
+        --self.info("novus.util loaded module $white;%s$info; which was found @ $white;%q$info;.", k, path)
         self[k] = M
         return M
     end

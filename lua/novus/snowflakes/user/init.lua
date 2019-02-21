@@ -1,6 +1,7 @@
 --imports--
 local util = require"novus.snowflakes.helpers"
 local snowflake = require"novus.snowflakes"
+local snowflakes = snowflake.snowflakes
 local const = require"novus.const"
 local api = require"novus.api"
 local cqueues = require"cqueues"
@@ -20,6 +21,7 @@ schema {
     ,"locale"
     ,"verified"
     ,"email"
+    ,"dm_id"
 }
 
 function new_from(state, payload)
@@ -63,9 +65,23 @@ function methods.default_avatar(user, size)
     end
 end
 
+function methods.create_private_channel(user)
+    local state = running():novus()
+    local success, data, err = api.create_dM(state.api, {recipient_id = util.uint.tostring(user.id)})
+    if success then
+        local c = snowflakes.privatechannel.upsert(state, data)
+        user.dm_id = c.id
+        return c
+    else
+        return nil, err
+    end
+end
+
 function methods.private_channel(user)
-    local channel, err = snowflakes.private_channel.get(user[1])
-    return channel, err
+    if user.dm_id then
+        return snowflakes.channel.get(user.dm_id)
+    else return methods.create_private_channel(user)
+    end
 end
 
 function methods.dm(user, ...)

@@ -43,6 +43,8 @@ function properties.emoji(reaction)
     end
 end
 
+__gc = nil
+
 constants.virtual = true
 --end-module--
 return _ENV
