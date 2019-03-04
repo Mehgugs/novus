@@ -38,12 +38,9 @@ local client = require"novus.client"
 
 local myclient = client.create{
   token = "Bot "..os.getenv"TOKEN"
-  ,compress = false
-  ,large_threshold = 100
-  ,driver = "default"
 }
 
-client.run(myclient)
+myclient:run()
 ```
 
 ### Documentation
