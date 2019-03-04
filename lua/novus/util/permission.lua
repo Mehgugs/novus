@@ -1,8 +1,7 @@
 --- Permission value utilities.
--- Dependencies: `novus.util`
--- @module novus.util.permission
+-- Dependencies: `util`
+-- @module util.permission
 -- @alias _ENV
--- @see novus.util
 
 --imports--
 local util = require"novus.util"

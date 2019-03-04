@@ -1,6 +1,5 @@
 --- Lpeg combinators and utilities.
--- @module novus.util.lpeg
--- @see novus.util
+-- @module util.lpeg
 -- @alias _ENV
 
 --imports--

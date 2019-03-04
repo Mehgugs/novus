@@ -40,31 +40,31 @@
 
 <h2>Libraries</h2>
 <ul class="nowrap">
-  <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
-  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
-  <li><a href="../libraries/novus.client.html">novus.client</a></li>
-  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
-  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
-  <li><a href="../libraries/novus.const.html">novus.const</a></li>
-  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
-  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
-  <li><a href="../libraries/novus.util.html">novus.util</a></li>
-  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
-  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
-  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
-  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
-  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
-  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
-  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
-  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
-  <li><strong>novus.util.queue</strong></li>
-  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
-  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
-  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
-  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
-  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+  <li><a href="../libraries/api.html">api</a></li>
+  <li><a href="../libraries/cache.html">cache</a></li>
+  <li><a href="../libraries/cache.view.html">cache.view</a></li>
+  <li><a href="../libraries/client.html">client</a></li>
+  <li><a href="../libraries/client.context.html">client.context</a></li>
+  <li><a href="../libraries/client.emission.html">client.emission</a></li>
+  <li><a href="../libraries/client.interposable.html">client.interposable</a></li>
+  <li><a href="../libraries/const.html">const</a></li>
+  <li><a href="../libraries/enums.html">enums</a></li>
+  <li><a href="../libraries/shard.html">shard</a></li>
+  <li><a href="../libraries/util.html">util</a></li>
+  <li><a href="../libraries/util.date.html">util.date</a></li>
+  <li><a href="../libraries/util.func.html">util.func</a></li>
+  <li><a href="../libraries/util.list.html">util.list</a></li>
+  <li><a href="../libraries/util.lpeg.html">util.lpeg</a></li>
+  <li><a href="../libraries/util.mutex.html">util.mutex</a></li>
+  <li><a href="../libraries/util.patterns.html">util.patterns</a></li>
+  <li><a href="../libraries/util.permission.html">util.permission</a></li>
+  <li><a href="../libraries/util.plcompat.html">util.plcompat</a></li>
+  <li><a href="../libraries/util.printf.html">util.printf</a></li>
+  <li><strong>util.queue</strong></li>
+  <li><a href="../libraries/util.relabel.html">util.relabel</a></li>
+  <li><a href="../libraries/util.string.html">util.string</a></li>
+  <li><a href="../libraries/util.table.html">util.table</a></li>
+  <li><a href="../libraries/util.uint.html">util.uint</a></li>
 </ul>
 <h2>Manual</h2>
 <ul class="nowrap">
@@ -89,21 +89,17 @@
 
 <div id="content">
 
-<h1>Module <code>novus.util.queue</code></h1>
+<h1>Module <code>util.queue</code></h1>
 <p>Simple double-ended queue from lua examples.</p>
 <p>
 </p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../libraries/novus.util.html#">novus.util</a>
-    </ul>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#new">new ()</a></td>
-	<td class="summary">Constructs a new <a href="../libraries/novus.util.queue.html">queue</a>.</td>
+	<td class="summary">Constructs a new <a href="../libraries/util.queue.html">queue</a>.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#push_left">push_left (list, value)</a></td>
@@ -194,14 +190,14 @@
     <strong>new ()</strong>
     </dt>
     <dd>
-    Constructs a new <a href="../libraries/novus.util.queue.html">queue</a>.
+    Constructs a new <a href="../libraries/util.queue.html">queue</a>.
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -221,7 +217,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
         <li><span class="parameter">value</span>
@@ -232,7 +228,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -252,7 +248,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
         <li><span class="parameter">value</span>
@@ -263,7 +259,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -284,7 +280,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
         <li><span class="parameter">a</span>
@@ -322,7 +318,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
         <li><span class="parameter">a</span>
@@ -359,7 +355,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
     </ul>
@@ -367,7 +363,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -387,7 +383,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
     </ul>
@@ -395,7 +391,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -415,7 +411,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue to iterate over.
         </li>
     </ul>
@@ -452,7 +448,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue to iterate over.
         </li>
     </ul>
@@ -489,7 +485,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue to iterate over.
         </li>
     </ul>
@@ -524,7 +520,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue to iterate over.
         </li>
     </ul>
@@ -554,13 +550,13 @@
     </dt>
     <dd>
     Filters a queue in-place, from left to right.
-  See <a href="../libraries/novus.util.list.html#filter">novus.util.list.filter</a> for filtering examples.
+  See <a href="../libraries/util.list.html#filter">util.list.filter</a> for filtering examples.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue to filter.
         </li>
         <li><span class="parameter">f</span>
@@ -576,7 +572,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -601,13 +597,13 @@ q:filter(<span class="keyword">function</span>(x) <span class="keyword">return</
     </dt>
     <dd>
     Filters a queue out of place, returning a new queue, from left to right.
-  See <a href="../libraries/novus.util.list.html#filter">novus.util.list.filter</a> for filtering examples.
+  See <a href="../libraries/util.list.html#filter">util.list.filter</a> for filtering examples.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue to filter.
         </li>
         <li><span class="parameter">f</span>
@@ -623,7 +619,7 @@ q:filter(<span class="keyword">function</span>(x) <span class="keyword">return</
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
         The new queue containing the results.
     </ol>
 
@@ -637,13 +633,13 @@ q:filter(<span class="keyword">function</span>(x) <span class="keyword">return</
     </dt>
     <dd>
     Transforms a queue in place, from left to right.
-  See <a href="../libraries/novus.util.list.html#map">novus.util.list.map</a> for mapping examples.
+  See <a href="../libraries/util.list.html#map">util.list.map</a> for mapping examples.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The list to transform.
         </li>
         <li><span class="parameter">m</span>
@@ -659,7 +655,7 @@ q:filter(<span class="keyword">function</span>(x) <span class="keyword">return</
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -685,13 +681,13 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
     </dt>
     <dd>
     Transforms a queue out of place, returning a new queue, from left to right.
-  See <a href="../libraries/novus.util.list.html#map">novus.util.list.map</a> for mapping examples.
+  See <a href="../libraries/util.list.html#map">util.list.map</a> for mapping examples.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The list to transform
         </li>
         <li><span class="parameter">m</span>
@@ -703,7 +699,7 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
          (<em>optional</em>)
         </li>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The list to transform
         </li>
     </ul>
@@ -711,7 +707,7 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+           <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
 
 
     </ol>
@@ -732,7 +728,7 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
     </ul>
@@ -759,7 +755,7 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
     </ul>
@@ -787,13 +783,13 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
     </dt>
     <dd>
     <a href="https://www.lua.org/manual/5.3/manual.html#pdf-ipairs">ipairs</a> iterator.
-  Returns <a href="../libraries/novus.util.queue.html#from_left">from_left</a>
+  Returns <a href="../libraries/util.queue.html#from_left">from_left</a>
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.queue.html#queue">queue</a></span>
+            <span class="types"><a class="type" href="../libraries/util.queue.html#queue">queue</a></span>
          The queue.
         </li>
     </ul>
@@ -837,7 +833,7 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
 
     <h3>See also:</h3>
     <ul>
-         <a href="../libraries/novus.util.queue.html#new">queue.new</a>
+         <a href="../libraries/util.queue.html#new">queue.new</a>
     </ul>
 
 
@@ -848,7 +844,7 @@ q:map(<span class="keyword">function</span>(x) <span class="keyword">return</spa
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i>current version <a href="https://github.com/Mehgugs/novus">Novus 0.0.5</a></i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -1,4 +1,5 @@
 --imports--
+local interposable = require"novus.client.interposable"
 local cond = require"cqueues.condition"
 local promise = require"cqueues.promise"
 local util = require"novus.util"
@@ -22,7 +23,7 @@ local dm = require"novus.snowflakes.channel.privatechannel"
     local message  = require"novus.snowflakes.channel.message"
     local reaction = require"novus.snowflakes.channel.reaction"
 
-
+local assert = assert
 local ipairs = ipairs
 local insert = table.insert
 local function select_dms(_, chan)
@@ -32,7 +33,7 @@ end
 
 
 --start-module--
-local _ENV = {}
+local _ENV = interposable{}
 
 function READY(client, shard, _, event)
     util.info"READY"
@@ -86,14 +87,14 @@ function CHANNEL_CREATE(client, shard, _, event)
 end
 
 function CHANNEL_UPDATE(client, shard, _, event)
-    local has_guild = enums.channeltype[event.type]:startswith"guild"
     local g
     event.guild_id = util.uint(event.guild_id)
-    if has_guild then
+    if event.guild_id then
         g = guild.get_from(client, event.guild_id)
     end
-    local _ = channel.get_from(client, util.uint(event.id))
-    return client.events.CHANNEL_UPDATE:emit(ctx(g, channel.upsert(client, event)))
+    local c = channel.get_from(client, util.uint(event.id))
+    channel.update_from(client, c, event)
+    return client.events.CHANNEL_UPDATE:emit(ctx(g, c))
 end
 
 function CHANNEL_DELETE(client, shard, _, event)
@@ -208,17 +209,17 @@ function GUILD_MEMBER_REMOVE(client, shard, _, event)
 end
 
 function GUILD_ROLE_CREATE(client, shard, _, event)
-    event.guild_id = util.uint(event.guild_id)
-    local g = client.cache.guild[event.guild_id]
-    local m = role.upsert(client, event)
+    event.role.guild_id = util.uint(event.guild_id)
+    local g = client.cache.guild[event.role.guild_id]
+    local m = role.upsert(client, event.role)
     return client.events.GUILD_ROLE_CREATE:emit(ctx(g, nil, nil, m))
 end
 
 function GUILD_ROLE_UPDATE(client, shard, _, event)
-    event.guild_id = util.uint(event.guild_id)
-    local g = client.cache.guild[event.guild_id]
-    local _ = role.get_from(client, util.uint(event.id))
-    local m = role.upsert(client, event)
+    event.role.guild_id = util.uint(event.guild_id)
+    local g = client.cache.guild[event.role.guild_id]
+    local _ = role.get_from(client, g.id, util.uint(event.role.id))
+    local m = role.upsert(client, event.role)
     return client.events.GUILD_ROLE_UPDATE:emit(ctx(g, nil, nil, m))
 end
 
@@ -248,7 +249,8 @@ function MESSAGE_UPDATE(client, shard, _, event)
     local ch = client.cache.channel[chid]
     if ch == nil then ch = promise.new(channel.get_from, client, chid) end
     local g if event.guild_id then g = client.cache.guild[util.uint(event.guild_id)] end
-    local _ = message.get_from(client, chid, util.uint(event.id))
+
+    message.get_from(client, chid, util.uint(event.id))
     local m = message.upsert(client, event, chid)
     return client.events.MESSAGE_UPDATE:emit(ctx(g, ch, m.author, nil, m))
 end

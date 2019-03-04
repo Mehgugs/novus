@@ -1,6 +1,6 @@
 --- Discord REST api client.
--- Dependencies: `novus.util`,  `novus.const`, `novus.util.mutex`, `novus.util.lpeg`, `novus.util.patterns`
--- @module novus.api
+-- Dependencies: `util`,  `const`, `util.mutex`, `util.lpeg`, `util.patterns`
+-- @module api
 -- @alias _ENV
 
 --imports--
@@ -9,12 +9,15 @@ local errno = require"cqueues.errno"
 local newreq = require "http.request"
 local reason = require"http.h1_reason_phrases"
 local httputil = require "http.util"
+local zlib = require"http.zlib"
 local json = require"cjson"
 local util = require"novus.util"
 local const = require"novus.const"
 local mutex = require"novus.util.mutex".new
 local list = require"novus.util.list"
 local re = require"novus.util.relabel"
+local interposable = require"novus.client.interposable"
+local inflate = zlib.inflate
 local lpeg = util.lpeg
 local patterns = util.patterns
 local Date = util.Date
@@ -35,7 +38,7 @@ local raw_decode = json.decode
 local null = json.null
 local map = list.map
 --start-module--
-local _ENV = {}
+local _ENV = interposable{}
 
 --- The api URL the client uses connect.
 -- @string URL
@@ -112,6 +115,9 @@ local ends_in_id = check_anywhere("/" * digits * -1)
 local trailing_id = lpeg.anywhere(lpeg.C(lpeg.lazy(1,"/")) * digits * -1)
 
 local function route_of(endpoint, method)
+    if endpoint:find('reactions') then
+        endpoint = endpoint:match('.*/reactions')
+    end
     if method == "DELETE" and message_endpoint:match(endpoint) then
         return ("%s %s"):format(trailing_id:match(endpoint), method)
     elseif endpoint:sub(1,9) == "/invites/" then
@@ -150,12 +156,16 @@ local token_check = lpeg.check(patterns.token * -1)
 function init(options)
     local state = {}
     if not (options.token and options.token:sub(1,4) == "Bot " and token_check:match(options.token:sub(5,-1))) then
-        return util.fatal("Please supply a bot token!")
+        return util.fatal("Please supply a bot token! It must start with 'Bot '.")
     end
     state.token = options.token
     state.id = util.rid()
     state.routex = mutex_cache()
     state.global_lock = mutex()
+    state.accept_encoding = options.accept_encoding == "gzip"
+    if state.accept_encoding then
+        util.info("Api-%s is using $white;accept-encoding: 'gzip, *;q=0'$info;.", state.id)
+    end
     util.info("Initialized API-%s with TOKEN-%x", state.id, util.hash(state.token))
     return state
 end
@@ -190,6 +200,9 @@ function request(state, method, endpoint, payload, query, files)
     req.headers:upsert(":method", method)
     req.headers:upsert("user-agent", USER_AGENT)
     req.headers:append("authorization", state.token)
+    if state.accept_encoding then
+        req.headers:append("accept-encoding", "gzip, *;q=0")
+    end
     if with_payload[method] then
         payload = payload and json.encode(payload) or '{}'
         if files and next(files) then
@@ -259,6 +272,12 @@ function push(state, req, method,route, retries)
     end
 
     local raw = stream:get_body_as_string()
+    if state.accept_encoding and headers:get"content-encoding" == "gzip" then
+        raw = inflate()(raw, true)
+    elseif state.accept_encoding and headers:get"content-encoding" ~= "gzip" then
+        util.warn("Content negotiation failed or was ignored! (server responded with %q)", headers:get"content-encoding")
+    end
+
     local data = headers:get"content-type" == JSON and decode(raw) or raw
     if code < 300 then
         return data, nil, delay, global
@@ -283,12 +302,12 @@ function push(state, req, method,route, retries)
 
             local msg
             if data.code and data.message then
-				msg = ('HTTP Error %i : %s'):format(data.code, data.message)
-			else
-				msg = 'HTTP Error'
-			end
-			if data.errors then
-				msg = parseErrors({msg}, data.errors)
+                msg = ('HTTP Error %i : %s'):format(data.code, data.message)
+            else
+                msg = 'HTTP Error'
+            end
+            if data.errors then
+                msg = parseErrors({msg}, data.errors)
             end
 
             data = msg

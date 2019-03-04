@@ -1,3 +1,8 @@
+--- Abstract text channel snowflake definition.
+--  Dependencies: `snowflakes`, `channel`, `novus.api`, `novus.cache`, `novus.cache.view`.
+--  @module snowflakes.textchannel
+--  @alias textchannel
+
 --imports--
 local util = require"novus.snowflakes.helpers"
 local cache = require"novus.cache"
@@ -20,6 +25,17 @@ schema {
      "last_message_id" --5
     ,"messages" --6
 }
+
+--- An abstract text channel object.
+--  Inherits from `snowflakes.channel`
+-- @table textchannel
+-- @within Objects
+-- @int id
+-- @tparam number life
+-- @tparam function cache
+-- @tparam integer type See @{novus.enums.channeltype|channel types}
+-- @tparam integer last_message_id
+-- @tparam view messages
 
 local base = base_channel.newer_from
 function newer_from(_ENV, state, payload) --luacheck: ignore
@@ -121,6 +137,15 @@ function methods.broadcast_typing(channel)
     end
 end
 
+--- Sends a message to the channel.
+--  @function textchannel.send
+--  @within Methods
+--  @tparam textchannel channel
+--  @tparam string|table content Either a formattable string, or an options table.
+--  @param  ... Format parameters to the format string.
+--  @treturn[1] message
+--  @treturn[2] nil
+--  @treturn[2] string error message
 function methods.send(channel, content, ...)
     local state = running():novus()
     local success, data, err
@@ -161,6 +186,17 @@ function methods.send(channel, content, ...)
         return false, err
     end
 end
+
+--- `textchannel.send` options.
+--   @table send_options
+--   @within Objects
+--   @see textchannel.send
+--   @tparam string content The content to send.
+--   @tparam snowflakes.snowflake|nil mention A mentionable discord object.
+--   @tparam table(snowflakes.snowflake)|nil mentions A list of mentionable discord objects.
+--   @tab embed A table describing a discord embed.
+--   @tparam boolean tts Whether the message is `tts`.
+--   @tab files A list of `{name, content}` pairs to send as attached files.
 
 --end-module--
 return _ENV

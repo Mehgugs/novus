@@ -1,5 +1,5 @@
 --- Compatability modules for penlight based dependencies.
--- @module novus.util.plcompat
+-- @module util.plcompat
 
 --imports--
 local error = error

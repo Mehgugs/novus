@@ -19,11 +19,18 @@ topics = {
 }
 examples = {'./examples'}
 
-package = 'novus'
+--package = 'novus'
 format = 'discount'
 sort_modules=true
 file = {
-    'lua/novus'
+     'lua/novus/api'
+    ,'lua/novus/cache'
+    ,'lua/novus/client'
+    ,'lua/novus/enums'
+    ,'lua/novus/shard'
+    ,'lua/novus/util'
+    ,'lua/novus/const.lua'
+    ,'lua/novus/init.lua'
 }
 
 style = 'docs_style'
@@ -33,6 +40,8 @@ kind_names={topic='Manual',module='Libraries'}
 tparam_alias('pattern','lpeg-pattern')
 tparam_alias('int', 'integer')
 tparam_alias('tab', 'table')
+tparam_alias('str', 'string')
+tparam_alias('boolean', 'boolean')
 tparam_alias('func', 'function')
 tparam_alias('view', 'view')
 alias('ret',{'return',modifiers={type="$1"}})

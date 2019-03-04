@@ -1,7 +1,6 @@
 --- Provides the relabel module from lpeglabel.
 -- Some extra syntax is added to make some re constructs terser.
--- @module novus.util.relabel
--- @see novus.util
+-- @module util.relabel
 
 -- $Id: re.lua,v 1.44 2013/03/26 20:11:40 roberto Exp $
 

@@ -1,3 +1,8 @@
+--- Discord message snowflake definition.
+--  Dependencies: `snowflakes`, `reaction`, `novus.api`, `novus.cache`, `novus.cache.view`
+--  @module snowflakes.message
+--  @alias message
+
 --imports--
 local api = require"novus.api"
 local util = require"novus.snowflakes.helpers"
@@ -71,10 +76,36 @@ schema {
     ,"mentioned"
 }
 
-function processor.mentions(payload, state)
+--- A discord message object.
+--  @table message
+--  @within Objects
+--  @int id
+--  @tparam number life
+--  @tparam function cache
+--  @int channel_id
+--  @tparam integer|nil guild_id
+--  @int author_id
+--  @int type See @{novus.enums.messagetype|message types}
+--  @str content
+--  @str timestamp
+--  @str edited_timestamp
+--  @tparam boolean tts
+--  @tab attachments
+--  @tab embeds
+--  @tparam string|nil nonce
+--  @tparam boolean pinned
+--  @tparam boolean mention_everyone
+--  @tab mentions
+--  @tab mention_roles
+--  @tparam table(reaction)|nil reactions
+--  @tparam integer|nil webhook_id
+--  @tparam table|nil activity
+--  @tparam table|nil application
+
+function processor.mentions(inmentions, state)
     local mentions = {}
-    if payload.mentions then
-        for i, u in ipairs(payload.mentions) do
+    if inmentions then
+        for i, u in ipairs(inmentions) do
             local uid = util.uint(u.id)
             if not state.cache.user[uid] then
                 snowflakes.user.new_from(state, u, state.cache.methods.user)
@@ -85,11 +116,11 @@ function processor.mentions(payload, state)
     return mentions
 end
 
-function processor.reactions(payload, state)
+function processor.reactions(inreactions, state)
     local out = {}
-    if payload.reactions then
+    if inreactions then
         out = {}
-        for _, r in ipairs(payload.reactions) do
+        for _, r in ipairs(inreactions) do
             local new = reaction.new_from(state, r)
             out[new.emoji_id] = new
         end
@@ -97,14 +128,11 @@ function processor.reactions(payload, state)
     return out
 end
 
-function processor.author(payload, state)
-    local user = payload.author
+function processor.author(user, state)
     if user then
         local uid = util.uint(user.id)
-        if not state.cache.user[uid] then
-            snowflakes.user.new_from(state, user, state.cache.methods.user)
-        end
-        return uid
+        snowflakes.user.upsert(state, user)
+        return uid, "author_id"
     end
 end
 
@@ -112,14 +140,14 @@ function new_from(state, payload)
     local channel_id, guild_id =
      util.uint(payload.channel_id)
     ,util.uint(payload.guild_id)
-    -- local mycache = state.cache.message[channel_id]
-    -- local method = state.cache.methods.message[channel_id]
-    -- if mycache == nil then
-    --     mycache = util.cache()
-    --     state.cache.message[channel_id] = mycache
-    --     method = cache.inserter(mycache)
-    --     state.cache.methods.message[channel_id] = method
-    -- end
+    local mycache = state.cache.message[channel_id]
+    local method = state.cache.methods.message[channel_id]
+    if mycache == nil then
+        mycache = util.cache()
+        state.cache.message[channel_id] = mycache
+        method = cache.inserter(mycache)
+        state.cache.methods.message[channel_id] = method
+    end
 
     return setmetatable({
         util.uint(payload.id)
@@ -127,7 +155,7 @@ function new_from(state, payload)
         ,method
         ,channel_id
         ,guild_id
-        ,processor.author(payload, state)
+        ,processor.author(payload.author, state)
         ,payload.type
         ,payload.content
         ,payload.timestamp
@@ -139,10 +167,10 @@ function new_from(state, payload)
         ,payload.pinned
 
         ,payload.mention_everyone
-        ,processor.mentions(payload, state)
+        ,processor.mentions(payload,mentions, state)
         ,payload.mention_roles
 
-        ,processor.reactions(payload, state)
+        ,processor.reactions(payload.reactions, state)
 
         ,payload.webhook_id
 

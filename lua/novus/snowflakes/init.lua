@@ -1,9 +1,13 @@
 --- Snowflake object protocol.
 --  Dependencies: `novus.const`
+--  All snowflake objects follow linear inheritance with the abstract `snowflake`
+--  at the root. Within the `snowflakes.*` documentation inherited objects will only
+--  list the components they add and not inherited components.
 -- @module snowflakes
 -- @alias _ENV
 
 --imports--
+local interposable = require"novus.client.interposable"
 local util = require"novus.snowflakes.helpers"
 local const = require"novus.const"
 local cache = require"novus.cache"
@@ -15,7 +19,7 @@ local type = type
 local max = math.max
 local running = cqueues.running
 --start-module--
-local _ENV = util.snowflake_root()
+local _ENV = interposable(util.snowflake_root())
 
 __name = "snowflake"
 

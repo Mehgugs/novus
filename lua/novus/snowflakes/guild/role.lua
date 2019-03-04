@@ -92,6 +92,16 @@ function methods.can(role, ...)
     return permission.contains(role[9], ...)
 end
 
+function methods.move_up(role, by)
+    return role.guild:move_role_up(role, by)
+end
+
+function methods.move_down(role, by)
+    return role.guild:move_role_down(role, by)
+end
+
+methods.move = methods.move_up
+
 function properties.guild(role)
     local parent = snowflakes.guild.get(role[4])
     return parent
@@ -102,7 +112,7 @@ function properties.mention(role)
 end
 
 function get_from(state, guild_id, id)
-    local cache = state.cache[__name]
+    local cache = state.cache.role
     if cache[id] then return cache[id]
     else
         local guild = state.cache.guild[guild_id]

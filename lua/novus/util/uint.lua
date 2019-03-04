@@ -1,8 +1,7 @@
 --- Unsigned integer encoding and utilities.
--- Dependencies: `novus.util.lpeg`, `novus.const`
--- @module novus.util.uint
+-- Dependencies: `util.lpeg`, `const`
+-- @module util.uint
 -- @alias _ENV
--- @see novus.util
 
 --imports--
 local ult, mtoint, mntype, max_int = math.ult, math.tointeger, math.type, math.maxinteger

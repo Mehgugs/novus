@@ -53,31 +53,31 @@
 </ul>
 <h2>Libraries</h2>
 <ul class="nowrap">
-  <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
-  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
-  <li><a href="../libraries/novus.client.html">novus.client</a></li>
-  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
-  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
-  <li><a href="../libraries/novus.const.html">novus.const</a></li>
-  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
-  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
-  <li><a href="../libraries/novus.util.html">novus.util</a></li>
-  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
-  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
-  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
-  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
-  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
-  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
-  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
-  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
-  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
-  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
-  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
-  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
-  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
-  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+  <li><a href="../libraries/api.html">api</a></li>
+  <li><a href="../libraries/cache.html">cache</a></li>
+  <li><a href="../libraries/cache.view.html">cache.view</a></li>
+  <li><a href="../libraries/client.html">client</a></li>
+  <li><a href="../libraries/client.context.html">client.context</a></li>
+  <li><a href="../libraries/client.emission.html">client.emission</a></li>
+  <li><a href="../libraries/client.interposable.html">client.interposable</a></li>
+  <li><a href="../libraries/const.html">const</a></li>
+  <li><a href="../libraries/enums.html">enums</a></li>
+  <li><a href="../libraries/shard.html">shard</a></li>
+  <li><a href="../libraries/util.html">util</a></li>
+  <li><a href="../libraries/util.date.html">util.date</a></li>
+  <li><a href="../libraries/util.func.html">util.func</a></li>
+  <li><a href="../libraries/util.list.html">util.list</a></li>
+  <li><a href="../libraries/util.lpeg.html">util.lpeg</a></li>
+  <li><a href="../libraries/util.mutex.html">util.mutex</a></li>
+  <li><a href="../libraries/util.patterns.html">util.patterns</a></li>
+  <li><a href="../libraries/util.permission.html">util.permission</a></li>
+  <li><a href="../libraries/util.plcompat.html">util.plcompat</a></li>
+  <li><a href="../libraries/util.printf.html">util.printf</a></li>
+  <li><a href="../libraries/util.queue.html">util.queue</a></li>
+  <li><a href="../libraries/util.relabel.html">util.relabel</a></li>
+  <li><a href="../libraries/util.string.html">util.string</a></li>
+  <li><a href="../libraries/util.table.html">util.table</a></li>
+  <li><a href="../libraries/util.uint.html">util.uint</a></li>
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
@@ -190,11 +190,11 @@ required_perms[<span class="string">'!ping'</span>] = perms(<span class="string"
 <h3>Difference between <code>has</code> and <code>contains</code></h3>
 
 <p>You may have noticed that, between our first has_perms and the final version,
-we swapped from using <a href="../libraries/novus.util.permission.html#contains">perms:contains</a>
-and <a href="../libraries/novus.util.permission.html#has">perms:has</a>. This is because when you want to
+we swapped from using <a href="../libraries/util.permission.html#contains">perms:contains</a>
+and <a href="../libraries/util.permission.html#has">perms:has</a>. This is because when you want to
 see if a <em>permission value</em> has all the permissions another <em>has</em> you use
-<a href="../libraries/novus.util.permission.html#has">perms:has</a>. If you want to see which <em>permissions</em> are <em>contained</em> in a
-<em>permission value</em> you use <a href="../libraries/novus.util.permission.html#contains">perms:contains</a>.</p>
+<a href="../libraries/util.permission.html#has">perms:has</a>. If you want to see which <em>permissions</em> are <em>contained</em> in a
+<em>permission value</em> you use <a href="../libraries/util.permission.html#contains">perms:contains</a>.</p>
 
 <h4><a href="../manual/01-Introduction.md.html#">What to do next?</a></h4>
 
@@ -202,7 +202,7 @@ see if a <em>permission value</em> has all the permissions another <em>has</em> 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i>current version <a href="https://github.com/Mehgugs/novus">Novus 0.0.5</a></i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -57,31 +57,31 @@
 </ul>
 <h2>Libraries</h2>
 <ul class="nowrap">
-  <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
-  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
-  <li><a href="../libraries/novus.client.html">novus.client</a></li>
-  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
-  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
-  <li><a href="../libraries/novus.const.html">novus.const</a></li>
-  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
-  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
-  <li><a href="../libraries/novus.util.html">novus.util</a></li>
-  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
-  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
-  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
-  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
-  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
-  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
-  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
-  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
-  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
-  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
-  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
-  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
-  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
-  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+  <li><a href="../libraries/api.html">api</a></li>
+  <li><a href="../libraries/cache.html">cache</a></li>
+  <li><a href="../libraries/cache.view.html">cache.view</a></li>
+  <li><a href="../libraries/client.html">client</a></li>
+  <li><a href="../libraries/client.context.html">client.context</a></li>
+  <li><a href="../libraries/client.emission.html">client.emission</a></li>
+  <li><a href="../libraries/client.interposable.html">client.interposable</a></li>
+  <li><a href="../libraries/const.html">const</a></li>
+  <li><a href="../libraries/enums.html">enums</a></li>
+  <li><a href="../libraries/shard.html">shard</a></li>
+  <li><a href="../libraries/util.html">util</a></li>
+  <li><a href="../libraries/util.date.html">util.date</a></li>
+  <li><a href="../libraries/util.func.html">util.func</a></li>
+  <li><a href="../libraries/util.list.html">util.list</a></li>
+  <li><a href="../libraries/util.lpeg.html">util.lpeg</a></li>
+  <li><a href="../libraries/util.mutex.html">util.mutex</a></li>
+  <li><a href="../libraries/util.patterns.html">util.patterns</a></li>
+  <li><a href="../libraries/util.permission.html">util.permission</a></li>
+  <li><a href="../libraries/util.plcompat.html">util.plcompat</a></li>
+  <li><a href="../libraries/util.printf.html">util.printf</a></li>
+  <li><a href="../libraries/util.queue.html">util.queue</a></li>
+  <li><a href="../libraries/util.relabel.html">util.relabel</a></li>
+  <li><a href="../libraries/util.string.html">util.string</a></li>
+  <li><a href="../libraries/util.table.html">util.table</a></li>
+  <li><a href="../libraries/util.uint.html">util.uint</a></li>
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
@@ -106,9 +106,9 @@ dive in deep and get a feel for what&rsquo;s happening.</p>
 
 <h3>Importing Modules</h3>
 
-<p>To use the client level we simply import it from <a href="../libraries/novus.client.html#">novus.client</a>, we also need <a href="../libraries/novus.client.emission.html#">novus.client.emission</a> to deal with <code>emitters</code> and it doesn&rsquo;t hurt to loads <a href="../libraries/novus.util.html#">novus.util</a> (the second biggest section of the library 😔)</p>
+<p>To use the client level we simply import it from <code>novus.client</code>, we also need <code>novus.client.emission</code> to deal with <code>emitters</code> and it doesn&rsquo;t hurt to loads <code>novus.util</code> (the second biggest section of the library 😔)</p>
 
-<p>We need the <a href="../libraries/novus.util.relabel.html#">novus.util.relabel</a> module to write our command&rsquo;s syntax grammar (I promise it&rsquo;s not as scary as it sounds!) so we can check a message does indeed contain commands.</p>
+<p>We need the <code>novus.util.relabel</code> module to write our command&rsquo;s syntax grammar (I promise it&rsquo;s not as scary as it sounds!) so we can check a message does indeed contain commands.</p>
 
 <pre>
 <span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span> <span class="comment">-- Our utilities
@@ -122,8 +122,8 @@ dive in deep and get a feel for what&rsquo;s happening.</p>
 
 <h3>Making a Client</h3>
 
-<p>Since the client level api isn&rsquo;t designed to be too complex, we just call <a href="../libraries/novus.client.html#create">client.create</a> with our
-options and get back a <a href="../libraries/novus.client.html#">client</a> state which is just a table bundling all the bits we need to run a bot.</p>
+<p>Since the client level api isn&rsquo;t designed to be too complex, we just call <a href="../libraries/client.html#create">client.create</a> with our
+options and get back a <a href="../libraries/client.html#">client</a> state which is just a table bundling all the bits we need to run a bot.</p>
 
 <pre>
 <span class="keyword">local</span> myclient = client.create{
@@ -137,7 +137,7 @@ options and get back a <a href="../libraries/novus.client.html#">client</a> stat
 <h3>Emitters and Events</h3>
 
 <p>Novus uses an emitter pattern to communicate events to your code. Inside <code>client.events</code> you will
-find a collection of <a href="../libraries/novus.client.emission.html#emitter">emitter</a> objects, indexed by their event name. Let&rsquo;s make our bot log when it&rsquo;s <code>READY</code>.</p>
+find a collection of <a href="../libraries/client.emission.html#emitter">emitter</a> objects, indexed by their event name. Let&rsquo;s make our bot log when it&rsquo;s <code>READY</code>.</p>
 
 <pre>
 <span class="comment">-- An emitter exposes a emitter:listen method to add callbacks.
@@ -147,7 +147,7 @@ find a collection of <a href="../libraries/novus.client.emission.html#emitter">e
 </pre>
 
 
-<p>The argument we receive in the callback is the <a href="../libraries/novus.client.context.html#context">context</a> of the event, it will contain all the relevant discord objects involved in the event.</p>
+<p>The argument we receive in the callback is the <a href="../libraries/client.context.html#context">context</a> of the event, it will contain all the relevant discord objects involved in the event.</p>
 
 <p><a name="What_if_I_m_morally_against_callbacks_"></a></p>
 
@@ -199,7 +199,7 @@ myclient:wrap(<span class="keyword">function</span>()
 
 <h3>Recap</h3>
 
-<p>We've seen: what modules we'll need; how to create a client state; and how to listen to events from discord. Putting that all together and running requires one more function, <a href="../libraries/novus.client.html#run">client.run</a> which will start our bot.</p>
+<p>We've seen: what modules we'll need; how to create a client state; and how to listen to events from discord. Putting that all together and running requires one more function, <a href="../libraries/client.html#run">client.run</a> which will start our bot.</p>
 
 <pre>
 <span class="keyword">local</span> util = <span class="global">require</span><span class="string">"novus.util"</span>
@@ -243,12 +243,12 @@ Sat Feb  <span class="number">9</span> <span class="number">16</span>:<span clas
 
 <h3>Listening for incoming messages</h3>
 
-<p>Using what we know about <a href="../libraries/novus.client.emission.html#emitter">emitters</a> we can add a listener to the <code>MESSAGE_CREATE</code>
+<p>Using what we know about <a href="../libraries/client.emission.html#emitter">emitters</a> we can add a listener to the <code>MESSAGE_CREATE</code>
 event:</p>
 
 <pre>
 myclient.events.MESSAGE_CREATE:listen(<span class="keyword">function</span>(ctx)
-<span class="comment">-- Looking at the <a href="../libraries/novus.client.context.html#context">context</a> docs we see that it has a <code>msg</code> field.
+<span class="comment">-- Looking at the <a href="../libraries/client.context.html#context">context</a> docs we see that it has a <code>msg</code> field.
 </span>  <span class="keyword">if</span> ctx.msg.content == <span class="string">"!ping"</span> <span class="keyword">then</span>
     ctx.msg:reply<span class="string">"Pong!"</span>
   <span class="keyword">end</span>
@@ -485,7 +485,7 @@ client.events.COMMAND = command_parsed
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i>current version <a href="https://github.com/Mehgugs/novus">Novus 0.0.5</a></i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

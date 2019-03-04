@@ -1,7 +1,6 @@
 --- Simple double-ended queue from lua examples.
--- @module novus.util.queue
+-- @module util.queue
 -- @alias _ENV
--- @see novus.util
 
 --imports--
 local setmetatable = setmetatable
@@ -194,7 +193,7 @@ function consume_right(list)
 end
 
 --- Filters a queue in-place, from left to right.
---  See @{novus.util.list.filter} for filtering examples.
+--  See @{util.list.filter} for filtering examples.
 -- @tparam queue list The queue to filter.
 -- @func f The predicate function.
 -- @param[opt] ... Optional arguments to `f`.
@@ -221,7 +220,7 @@ function filter(list, f, ...)
 end
 
 --- Filters a queue out of place, returning a new queue, from left to right.
---  See @{novus.util.list.filter} for filtering examples.
+--  See @{util.list.filter} for filtering examples.
 --  @tparam queue list The queue to filter.
 --  @tparam function f The predicate function.
 --  @param[opt] ... Optional arguments to `f`.
@@ -235,7 +234,7 @@ function filtered(list, f, ...)
 end
 
 --- Transforms a queue in place, from left to right.
---  See @{novus.util.list.map} for mapping examples.
+--  See @{util.list.map} for mapping examples.
 --  @tparam queue list The list to transform.
 --  @tparam function m The mapping function.
 --  @param[opt] ... Optional arguments to `m`.
@@ -258,7 +257,7 @@ function map(list, m,...)
 end
 
 --- Transforms a queue out of place, returning a new queue, from left to right.
---  See @{novus.util.list.map} for mapping examples.
+--  See @{util.list.map} for mapping examples.
 --  @tparam queue list The list to transform.
 --  @tparam function m The mapping function.
 --  @param[opt] ... Optional arguments to `m`.

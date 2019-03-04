@@ -1,10 +1,11 @@
 --- The novus discord client.
--- Dependencies: `novus.api`, `novus.shard`, `novus.cache`, `novus.util`, `novus.util.mutex`
--- @module novus.client
+-- Dependencies: `api`, `shard`, `cache`, `util`, `util.mutex`
+-- @module client
 -- @alias _ENV
 
 --imports--
 local cqueues = require"cqueues"
+local signal = require"cqueues.signal"
 local util = require"novus.util"
 local mutex = require"novus.util.mutex".new
 local api = require"novus.api"
@@ -14,76 +15,27 @@ local emission = require"novus.client.emission"
 local dispatch = require"novus.client.dispatch"
 local user = require"novus.snowflakes.user"
 local promise = require"cqueues.promise"
+local interpose = require"novus.client.interpose".client
 local xpcall = xpcall
 local unpack = table.unpack
 local tonumber = tonumber
 local traceback = debug.traceback
 local pairs = pairs
 local gettime = cqueues.monotime
+local sleep = cqueues.sleep
+local insert = table.insert
+local ipairs = ipairs
 local setmetatable = setmetatable
 local huge = math.huge
 local should_debug = _G.NOVUS_DEBUG or os.getenv"NOVUS_DEBUG"
 local debugger = debug.debug
+local require = require
 --start-module--
-local _ENV = {}
+local _ENV = interpose{clients = {}}
 
 --[[
 A client is: a slice of shard states; an api state; and a cache.
 --]]
-clients = _ENV.clients or {}
-cqueues.interpose('novus', function(self)
-    return clients[self]
-end)
-
-local function do_loop(id, loop)
-    while not loop:empty() do
-        local ok, err = loop:step()
-        if not ok then util.warn("%s loop.step: " .. err, id)
-            if id == 'main' then
-                util.fatal('main loop had error!')
-            end
-        end
-    end
-    util.warn("Terminating loop-%s", id)
-end
-
-cqueues.interpose('novus_associate', function(self, client, id)
-    clients[self] = client
-    if client.loops[id] ~= nil then
-        util.fatal("Client-%s has conflicting controller ids; %s is already set.", client.id, id)
-    end
-    client.loops[id] = self
-end)
-
-cqueues.interpose('novus_start', function(self, id)
-    local client = clients[self]
-    if client.loops.main and id ~= 'main' then
-        client.loops.main:wrap(do_loop, id, self)
-    end
-end)
-
-cqueues.interpose('novus_dispatch', function(self, s, E, ...)
-    local cli = clients[self]
-    local ev = cli and cli.dispatch[E]
-    return ev and self:wrap(ev, cli, s, E, ...)
-end)
-
-local function err_handler(...)
-    if should_debug then
-        debugger()
-    end
-    return traceback(...)
-end
-
-local old_wrap
-old_wrap = cqueues.interpose('wrap', function(self, ...)
-    return old_wrap(self, function(fn, ...)
-        local s, e = xpcall(fn, err_handler, ...)
-        if not s then
-            util.error(e)
-        end
-    end, ...)
-end)
 
 local events_mt = {}
 function events_mt:__index(key)
@@ -102,6 +54,7 @@ local default_options = {
     ,transport_compression = true
     ,compress = false
     ,auto_reconnect = true
+    ,accept_encoding = "gzip"
 }
 
 --- The client state.
@@ -109,7 +62,7 @@ local default_options = {
 -- @within Objects
 -- @see client.create
 -- @tparam client_options options The options used to instantiate the client. (copied)
--- @tparam novus.api.api api The api state.
+-- @tparam api.api api The api state.
 -- @tab shards The collection of shards the client is running.
 -- @tab loops The collection of cqueues controllers associated with the client.
 -- @tab dispatch The raw event dispatch handler table.
@@ -128,6 +81,15 @@ local default_options = {
 -- @bool[opt=false] auto_reconnect A boolean to indicate if the client should automatically connect if a reconnection is possible.
 -- @number[opt=60] receive_timeout The shard websocket receive timeout.
 
+option_spec = {
+     token = 'string'
+    ,sharding = 'table'
+    ,compress = 'boolean'
+    ,transport_compression = 'boolean'
+    ,large_threshold = 'number'
+    ,auto_reconnect = 'boolean'
+    ,receive_timeout = 'number'
+}
 
 --- Creates a discord client.
 -- @tparam client_options options The options table.
@@ -136,23 +98,16 @@ function create(options)
     local client = setmetatable({id = util.rid()}, _ENV)
     util.info("Creating Client-%s", client.id)
     client.options = util.merge(default_options, options)
-    client.api = api.init{token = client.options.token}
+    client.api = api.init{token = client.options.token, accept_encoding = options.accept_encoding}
     client.shards = {}
     client.loops = {}
     client.id_mutex = mutex()
     client._readies = 0
-    client.events = make_events()
+    client.events = options.events or make_events()
     -- client.dispatch = util.default(function(_, _, t)
     --     util.info("Got %q", t)
     -- end)
     client.dispatch = util.mergewith({}, dispatch)
-    function client.dispatch.SHARD_READY(self, s, _)
-        util.info("Client-%s Shard-%s online.", self.id, s.options.id)
-        self._readies = self._readies + 1
-        if self._readies == self.total_shards then
-            return client.dispatch.READY(self)
-        end
-    end
     client.mutex = mutex()
     cqueues.new():novus_associate( client, 'main')
     client.cache = cache.new()
@@ -237,16 +192,34 @@ end
 
 __index = _ENV
 
+local function term_handler(client)
+    local sig = signal.listen(signal.SIGTERM, signal.SIGINT)
+    local reason = signal.strsignal(sig:wait())
+    util.warn("Received %s -- disconnecting.", reason)
+    for _, sh in pairs(client.shards) do
+        sh.options.auto_reconnect = false
+        shard.disconnect(sh, "Received %s." % reason)
+    end
+    client.alive = false
+    if should_debug then
+        util.info("$debug_highlight;== Debug Report ==")
+        util.info("$debug;websocket.read_again used $white;%d$debug; retries.", require"novus.shard.websocket".used_tries())
+    end
+end
+
 --- Starts the client, this will block the current controller.
 -- @tparam client client The client state to run.
-function run(client)
+-- @bool polite If true then this client will not set the SIGTERM | SIGINT handler. (This will block those signals.)
+function run(client, polite)
+    client.alive = true
     client.loops.main:wrap(runner, client)
-    return do_loop('main', client.loops.main)
+    if not polite then signal.block(signal.SIGTERM, signal.SIGINT) client.loops.main:wrap(term_handler, client) end
+    return do_loop('main', client.loops.main, client)
 end
 
 --- Returns the bot application's owner.
 -- @tparam client client
--- @treturn user|nil
+-- @treturn user.user|nil
 function owner(client)
     if client.app.owner then return
         client.cache.user[util.uint(client.app.owner.id)]
@@ -256,7 +229,7 @@ end
 
 --- Returns the bot application's user object.
 -- @tparam client client
--- @treturn user|nil
+-- @treturn user.user|nil
 function me(client)
     if client.app.id then return
         client.cache.user[util.uint(client.app.id)]
@@ -287,10 +260,6 @@ function wrap(client, ...)
         util.info("%s", use)
         return use and use:wrap(...)
     end
-end
-
-function promised(client, ...)
-    return wrap(client, promise.new, ...)
 end
 
 --end-module--

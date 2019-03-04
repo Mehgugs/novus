@@ -1,8 +1,7 @@
 --- Date and time utilities.
 -- This is a minimal copy of the penlight version.
--- Dependencies: `novus.util.plcompat` `novus.util.uint`
--- @module novus.util.date
--- @see novus.util
+-- Dependencies: `util.plcompat` `util.uint`
+-- @module util.date
 local compat = require"novus.util.plcompat"
 local uint = require"novus.util.uint"
 

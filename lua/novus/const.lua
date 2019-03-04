@@ -1,5 +1,5 @@
 --- Constant values.
--- @module novus.const
+-- @module const
 -- @alias _ENV
 
 --- The novus library version string.

@@ -10,8 +10,17 @@ local enums = require"novus.enums"
 local json = require"cjson"
 local cqueues = require"cqueues"
 local cache = require"novus.cache"
+local pretty = require"pl.pretty"
 local setmetatable = setmetatable
-local ipairs = ipairs
+local ipairs, pairs = ipairs, pairs
+local tonumber = tonumber
+local insert = table.insert
+local sort = table.sort
+local ult = math.ult
+local assert = assert
+local type = type
+local MAX, MIN = math.maxinteger, math.mininteger
+local max,min = math.max, math.min
 local gettime = cqueues.monotime
 local running = cqueues.running
 local snowflakes = snowflake.snowflakes
@@ -292,7 +301,7 @@ function methods.request_members(guild)
     if not this_shard then
         return false, 'Shard-%s does not exist?' % shard_id
     end
-    this_shard.is_ready:wait()
+    this_shard.is_ready:get()
     return shard.request_guild_members(this_shard, guild[1])
 end
 
@@ -339,7 +348,12 @@ function methods.get_channel(guild, id)
         if this_channel then
             return this_channel
         else
-            return snowflakes.channel.get(guild[1], id)
+            local ch, err = snowflakes.channel.get(id)
+            if ch and ch.guild_id == guild[1] then
+                return ch
+            else
+                return nil, err or 'Channel not found or contained in %s.' % guild
+            end
         end
     end
 end
@@ -622,21 +636,174 @@ function methods.unban(guild, id, reason)
 end
 
 local function new_role(data, _, state, gid)
-    return role.upsert(state, data, gid)
+    data.guild_id = gid
+    return role.upsert(state, data)
 end
 
 function methods.loadget_role(guild, id)
     id = snowflake.id(id)
-    if id then
-        local state = running():novus()
-        local success, data, err = api.get_guild_roles(state.api, guild.id)
-        if success then
-            list.each(new_role, data, state, guild.id)
-            return state.cache.role[id]
-        else
-            return nil, err
+    local state = running():novus()
+    local success, data, err = api.get_guild_roles(state.api, guild.id)
+    if success then
+        list.each(new_role, data, state, guild.id)
+        if id then return state.cache.role[id] else return true end
+    else
+        return nil, err
+    end
+end
+
+function methods.populate_channels(guild)
+    list.each(snowflakes.channel.get, guild.channel_ids)
+    return guild.channels
+end
+
+local function sorter(a, b)
+	if a.position == b.position then
+		return ult(a.id, b.id)
+	else
+		return a.position < b.position
+	end
+end
+
+local channel_prop_types = {
+     text  = 'text_channels'
+    ,voice = 'voice_channels'
+    ,category = 'categories'
+}
+
+local function sorted_channels(guild, type)
+    guild:populate_channels()
+    type = channel_prop_types[type] or channel_prop_types[channeltype[type]]
+    local out = {}
+    for id, channel in pairs(guild[type]) do
+        insert(out, {id = id, position = channel.position})
+    end
+    sort(out, sorter)
+    return out
+end
+
+local function sorted_roles(guild)
+    guild:loadget_role()
+    local out = {}
+    for id, role in pairs(guild.roles) do
+        if id ~= guild.id then
+            insert(out, {id = id, position = role.position})
         end
     end
+    sort(out, sorter)
+    return out
+end
+
+local function fix_ids (v) v.id = util.uint.tostring(v.id) end
+
+local function set_sorted_channels(guild, channels)
+    list.each(fix_ids, channels)
+    local success, _, err = api.modify_guild_channel_positions(running():novus().api, guild.id, channels)
+    return success, err
+end
+
+local function set_sorted_roles(guild, roles)
+    insert(roles, {id = guild.id, position = 0})
+    list.each(fix_ids, roles)
+    local success, _, err = api.modify_guild_role_positions(running():novus().api, guild.id, roles)
+    return success, err
+end
+
+function methods.move_role_up(guild, role, n)
+    assert(type(n) == "number", "Must provide a number value.")
+    n = ~~n
+    if n < 0 then
+        return guild:move_role_down(role, -n)
+    end
+
+    local roles = sorted_roles(guild)
+
+    local new = MAX
+	for i = #roles - 1, 0, -1 do
+		local v = roles[i + 1]
+		if v.id == role.id then
+			new = max(0, i - n)
+			v.position = new
+		elseif i >= new then
+			v.position = i + 1
+		else
+			v.position = i
+		end
+    end
+    return set_sorted_roles(guild, roles)
+end
+
+function methods.move_role_down(guild, role, n)
+    assert(type(n) == "number", "Must provide a number value.")
+    n = ~~n
+    if n < 0 then
+        return guild:move_role_up(role, -n)
+    end
+
+    local roles = sorted_roles(guild)
+
+    local new = MIN
+	for i = 0, #roles - 1 do
+		local v = roles[i + 1]
+		if v.id == roles.id then
+			new = min(i + n, #roles - 1)
+			v.position = new
+		elseif i <= new then
+			v.position = i - 1
+		else
+			v.position = i
+		end
+	end
+    return set_sorted_roles(guild, roles)
+end
+
+function methods.move_channel_up(guild, channel, n)
+    assert(type(n) == "number", "Must provide a number value.")
+    n = ~~n
+    if n < 0 then
+        return guild:move_channel_down(channel, -n)
+    end
+
+    local channels = sorted_channels(guild, channel.type)
+    pretty.dump(channels)
+    local new = MAX
+	for i = #channels - 1, 0, -1 do
+		local v = channels[i + 1]
+		if v.id == channel.id then
+			new = max(0, i - n)
+			v.position = new
+		elseif i >= new then
+			v.position = i + 1
+		else
+			v.position = i
+		end
+    end
+    pretty.dump(channels)
+    return set_sorted_channels(guild, channels)
+end
+
+function methods.move_channel_down(guild, channel, n)
+    assert(type(n) == "number", "Must provide a number value.")
+    n = ~~n
+    if n < 0 then
+        return guild:move_channel_up(channel, -n)
+    end
+
+    local channels = sorted_channels(guild, channel.type)
+
+    local new = MIN
+	for i = 0, #channels - 1 do
+		local v = channels[i + 1]
+		if v.id == channel.id then
+			new = min(i + n, #channels - 1)
+			v.position = new
+		elseif i <= new then
+			v.position = i - 1
+		else
+			v.position = i
+		end
+	end
+    return set_sorted_channels(guild, channels)
 end
 
 function properties.icon_url(guild)
@@ -667,7 +834,7 @@ end
 
 function properties.me(guild)
     local state = running():novus()
-    return guild:get_member(state.me[1])
+    return guild:get_member(state:me().id)
 end
 
 function properties.owner(guild)

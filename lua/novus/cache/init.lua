@@ -1,20 +1,18 @@
 --- Caching mechanism for novus.
--- Dependencies: `novus.util`
--- @module novus.cache
+-- Dependencies: `util`
+-- @module cache
 -- @alias _ENV
 
 --imports--
+local interposable = require"novus.client.interposable"
 local util = require"novus.util"
 local ipairs = ipairs
 local eq = rawequal
 --start-module--
-local _ENV = {}
+local _ENV = interposable{}
 
 local cachable_entities = {
-     "user"
-    ,"guild"
-    ,"member"
-    ,"channel"
+     "channel"
     ,"emoji"
     ,"role"
     ,"reaction"
@@ -37,13 +35,14 @@ end
 function new()
     local cache = {methods = {}}
     for _, v in ipairs(cachable_entities) do
-        local new = util.cache()
+        local new = {}
         cache[v] = new
         cache.methods[v] = inserter(new)
     end
+    cache.user = util.cache()
+    cache.methods.user = inserter(cache.user)
     cache.guild = {}
     cache.methods.guild = inserter(cache.guild)
-    -- special case for messages & members
     cache.message = {}
     cache.methods.message = {}
     cache.member = {}

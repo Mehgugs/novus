@@ -41,31 +41,31 @@
 
 <h2>Libraries</h2>
 <ul class="nowrap">
-  <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
-  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
-  <li><a href="../libraries/novus.client.html">novus.client</a></li>
-  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
-  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
-  <li><a href="../libraries/novus.const.html">novus.const</a></li>
-  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
-  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
-  <li><a href="../libraries/novus.util.html">novus.util</a></li>
-  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
-  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
-  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
-  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
-  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
-  <li><strong>novus.util.permission</strong></li>
-  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
-  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
-  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
-  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
-  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
-  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
-  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
-  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+  <li><a href="../libraries/api.html">api</a></li>
+  <li><a href="../libraries/cache.html">cache</a></li>
+  <li><a href="../libraries/cache.view.html">cache.view</a></li>
+  <li><a href="../libraries/client.html">client</a></li>
+  <li><a href="../libraries/client.context.html">client.context</a></li>
+  <li><a href="../libraries/client.emission.html">client.emission</a></li>
+  <li><a href="../libraries/client.interposable.html">client.interposable</a></li>
+  <li><a href="../libraries/const.html">const</a></li>
+  <li><a href="../libraries/enums.html">enums</a></li>
+  <li><a href="../libraries/shard.html">shard</a></li>
+  <li><a href="../libraries/util.html">util</a></li>
+  <li><a href="../libraries/util.date.html">util.date</a></li>
+  <li><a href="../libraries/util.func.html">util.func</a></li>
+  <li><a href="../libraries/util.list.html">util.list</a></li>
+  <li><a href="../libraries/util.lpeg.html">util.lpeg</a></li>
+  <li><a href="../libraries/util.mutex.html">util.mutex</a></li>
+  <li><a href="../libraries/util.patterns.html">util.patterns</a></li>
+  <li><strong>util.permission</strong></li>
+  <li><a href="../libraries/util.plcompat.html">util.plcompat</a></li>
+  <li><a href="../libraries/util.printf.html">util.printf</a></li>
+  <li><a href="../libraries/util.queue.html">util.queue</a></li>
+  <li><a href="../libraries/util.relabel.html">util.relabel</a></li>
+  <li><a href="../libraries/util.string.html">util.string</a></li>
+  <li><a href="../libraries/util.table.html">util.table</a></li>
+  <li><a href="../libraries/util.uint.html">util.uint</a></li>
 </ul>
 <h2>Manual</h2>
 <ul class="nowrap">
@@ -90,13 +90,9 @@
 
 <div id="content">
 
-<h1>Module <code>novus.util.permission</code></h1>
+<h1>Module <code>util.permission</code></h1>
 <p>Permission value utilities.</p>
-<p> Dependencies: <a href="../libraries/novus.util.html#">novus.util</a></p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../libraries/novus.util.html#">novus.util</a>
-    </ul>
+<p> Dependencies: <a href="../libraries/util.html#">util</a></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
@@ -164,7 +160,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#new">new ([value])</a></td>
-	<td class="summary">Constructs a new <a href="../libraries/novus.util.permission.html#placeholder">placeholder</a>.</td>
+	<td class="summary">Constructs a new <a href="../libraries/util.permission.html#placeholder">placeholder</a>.</td>
 	</tr>
 </table>
 <h2><a href="#Constants">Constants</a></h2>
@@ -246,7 +242,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">p</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.permission.html#placeholder">placeholder</a> or <span class="type">integer</span></span>
+            <span class="types"><a class="type" href="../libraries/util.permission.html#placeholder">placeholder</a> or <span class="type">integer</span></span>
          The permission value.
         </li>
     </ul>
@@ -270,7 +266,7 @@
     Given a vararg list of permission names / integers,
  returns the permission integer for each.
  Calling the module table will call this via a metamethod.
- Unrecognized values are coerced to <a href="../libraries/novus.util.permission.html#NONE">permission.NONE</a>.
+ Unrecognized values are coerced to <a href="../libraries/util.permission.html#NONE">permission.NONE</a>.
 
 
     <h3>Parameters:</h3>
@@ -637,7 +633,7 @@
     <strong>new ([value])</strong>
     </dt>
     <dd>
-    Constructs a new <a href="../libraries/novus.util.permission.html#placeholder">placeholder</a>.
+    Constructs a new <a href="../libraries/util.permission.html#placeholder">placeholder</a>.
 
 
     <h3>Parameters:</h3>
@@ -725,7 +721,7 @@
     </dt>
     <dd>
     A permission placeholder value.  This is a stateful container for a permission value.
- You can use a <a href="../libraries/novus.util.permission.html#placeholder">placeholder</a> as a <strong>permission value</strong> in any of this module&rsquo;s functions.
+ You can use a <a href="../libraries/util.permission.html#placeholder">placeholder</a> as a <strong>permission value</strong> in any of this module&rsquo;s functions.
 
 
     <h3>Fields:</h3>
@@ -740,7 +736,7 @@
 
     <h3>See also:</h3>
     <ul>
-         <a href="../libraries/novus.util.permission.html#new">permission.new</a>
+         <a href="../libraries/util.permission.html#new">permission.new</a>
     </ul>
 
     <h3>Usage:</h3>
@@ -758,7 +754,7 @@ placeholder:decompose() <span class="comment">--&gt; {'administrator', 'sendMess
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i>current version <a href="https://github.com/Mehgugs/novus">Novus 0.0.5</a></i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

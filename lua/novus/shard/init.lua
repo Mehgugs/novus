@@ -1,13 +1,13 @@
 --- The gateway websocket connection container.
 -- Dependencies: `novus.util`, `novus.const`, `novus.util.mutex`, `novus.util.lpeg`, `novus.util.patterns`
--- @module novus.shard
+-- @module shard
 
 --imports--
 local cqueues = require"cqueues"
 local cond = require"cqueues.condition"
 local promise = require"cqueues.promise"
 local errno = require"cqueues.errno"
-local websocket = require"http.websocket"
+local websocket = require"novus.shard.websocket"
 local zlib = require"http.zlib"
 local httputil = require"http.util"
 local json = require"cjson"
@@ -15,6 +15,7 @@ local util = require"novus.util"
 local const = require"novus.const"
 local mutex = require"novus.util.mutex".new
 local list = require"novus.util.list"
+local interposable = require"novus.client.interposable"
 local USER_AGENT = require"novus.api".USER_AGENT
 
 local lpeg = util.lpeg
@@ -33,8 +34,9 @@ local toquery = httputil.dict_to_query
 local tostring = tostring
 local null = json.null
 local map = list.map
+local min, max = math.min, math.max
 --start-module--
-local _ENV = {}
+local _ENV = interposable{}
 
 local function remove_null(v)
     if v == null then return nil else return v end
@@ -88,6 +90,7 @@ function init(options, idmutex)
     state.to_load = -1
     state.loaded = 0
     state.beats = 0
+    state.backoff = 1
     util.info("Initialized Shard-%s with TOKEN-%x", state.options.id, util.hash(state.options.token))
     if not (state.options.compress or state.options.transport_compression) then
         state.options.transport_compression = true
@@ -109,10 +112,10 @@ function connect(state)
     util.info("Using user-agent: $white;%s", USER_AGENT)
     state.socket.request.headers:upsert("user-agent", USER_AGENT)
 
-    local success, _, err = state.socket:connect(3)
+    local success, str, err = state.socket:connect(3)
 
     if not success then
-        util.error("Shard-%s had an error while connecting %s - %s", state.options.id, errno[err], errno.strerror(err))
+        util.error("Shard-%s had an error while connecting (%s - %q, %q)", state.options.id, errno[err], errno.strerror(err), str or "")
         return state, false
     else
         util.info("Shard-%s has connected.", state.options.id)
@@ -128,6 +131,14 @@ function connect(state)
         state.loop:novus_start(state.options.id)
         return state, true
     end
+end
+
+function backoff(state)
+    state.backoff = min(state.backoff * 2, 60)
+end
+
+function winddown(state)
+    state.backoff = max(state.backoff / 2, 1)
 end
 
 local function beat_loop(state, interval)
@@ -181,7 +192,7 @@ function send(state, op, d, identify)
     local success, err
     if identify or state.session_id then
         if state.connected then
-            success, err = state.socket:send(encode {op = op, d = d}, 0x1)
+            success, err = state.socket:send(encode {op = op, d = d}, 0x1, state.options.rec_timeout or 60)
         else
             success, err = false, 'Not connected to gateway'
         end
@@ -263,16 +274,25 @@ function messages(state)
     end
 
     util.warn("Shard-%s %s reconnect.", state.options.id, reconnect and "will" or "will not")
-
+    local retry ::retry::
     if reconnect and state.reconnect then
         state.reconnect = nil
         sleep(util.rand(1, 5))
-        return connect(state)
-    elseif reconnect and state.options.auto_reconnect then
-        local time = util.rand(0, 30)
-        util.info("Shard-%s will automatically reconnect in %.2fsec", state.options.id, time)
-        sleep(time)
-        return connect(state)
+        local _, success = connect(state)
+        if not success then
+            backoff(state)
+            sleep()
+            retry = true
+            goto retry
+        end
+    elseif retry or (reconnect and state.options.auto_reconnect) then
+        repeat
+            local time = util.rand(0.9, 1.1) * state.backoff
+            backoff(state)
+            util.info("Shard-%s will automatically reconnect in %.2fsec", state.options.id, time)
+            sleep(time)
+            local _, success = connect(state)
+        until success or not state.options.auto_reconnect
     end
 end
 
@@ -303,6 +323,7 @@ function HEARTBEAT_ACK(state)
     if state.beats < 0 then
         util.warn("Shard-%s is missing heartbeat acknowledgement! (deficit=%s)", state.options.id, -state.beats)
     end
+    winddown(state)
     state.loop:novus_dispatch(state, "HEARTBEAT", state.beats)
     return state
 end

@@ -1,9 +1,10 @@
 --- Logging utilities.
--- @module novus.util.printf
+-- @module util.printf
 -- @alias _ENV
--- @see novus.util
 
 --imports--
+local running = require"cqueues".running
+local signal = require"cqueues.signal"
 local insert, unpack = table.insert, table.unpack
 local f = string.format
 local date, exit = os.date, os.exit
@@ -91,6 +92,8 @@ colors[8] = {
     ,info_highlight  = "\27[0m\27[38;5;48m"
     ,warn_highlight  = "\27[0m\27[38;5;11m"
     ,error_highlight = "\27[0m\27[38;5;9m"
+    ,debug = "\27[0m\27[38;5;105m"
+    ,debug_highlight = "\27[0m\27[38;5;123m"
 }
 
 _mode = 0
@@ -154,8 +157,11 @@ end
 -- @param[opt] ... Values passed into `string.format`.
 function fatal(...)
     error(...)
-    error"Fatal error: quitting!"
-    return exit(1)
+    if running() then
+        local cli = running():novus()
+        if cli.alive then signal.raise(signal.SIGINT) end
+        return err"Fatal error: quitting!"
+    else error"Fatal error: quitting!" return exit(1) end
 end
 
 --- Logs to stdout, and the output file if set.

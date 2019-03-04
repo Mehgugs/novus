@@ -1,0 +1,345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Novus Documentation</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Novus</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#objects">objects</a></li>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Libraries</h2>
+<ul class="nowrap">
+  <li><a href="../libraries/api.html">api</a></li>
+  <li><a href="../libraries/cache.html">cache</a></li>
+  <li><a href="../libraries/cache.view.html">cache.view</a></li>
+  <li><a href="../libraries/client.html">client</a></li>
+  <li><strong>client.context</strong></li>
+  <li><a href="../libraries/client.emission.html">client.emission</a></li>
+  <li><a href="../libraries/client.interposable.html">client.interposable</a></li>
+  <li><a href="../libraries/const.html">const</a></li>
+  <li><a href="../libraries/enums.html">enums</a></li>
+  <li><a href="../libraries/shard.html">shard</a></li>
+  <li><a href="../libraries/util.html">util</a></li>
+  <li><a href="../libraries/util.date.html">util.date</a></li>
+  <li><a href="../libraries/util.func.html">util.func</a></li>
+  <li><a href="../libraries/util.list.html">util.list</a></li>
+  <li><a href="../libraries/util.lpeg.html">util.lpeg</a></li>
+  <li><a href="../libraries/util.mutex.html">util.mutex</a></li>
+  <li><a href="../libraries/util.patterns.html">util.patterns</a></li>
+  <li><a href="../libraries/util.permission.html">util.permission</a></li>
+  <li><a href="../libraries/util.plcompat.html">util.plcompat</a></li>
+  <li><a href="../libraries/util.printf.html">util.printf</a></li>
+  <li><a href="../libraries/util.queue.html">util.queue</a></li>
+  <li><a href="../libraries/util.relabel.html">util.relabel</a></li>
+  <li><a href="../libraries/util.string.html">util.string</a></li>
+  <li><a href="../libraries/util.table.html">util.table</a></li>
+  <li><a href="../libraries/util.uint.html">util.uint</a></li>
+</ul>
+<h2>Manual</h2>
+<ul class="nowrap">
+  <li><a href="../manual/01-Introduction.md.html">Introduction
+</a></li>
+  <li><a href="../manual/02-DiveIn.md.html">The First Example
+</a></li>
+  <li><a href="../manual/03-Permissions.md.html">Using Permissions
+</a></li>
+  <li><a href="../manual/0x1-UInts.md.html">UInts?
+</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/commandline.lua.html">commandline.lua</a></li>
+  <li><a href="../examples/divein-permissions.lua.html">divein-permissions.lua</a></li>
+  <li><a href="../examples/divein.lua.html">divein.lua</a></li>
+  <li><a href="../examples/simple-eval.lua.html">simple-eval.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>client.context</code></h1>
+<p>Context object returned in events.</p>
+<p>  Dependencies: <code>snowflakes</code>, <a href="../libraries/util.html#">util</a></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#interpose">interpose (name, value)</a></td>
+	<td class="summary">Interposition mechanism for adding new methods to the context object.</td>
+	</tr>
+</table>
+<h2><a href="#objects">objects</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#context">context</a></td>
+	<td class="summary">An object for holding the various objects emitted in events.</td>
+	</tr>
+</table>
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#add_extra">add_extra (ctx, field, value)</a></td>
+	<td class="summary">Adds a new key value pair into the context object</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#send">send (ctx, ...)</a></td>
+	<td class="summary">Wrapper around <code>ctx.channel:send</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#users_next">users_next (ctx, name, timeout)</a></td>
+	<td class="summary">Wrapper around the <code>client.events</code> emitters.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "interpose"></a>
+    <strong>interpose (name, value)</strong>
+    </dt>
+    <dd>
+    Interposition mechanism for adding new methods to the context object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The method name to interpose.
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">function</span></span>
+         The function value to interpose.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">func</span></span>
+        The old method, if it exists.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="objects"></a>objects</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "context"></a>
+    <strong>context</strong>
+    </dt>
+    <dd>
+    An object for holding the various objects emitted in events.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">guild</span>
+         The guild involved in the request.
+        </li>
+        <li><span class="parameter">channel</span>
+         The channel involved in the request.
+        </li>
+        <li><span class="parameter">user</span>
+         The user object involved in the request.
+        </li>
+        <li><span class="parameter">member</span>
+         The member object involved in the request.
+        </li>
+        <li><span class="parameter">role</span>
+         The role involved in the request.
+        </li>
+        <li><span class="parameter">msg</span>
+         The msg involved in the request.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- Example
+</span>client.events.MESSAGE_CREATE :listen (<span class="keyword">function</span>(ctx)
+    ctx.channel:send{embed = {
+        title = ctx.guild.name
+        description = <span class="string">"%s sent a message."</span> % ctx.user
+    }}
+<span class="keyword">end</span>)
+</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "add_extra"></a>
+    <strong>add_extra (ctx, field, value)</strong>
+    </dt>
+    <dd>
+    Adds a new key value pair into the context object
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ctx</span>
+            <span class="types"><a class="type" href="../libraries/client.context.html#context">context</a></span>
+
+
+        </li>
+        <li><span class="parameter">field</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+
+
+        </li>
+        <li><span class="parameter">value</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "send"></a>
+    <strong>send (ctx, ...)</strong>
+    </dt>
+    <dd>
+    Wrapper around <code>ctx.channel:send</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ctx</span>
+            <span class="types"><a class="type" href="../libraries/client.context.html#context">context</a></span>
+
+
+        </li>
+        <li><span class="parameter">...</span>
+         Arguments to ???
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">message</span></span>
+
+
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "users_next"></a>
+    <strong>users_next (ctx, name, timeout)</strong>
+    </dt>
+    <dd>
+    Wrapper around the <code>client.events</code> emitters.
+  This will wait for the next event such that the context.user is the current user.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ctx</span>
+            <span class="types"><a class="type" href="../libraries/client.context.html#context">context</a></span>
+
+
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The event name to wait for. Or a table of the form <code>{name, such_that = func; timeout}</code>.
+        </li>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span> or <span class="type">nil</span></span>
+         The timeout in seconds (unused if name is a table).
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The event emitted.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../libraries/client.emission.html#await">client.emission.await</a>
+    </ul>
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>current version <a href="https://github.com/Mehgugs/novus">Novus 0.0.5</a></i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
+
+

@@ -5,7 +5,7 @@ local warn = util.warn
 local running = require"cqueues".running
 local inserter = require"novus.cache".inserter
 local setmetatable = setmetatable
-local ipairs = ipairs
+local ipairs, pairs = ipairs, pairs
 local set = rawset
 local rawget = rawget
 --start-module--
@@ -44,12 +44,13 @@ end
 
 function makeupdatefrom(_ENV) --luacheck:ignore
     return function(state, snowflake, payload)
-        for k, v in ipairs(payload) do
+        for k, v in pairs(payload) do
             if processor[k] or (schema[k] and schema[k] >= 4) then
                 local proc = processor[k]
                 if proc then
                     local value, key = proc(v, state, snowflake)
                     key = key or k
+                    if schema[key] == nil then util.throw("%s -> %s not stored in schema", k, key) end
                     snowflake[schema[key]] = value
                 else
                     snowflake[schema[k]] = v
@@ -71,6 +72,7 @@ function makeupsert(_ENV)
         local id = util.uint(payload.id)
         local cached = client.cache[__name]
         if cached then
+            if guild_id then payload.guild_id = guild_id end
             local mycache = guild_id and cached[guild_id] or cached
             if mycache == nil and guild_id then
                 mycache = util.cache()
@@ -78,7 +80,9 @@ function makeupsert(_ENV)
                 client.cache[__name].methods[guild_id] = inserter(mycache)
             end
             local obj = mycache[id]
-            return obj and update_from(client, obj, payload) or new_from(client, payload)
+            if obj then return update_from(client, obj, payload)
+            else return new_from(client, payload)
+            end
         else
             return new_from(client, payload)
         end
@@ -102,9 +106,6 @@ function wrap_defs(obj, key, val)
     if key == 'new_from' then
         set(obj, key, function(...)
             local out = val(...)
-            if not out.cache then
-                util.warn("%s will not be cached [%s]", out ,out[3])
-            end
             return out.cache and out:cache() or out
         end)
     else
@@ -114,10 +115,6 @@ end
 
 function snowflake_inherit(self, base, name)
     local next = tab.deeplycopy({}, base)
-    if next.constants == nil then
-        tab.deeplycopy({}, base, 0)
-        util.fatal("%s %s %s %s", self, base, base.constants, rawget(base,"constants"))
-    end
     next.__name = name
     next.__index = makeindex(next)
     next.__newindex = makenewindex(next)

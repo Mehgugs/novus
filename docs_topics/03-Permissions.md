@@ -83,11 +83,11 @@ See the completed example with permissions @{divein-permissions.lua|here}
 ### Difference between `has` and `contains`
 
 You may have noticed that, between our first has_perms and the final version,
-we swapped from using @{novus.util.permission.contains|perms:contains}
-and @{novus.util.permission.has|perms:has}. This is because when you want to
+we swapped from using @{util.permission.contains|perms:contains}
+and @{util.permission.has|perms:has}. This is because when you want to
 see if a *permission value* has all the permissions another *has* you use
-@{novus.util.permission.has|perms:has}. If you want to see which *permissions* are *contained* in a
-*permission value* you use @{novus.util.permission.contains|perms:contains}.
+@{util.permission.has|perms:has}. If you want to see which *permissions* are *contained* in a
+*permission value* you use @{util.permission.contains|perms:contains}.
 
 #### @{01-Introduction.md|What to do next?}
 

@@ -1,5 +1,5 @@
 --- Object for a read-only view into a table.
--- @module novus.cache.view
+-- @module cache.view
 -- @alias _ENV
 
 --imports--

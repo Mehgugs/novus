@@ -1,12 +1,7 @@
 --- Event emission.
--- Dependencies: `novus.util`
--- @module novus.client.emission
+-- Dependencies: `util`
+-- @module client.emission
 -- @alias _ENV
-
---[[
-    TODO
-    needs a pair of condition values to signal to each direction!!
-]]
 
 --imports--
 local util = require"novus.util"
@@ -81,7 +76,7 @@ local function not_eq(a,b) return a ~= b end
 -- @tparam emitter em
 -- @func cb The callback to remove.
 function remove(em, cb)
-    em.cbs:filter(not_eq, cb)
+    em.cbs = em.cbs:filtered(not_eq, cb)
 end
 
 --- Waits for the next event to be emitted, or the timeout to expire.
@@ -114,6 +109,10 @@ local function iter(ctx)
     else ctx.em:remove(ctx.set) end
 end
 
+local function pairs_quitter(m)
+    m.timeout = 0
+end
+
 --- `pairs` iterator, iterates over all events received until timeout or event data is nil.
 --  You may set the timeout to 0 to effectively stop receiving events.
 --  @tparam emitter em
@@ -128,26 +127,8 @@ function __pairs(em, timeout)
     local set = function(event) ctx = event end
     local get = function() return ctx end
     em:listen(set)
-    return iter, {get = get, set = set, em = em, timeout = timeout}
+    return iter, {get = get, set = set, em = em, timeout = timeout, quit = pairs_quitter}
 end
-
--- function __shl(func, em)
---     assert(type(em) == 'table' and em.listen, "Did not pass emitter on lefthand side of emitter >> X expression!")
---     if type(func) == 'func' then
---         em._map = func
---         return em
---     elseif type(func) == 'table' and func.emit then
---         local f = em._map; em._map = nil
---         local function call(ctx)
---             local send, ntx = f(ctx)
---             if send then
---                 func:emit(nxt)
---             end
---         end
---         em:listen(call)
---         return em
---     end
--- end
 
 local function shift_one(em, f)
     em._map = em._map or {}
@@ -169,35 +150,9 @@ local function shift_two(em, it)
     return em
 end
 
-function __add(A, B)
-    return {both = true, A, B}
-end
-
-local function shift_three(em, fork)
-    fork[1]:listen(em)
-    fork[2]:listen(em)
-    return em
-end
-
-function __div(A, B)
-    return {fork = true, A, B}
-end
-
-local function decide(em, fork)
-    local A, B = fork[1], fork[2]
-    em:listen(function(ctx)
-        A:emit(ctx)
-        B:emit(ctx)
-    end)
-end
-
 function __shl(A, B)
     if type(A) == 'table' and type(B) == 'function' then
         return shift_one(A, B)
-    elseif B.both then
-        return shift_three(A, B)
-    elseif A.fork then
-        return decide(A, B)
     else
         return shift_two(A, B)
     end
@@ -220,12 +175,39 @@ end
 function __shr(A, B)
     if type(A) == 'table' and type(B) == 'function' then
         return shift_one(A, B)
-    elseif A.both then
-        return shift_three(B, A)
-    elseif A.fork then
-        return decide(B, A)
     else
         return shift_two_right(A, B)
+    end
+end
+
+local function includes(t, e) return t[1] == e or t[2] == e end
+
+--- Waits for the first event to match the predicate within the timeout.
+--  @tparam emitter em
+--  @tparam function f A predicate, which returns true if the function should return the event.
+--  @tparam[opt] number timeout How long to to wait for events. (defaults to indefinitely.)
+--  @return The event emitted.
+--  @usage
+--   local ntx = client.events.MESSAGE_CREATE:await(function(pending) return pending.user.id == client:me().id end)
+function await(em, f, timeout)
+    assert(f, "Please provide a filter to await. To wait for an event with no filtering use emitter:wait().")
+    if timeout then
+        local gtime = promise.new(sleep, timeout)
+        repeat
+            local recv = em:promised()
+            local ready = {poll(gtime, recv)}
+            local got_event = includes(ready, recv)
+            if got_event then
+                local e = recv()
+                if f(e) then return e end
+            end
+        until not got_event
+    else
+        local e
+        repeat
+            e = em:wait()
+        until f(e)
+        return e
     end
 end
 

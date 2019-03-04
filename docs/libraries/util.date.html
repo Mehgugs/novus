@@ -39,31 +39,31 @@
 
 <h2>Libraries</h2>
 <ul class="nowrap">
-  <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
-  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
-  <li><a href="../libraries/novus.client.html">novus.client</a></li>
-  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
-  <li><a href="../libraries/novus.client.emission.html">novus.client.emission</a></li>
-  <li><a href="../libraries/novus.const.html">novus.const</a></li>
-  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
-  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
-  <li><a href="../libraries/novus.util.html">novus.util</a></li>
-  <li><strong>novus.util.date</strong></li>
-  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
-  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
-  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
-  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
-  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
-  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
-  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
-  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
-  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
-  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
-  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
-  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
-  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+  <li><a href="../libraries/api.html">api</a></li>
+  <li><a href="../libraries/cache.html">cache</a></li>
+  <li><a href="../libraries/cache.view.html">cache.view</a></li>
+  <li><a href="../libraries/client.html">client</a></li>
+  <li><a href="../libraries/client.context.html">client.context</a></li>
+  <li><a href="../libraries/client.emission.html">client.emission</a></li>
+  <li><a href="../libraries/client.interposable.html">client.interposable</a></li>
+  <li><a href="../libraries/const.html">const</a></li>
+  <li><a href="../libraries/enums.html">enums</a></li>
+  <li><a href="../libraries/shard.html">shard</a></li>
+  <li><a href="../libraries/util.html">util</a></li>
+  <li><strong>util.date</strong></li>
+  <li><a href="../libraries/util.func.html">util.func</a></li>
+  <li><a href="../libraries/util.list.html">util.list</a></li>
+  <li><a href="../libraries/util.lpeg.html">util.lpeg</a></li>
+  <li><a href="../libraries/util.mutex.html">util.mutex</a></li>
+  <li><a href="../libraries/util.patterns.html">util.patterns</a></li>
+  <li><a href="../libraries/util.permission.html">util.permission</a></li>
+  <li><a href="../libraries/util.plcompat.html">util.plcompat</a></li>
+  <li><a href="../libraries/util.printf.html">util.printf</a></li>
+  <li><a href="../libraries/util.queue.html">util.queue</a></li>
+  <li><a href="../libraries/util.relabel.html">util.relabel</a></li>
+  <li><a href="../libraries/util.string.html">util.string</a></li>
+  <li><a href="../libraries/util.table.html">util.table</a></li>
+  <li><a href="../libraries/util.uint.html">util.uint</a></li>
 </ul>
 <h2>Manual</h2>
 <ul class="nowrap">
@@ -88,14 +88,10 @@
 
 <div id="content">
 
-<h1>Module <code>novus.util.date</code></h1>
+<h1>Module <code>util.date</code></h1>
 <p>Date and time utilities.</p>
 <p> This is a minimal copy of the penlight version.
- Dependencies: <a href="../libraries/novus.util.plcompat.html#">novus.util.plcompat</a> <a href="../libraries/novus.util.uint.html#">novus.util.uint</a></p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../libraries/novus.util.html#">novus.util</a>
-    </ul>
+ Dependencies: <a href="../libraries/util.plcompat.html#">util.plcompat</a> <a href="../libraries/util.uint.html#">util.uint</a></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
@@ -285,7 +281,7 @@
 <ul>
 <li> <code>nil</code> or empty &ndash; use current date and time</li>
 <li> number &ndash; seconds since epoch (as returned by <a href="https://www.lua.org/manual/5.3/manual.html#pdf-os.time">os.time</a>). Resulting time is UTC</li>
-<li> <a href="../libraries/novus.util.date.html#Date">Date</a> &ndash; make a copy of this date</li>
+<li> <a href="../libraries/util.date.html#Date">Date</a> &ndash; make a copy of this date</li>
 <li> table &ndash; table containing year, month, etc as for <a href="https://www.lua.org/manual/5.3/manual.html#pdf-os.time">os.time</a>. You may leave out year, month or day,
 in which case current values will be used.</li>
 <li> year (will be followed by month, day etc)</li>
@@ -699,7 +695,7 @@ in which case current values will be used.</li>
     </dt>
     <dd>
     add to a date object.
- one of <a href="../libraries/novus.util.date.html#Date:year">year</a>,<a href="../libraries/novus.util.date.html#Date:month">month</a>,<a href="../libraries/novus.util.date.html#Date:day">day</a>,<a href="../libraries/novus.util.date.html#Date:hour">hour</a>,<a href="../libraries/novus.util.date.html#Date:min">min</a>,<a href="../libraries/novus.util.date.html#Date:sec">sec</a>
+ one of <a href="../libraries/util.date.html#Date:year">year</a>,<a href="../libraries/util.date.html#Date:month">month</a>,<a href="../libraries/util.date.html#Date:day">day</a>,<a href="../libraries/util.date.html#Date:hour">hour</a>,<a href="../libraries/util.date.html#Date:min">min</a>,<a href="../libraries/util.date.html#Date:sec">sec</a>
 
 
     <h3>Parameters:</h3>
@@ -749,7 +745,7 @@ in which case current values will be used.</li>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">other</span>
-            <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+            <span class="types"><a class="type" href="../libraries/util.date.html#Date">Date</a></span>
          Date object
         </li>
     </ul>
@@ -757,7 +753,7 @@ in which case current values will be used.</li>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date.Interval">Date.Interval</a></span>
+           <span class="types"><a class="type" href="../libraries/util.date.html#Date.Interval">Date.Interval</a></span>
         object
     </ol>
 
@@ -841,13 +837,13 @@ in which case current values will be used.</li>
     </dt>
     <dd>
     add a date and an interval.
- passed to <a href="../libraries/novus.util.date.html#Date:add">Date:add</a>
+ passed to <a href="../libraries/util.date.html#Date:add">Date:add</a>
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">other</span>
-         either a <a href="../libraries/novus.util.date.html#Date.Interval">Date.Interval</a> object or a table such as
+         either a <a href="../libraries/util.date.html#Date.Interval">Date.Interval</a> object or a table such as
         </li>
     </ul>
 
@@ -902,14 +898,14 @@ in which case current values will be used.</li>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">id</span>
-         either a <a href="../libraries/novus.util.string.html">string</a> id or a <code>number</code> (encoded uint64) id.
+         either a <a href="../libraries/util.string.html">string</a> id or a <code>number</code> (encoded uint64) id.
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+           <span class="types"><a class="type" href="../libraries/util.date.html#Date">Date</a></span>
         object
     </ol>
 
@@ -983,7 +979,7 @@ in which case current values will be used.</li>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+           <span class="types"><a class="type" href="../libraries/util.date.html#Date">Date</a></span>
         object
     </ol>
 
@@ -1010,7 +1006,7 @@ in which case current values will be used.</li>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+           <span class="types"><a class="type" href="../libraries/util.date.html#Date">Date</a></span>
         object
     </ol>
 
@@ -1037,7 +1033,7 @@ in which case current values will be used.</li>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.util.date.html#Date">Date</a></span>
+           <span class="types"><a class="type" href="../libraries/util.date.html#Date">Date</a></span>
         object
     </ol>
 
@@ -1105,7 +1101,7 @@ in which case current values will be used.</li>
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i>current version <a href="https://github.com/Mehgugs/novus">Novus 0.0.5</a></i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

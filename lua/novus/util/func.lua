@@ -1,6 +1,5 @@
 --- Function utilities.
--- @module novus.util.func
--- @see novus.util
+-- @module util.func
 -- @alias _ENV
 
 --imports--

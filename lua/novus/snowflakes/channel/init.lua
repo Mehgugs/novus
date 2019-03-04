@@ -1,3 +1,8 @@
+--- Abstract channel snowflake definition.
+--  Dependencies: `snowflakes`, `novus.api`, `novus.enums`.
+--  @module snowflakes.channel
+--  @alias channel
+
 --imports--
 local api = require"novus.api"
 local util = require"novus.snowflakes.helpers"
@@ -16,6 +21,12 @@ schema {
      "type" --4
 }
 
+--- An abstract discord channel object.
+--  Inherits from `snowflakes.snowflake`
+-- @table channel
+-- @within Objects
+-- @tparam integer type See @{novus.enums.channeltype|channel types}
+
 function newer_from(_ENV, state, payload) --luacheck: ignore
     return setmetatable({
          util.uint(payload.id)
@@ -25,6 +36,13 @@ function newer_from(_ENV, state, payload) --luacheck: ignore
     }, _ENV)
 end
 
+--- Deletes the channel.
+--  @function channel.delete
+--  @within Methods
+--  @tparam channel channel
+--  @treturn[1] true
+--  @treturn[2] nil
+--  @treturn[2] string error string
 function methods.delete(channel)
     local state = running():novus()
     local success, data, err = api.delete_channel(state.api, channel[1])
@@ -60,6 +78,11 @@ end
 function new_from(state, payload, old)
     local typ = snowflakes[snowflake_map[channel_type[payload.type]]]
     return typ.new_from(state, payload, old)
+end
+
+function update_from(state, chan, payload)
+    local typ = snowflakes[snowflake_map[channel_type[chan.type]]]
+    return typ.update_from(state, chan, payload)
 end
 
 --end-module--

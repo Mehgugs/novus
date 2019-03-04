@@ -97,6 +97,16 @@ return function (_ENV)
         end
     end
 
+    function methods.move_up(channel, by)
+        return channel.guild:move_channel_up(channel, by)
+    end
+
+    function methods.move_down(channel, by)
+        return channel.guild:move_channel_down(channel, by)
+    end
+
+    methods.move = methods.move_up
+
     function properties.guild(channel)
         return snowflakes.guild.get(channel.guild_id)
     end

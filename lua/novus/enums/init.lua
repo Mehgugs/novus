@@ -1,7 +1,7 @@
 --- Discord enumerations.
--- Dependencies: `novus.util`
+-- Dependencies: `util`
 -- Please refer to the [discord api documentation](https://discordapp.com/developers/docs/intro) for specific information.
--- @module novus.enums
+-- @module enums
 -- @alias _ENV
 
 --imports--

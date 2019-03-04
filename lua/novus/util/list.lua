@@ -1,6 +1,5 @@
 --- List utilities
--- @module novus.util.list
--- @see novus.util
+-- @module util.list
 -- @alias _ENV
 
 --imports--
@@ -79,6 +78,7 @@ function fold(f, a, l, ...)
     end
     return a
 end
+reduce = fold
 
 --- Finds the first value in the list which satisfies the predicate `f`.
 -- @tparam function f The predicate.
@@ -126,6 +126,14 @@ function shuffle(l)
         new[j] = l[i]
     end
     return new
+end
+
+function foldinc(f, t, ...)
+    local a = t[1]
+    for i = 2, #t do
+        a = f(a, t[i], ...)
+    end
+    return a
 end
 --end-module--
 return _ENV

@@ -48,7 +48,7 @@ client.run(myclient)
 
 ### Documentation
 
-Documentation and more involved examples can be found in the [User Manual]().
+Documentation and more involved examples can be found in the [User Manual](https://mehgugs.github.io/novus/manual/01-Introduction.md.html).
 
 ### Contributing
 

@@ -40,31 +40,31 @@
 
 <h2>Libraries</h2>
 <ul class="nowrap">
-  <li><a href="../libraries/novus.api.html">novus.api</a></li>
-  <li><a href="../libraries/novus.cache.html">novus.cache</a></li>
-  <li><a href="../libraries/novus.cache.view.html">novus.cache.view</a></li>
-  <li><a href="../libraries/novus.client.html">novus.client</a></li>
-  <li><a href="../libraries/novus.client.context.html">novus.client.context</a></li>
-  <li><strong>novus.client.emission</strong></li>
-  <li><a href="../libraries/novus.const.html">novus.const</a></li>
-  <li><a href="../libraries/novus.enums.html">novus.enums</a></li>
-  <li><a href="../libraries/novus.shard.html">novus.shard</a></li>
-  <li><a href="../libraries/novus.util.html">novus.util</a></li>
-  <li><a href="../libraries/novus.util.date.html">novus.util.date</a></li>
-  <li><a href="../libraries/novus.util.func.html">novus.util.func</a></li>
-  <li><a href="../libraries/novus.util.list.html">novus.util.list</a></li>
-  <li><a href="../libraries/novus.util.lpeg.html">novus.util.lpeg</a></li>
-  <li><a href="../libraries/novus.util.mutex.html">novus.util.mutex</a></li>
-  <li><a href="../libraries/novus.util.patterns.html">novus.util.patterns</a></li>
-  <li><a href="../libraries/novus.util.permission.html">novus.util.permission</a></li>
-  <li><a href="../libraries/novus.util.plcompat.html">novus.util.plcompat</a></li>
-  <li><a href="../libraries/novus.util.printf.html">novus.util.printf</a></li>
-  <li><a href="../libraries/novus.util.queue.html">novus.util.queue</a></li>
-  <li><a href="../libraries/novus.util.relabel.html">novus.util.relabel</a></li>
-  <li><a href="../libraries/novus.util.string.html">novus.util.string</a></li>
-  <li><a href="../libraries/novus.util.table.html">novus.util.table</a></li>
-  <li><a href="../libraries/novus.util.uint.html">novus.util.uint</a></li>
-  <li><a href="../libraries/snowflakes.html">snowflakes</a></li>
+  <li><a href="../libraries/api.html">api</a></li>
+  <li><a href="../libraries/cache.html">cache</a></li>
+  <li><a href="../libraries/cache.view.html">cache.view</a></li>
+  <li><a href="../libraries/client.html">client</a></li>
+  <li><a href="../libraries/client.context.html">client.context</a></li>
+  <li><strong>client.emission</strong></li>
+  <li><a href="../libraries/client.interposable.html">client.interposable</a></li>
+  <li><a href="../libraries/const.html">const</a></li>
+  <li><a href="../libraries/enums.html">enums</a></li>
+  <li><a href="../libraries/shard.html">shard</a></li>
+  <li><a href="../libraries/util.html">util</a></li>
+  <li><a href="../libraries/util.date.html">util.date</a></li>
+  <li><a href="../libraries/util.func.html">util.func</a></li>
+  <li><a href="../libraries/util.list.html">util.list</a></li>
+  <li><a href="../libraries/util.lpeg.html">util.lpeg</a></li>
+  <li><a href="../libraries/util.mutex.html">util.mutex</a></li>
+  <li><a href="../libraries/util.patterns.html">util.patterns</a></li>
+  <li><a href="../libraries/util.permission.html">util.permission</a></li>
+  <li><a href="../libraries/util.plcompat.html">util.plcompat</a></li>
+  <li><a href="../libraries/util.printf.html">util.printf</a></li>
+  <li><a href="../libraries/util.queue.html">util.queue</a></li>
+  <li><a href="../libraries/util.relabel.html">util.relabel</a></li>
+  <li><a href="../libraries/util.string.html">util.string</a></li>
+  <li><a href="../libraries/util.table.html">util.table</a></li>
+  <li><a href="../libraries/util.uint.html">util.uint</a></li>
 </ul>
 <h2>Manual</h2>
 <ul class="nowrap">
@@ -89,9 +89,9 @@
 
 <div id="content">
 
-<h1>Module <code>novus.client.emission</code></h1>
+<h1>Module <code>client.emission</code></h1>
 <p>Event emission.</p>
-<p> Dependencies: <a href="../libraries/novus.util.html#">novus.util</a></p>
+<p> Dependencies: <a href="../libraries/util.html#">util</a></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
@@ -128,6 +128,10 @@
 	<td class="name" nowrap><a href="#__pairs">__pairs (em[, timeout])</a></td>
 	<td class="summary"><a href="https://www.lua.org/manual/5.3/manual.html#pdf-pairs">pairs</a> iterator, iterates over all events received until timeout or event data is nil.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#await">await (em, f[, timeout])</a></td>
+	<td class="summary">Waits for the first event to match the predicate within the timeout.</td>
+	</tr>
 </table>
 <h2><a href="#objects">objects</a></h2>
 <table class="function_list">
@@ -156,7 +160,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+           <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
     </ol>
@@ -176,7 +180,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">em</span>
-            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
         </li>
@@ -202,7 +206,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">em</span>
-            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
         </li>
@@ -227,7 +231,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">em</span>
-            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
         </li>
@@ -252,7 +256,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">em</span>
-            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
         </li>
@@ -278,7 +282,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">em</span>
-            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
         </li>
@@ -317,7 +321,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">em</span>
-            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
         </li>
@@ -347,7 +351,7 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">em</span>
-            <span class="types"><a class="type" href="../libraries/novus.client.emission.html#emitter">emitter</a></span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
 
 
         </li>
@@ -372,6 +376,46 @@
     </ul>
 
 </dd>
+    <dt>
+    <a name = "await"></a>
+    <strong>await (em, f[, timeout])</strong>
+    </dt>
+    <dd>
+    Waits for the first event to match the predicate within the timeout.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">em</span>
+            <span class="types"><a class="type" href="../libraries/client.emission.html#emitter">emitter</a></span>
+
+
+        </li>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         A predicate, which returns true if the function should return the event.
+        </li>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span></span>
+         How long to to wait for events. (defaults to indefinitely.)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The event emitted.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> ntx = client.events.MESSAGE_CREATE:await(<span class="keyword">function</span>(pending) <span class="keyword">return</span> pending.user.id == client:me().id <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="objects"></a>objects</h2>
 
@@ -381,7 +425,7 @@
     <strong>emitter</strong>
     </dt>
     <dd>
-    An emitter object.  Set callbacks with <a href="../libraries/novus.client.emission.html#listen">listen</a> and emit events with <a href="../libraries/novus.client.emission.html#emit">emit</a>.
+    An emitter object.  Set callbacks with <a href="../libraries/client.emission.html#listen">listen</a> and emit events with <a href="../libraries/client.emission.html#emit">emit</a>.
   All functions which take a emitter as their first argument can be called from the emitter in method form.
 
 
@@ -413,7 +457,7 @@ E:emit<span class="string">"No one's listening :("</span>
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i>current version <a href="https://github.com/Mehgugs/novus">Novus 0.0.5</a></i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

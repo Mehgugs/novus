@@ -1,7 +1,6 @@
 --- Table utilities.
--- Dependencies: `novus.util.func`
--- @module novus.util.table
--- @see novus.util
+-- Dependencies: `util.func`
+-- @module util.table
 -- @alias _ENV
 
 --imports--
@@ -179,6 +178,17 @@ function includes(t, v)
         if val == v then return true end
     end
     return false
+end
+
+--- Creates a set from the values in a table.
+--  @tab t
+--- @treturn table
+function set(t)
+    local out = {}
+    for _, v in pairs(t) do
+        out[v] = true
+    end
+    return out
 end
 
 --end-module--

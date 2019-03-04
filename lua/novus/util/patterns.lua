@@ -1,8 +1,7 @@
 --- Various Lpeg patterns for discord related parsing.
--- Dependencies: `novus.util.lpeg`, `novus.util.relabel`, `novus.util.uint`
--- @module novus.util.patterns
+-- Dependencies: `util.lpeg`, `util.relabel`, `util.uint`
+-- @module util.patterns
 -- @alias _ENV
--- @see novus.util
 
 --imports--
 local lpeg = require"novus.util.lpeg"
@@ -10,6 +9,7 @@ local re = require"novus.util.relabel"
 local uint = require"novus.util.uint"
 local setmetatable = setmetatable
 local pairs = pairs
+local concat = table.concat
 --start-module--
 local _ENV = setmetatable({}, {__index = lpeg})
 -- some useful patterns
@@ -104,8 +104,13 @@ setmetatable(mentions, {__call = mention_iterate})
 -- @within Patterns
 codeblock = re.compile[[("```" {(!"```" .)*} "```")]]
 
-codesnip = re.compile[[("`" {(!"`" .)+} "`")]]
-doublesnip = re.compile[[("``" {(!"``" .)+} "``")]]
+region = function(dl) return re.compile([[(%dl {((!%dl .)/(&%dl %dl %dl))+} %dl)]], {dl = dl}) end
+
+local md = function(pc) return re.compile(pc, _ENV) end
+
+codesnip = region"`"
+
+doublesnip = region"``"
 
 --- Matches a code snippet.
 -- @tparam lpeg-pattern codesnippet
@@ -120,34 +125,32 @@ quoted = codeblock + codesnippet
 --- Matches a italic text.
 -- @tparam lpeg-pattern italic
 -- @within Patterns
-italic = re.compile[[("*" {(!"*" .)+} "*")]]
-       + re.compile[[("_" {(!"_" .)+} "_")]]
+italic = region"*"
+       + region"_"
 
 --- Matches a bold text.
 -- @tparam lpeg-pattern bold
 -- @within Patterns
-bold = re.compile[[("**" {(!"**" .)+} "**")]]
+bold = region"**"
 
 --- Matches a underlined text.
 -- @tparam lpeg-pattern underline
 -- @within Patterns
-underline = re.compile[[("__" {(!"__" .)+} "__")]]
+underline = region"__"
 
 --- Matches spoilered text.
 -- @tparam lpeg-pattern spoiler
 -- @within Patterns
 spoiler = re.compile[[
-    spoiler <- {"||" (!"|" .)* "||"}
+    spoiler <- {"||" ((!"|" .) / spoiler)+ "||"}
 ]]
 
 --- Matches strikethrough text.
 -- @tparam lpeg-pattern strikethrough
 -- @within Patterns
 strikethrough = re.compile[[
-    strikethrough <- {"~~" ((!"~" .) / strikethrough)+ "~~"}
+    strikethrough <- {"~~" ((!"~~" .))+ "~~"}
 ]]
-
-format = codeblock + codesnippet + bold + underline + italic + spoiler + strikethrough
 
 --end-module--
 return _ENV

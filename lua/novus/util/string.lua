@@ -1,8 +1,7 @@
 --- String utilities.
 -- Dependencies: `novus.util.table`
--- @module novus.util.string
+-- @module util.string
 -- @alias _ENV
--- @see novus.util
 
 --imports--
 local setmetatable, getmetatable = setmetatable,getmetatable
@@ -102,7 +101,7 @@ function levenshtein(str1, str2)
 end
 
 --- Adds the module functions into the global string table,
--- this is called automatically by @{novus.util}
+-- this is called automatically by @{util}
 function inject() return tablex.overwrite(global_string, _ENV) end
 
 --- Shorthand for formatting a string.

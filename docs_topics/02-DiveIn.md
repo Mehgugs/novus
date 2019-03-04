@@ -36,7 +36,7 @@ local myclient = client.create{
 ### Emitters and Events
 
 Novus uses an emitter pattern to communicate events to your code. Inside `client.events` you will
-find a collection of @{novus.client.emission.emitter|emitter} objects, indexed by their event name. Let's make our bot log when it's `READY`.
+find a collection of @{client.emission.emitter|emitter} objects, indexed by their event name. Let's make our bot log when it's `READY`.
 
 
 ```lua
@@ -46,7 +46,7 @@ myclient.events.READY:listen(function(ctx)
 end)
 ```
 
-The argument we receive in the callback is the @{novus.client.context.context|context} of the event, it will contain all the relevant discord objects involved in the event.
+The argument we receive in the callback is the @{client.context.context|context} of the event, it will contain all the relevant discord objects involved in the event.
 
 
 ### What if I'm morally against callbacks?
@@ -136,12 +136,12 @@ Okay so our bot is online, but it doesn't do do anything right now. Let's change
 
 ### Listening for incoming messages
 
-Using what we know about @{novus.client.emission.emitter|emitters} we can add a listener to the `MESSAGE_CREATE`
+Using what we know about @{client.emission.emitter|emitters} we can add a listener to the `MESSAGE_CREATE`
 event:
 
 ```lua
 myclient.events.MESSAGE_CREATE:listen(function(ctx)
--- Looking at the @{novus.client.context.context|context} docs we see that it has a `msg` field.
+-- Looking at the @{client.context.context|context} docs we see that it has a `msg` field.
   if ctx.msg.content == "!ping" then
     ctx.msg:reply"Pong!"
   end

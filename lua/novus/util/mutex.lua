@@ -1,6 +1,5 @@
 --- A minimal mutex implementation.
--- @module novus.util.mutex
--- @see novus.util
+-- @module util.mutex
 -- @alias _ENV
 
 --imports--
@@ -19,7 +18,7 @@ __index = _ENV
 -- @tparam[opt] number timeout an optional timeout to wait.
 function lock(self, timeout)
     if self.inuse then
-        self.inuse = self.cond:wait(timeout)
+        self.inuse = self.pollfd:wait(timeout)
     else
         self.inuse = true
     end
@@ -30,7 +29,7 @@ end
 function unlock(self)
     if self.inuse then
         self.inuse = false
-        self.cond:signal(1)
+        self.pollfd:signal(1)
     end
 end
 
@@ -61,7 +60,7 @@ end
 -- @treturn mutex
 function new()
     return setmetatable({
-         cond = cond.new()
+         pollfd = cond.new()
         ,inuse= false
     }, _ENV)
 end

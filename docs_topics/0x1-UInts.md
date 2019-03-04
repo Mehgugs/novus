@@ -31,7 +31,7 @@ which is quite a long way away.
 ### Using them in code
 
 Novus internally uses the encoded uint64 for all snowflakes and will convert the
-strings sent by discord. You should use the @{novus.util.uint|uint} module to write down literals.
+strings sent by discord. You should use the @{util.uint|uint} module to write down literals.
 
 ```lua
 
