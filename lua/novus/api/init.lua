@@ -275,7 +275,7 @@ function push(state, req, method,route, retries)
     if state.accept_encoding and headers:get"content-encoding" == "gzip" then
         raw = inflate()(raw, true)
     elseif state.accept_encoding and headers:get"content-encoding" ~= "gzip" then
-        util.warn("Content negotiation failed or was ignored! (server responded with %q)", headers:get"content-encoding")
+        util.warn("Content negotiation failed or was ignored! (server responded with %q)", tostring(headers:get"content-encoding"))
     end
 
     local data = headers:get"content-type" == JSON and decode(raw) or raw
