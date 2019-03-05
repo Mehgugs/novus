@@ -168,7 +168,7 @@ function disconnect(state, why, code)
     return state
 end
 
-local function read_message(state, message, op)
+function read_message(state, message, op)
     if op == "text" then
         return decode(message)
     elseif op == "binary" then

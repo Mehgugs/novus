@@ -162,9 +162,9 @@ function init(options)
     state.id = util.rid()
     state.routex = mutex_cache()
     state.global_lock = mutex()
-    state.accept_encoding = options.accept_encoding == "gzip"
-    if state.accept_encoding then
-        util.info("Api-%s is using $white;accept-encoding: 'gzip, *;q=0'$info;.", state.id)
+    if not not options.accept_encoding then
+        state.accept_encoding = "gzip, deflate, gzip-x"
+        util.info("Api-%s is using $white;accept-encoding: %q", state.id, state.accept_encoding)
     end
     util.info("Initialized API-%s with TOKEN-%x", state.id, util.hash(state.token))
     return state
@@ -201,7 +201,7 @@ function request(state, method, endpoint, payload, query, files)
     req.headers:upsert("user-agent", USER_AGENT)
     req.headers:append("authorization", state.token)
     if state.accept_encoding then
-        req.headers:append("accept-encoding", "gzip, *;q=0")
+        req.headers:append("accept-encoding", state.accept_encoding)
     end
     if with_payload[method] then
         payload = payload and json.encode(payload) or '{}'
@@ -272,10 +272,11 @@ function push(state, req, method,route, retries)
     end
 
     local raw = stream:get_body_as_string()
-    if state.accept_encoding and headers:get"content-encoding" == "gzip" then
+
+    if headers:get"content-encoding" == "gzip"
+    or headers:get"content-encoding" == "deflate"
+    or headers:get"content-encoding" == "gzip-x" then
         raw = inflate()(raw, true)
-    elseif state.accept_encoding and headers:get"content-encoding" ~= "gzip" then
-        util.warn("Content negotiation failed or was ignored! (server responded with %q)", tostring(headers:get"content-encoding" or "nil"))
     end
 
     local data = headers:get"content-type" == JSON and decode(raw) or raw
