@@ -5,6 +5,7 @@
 --imports--
 local setmetatable = setmetatable
 local insert, ipairs = table.insert, ipairs
+local max = math.max
 --start-module--
 local _ENV = {}
 
@@ -24,6 +25,27 @@ function new()
         ,_last = -1
         ,parity = 'left'
     }, _ENV)
+end
+
+--- Concatenates two lists into a queue.
+-- @param t1 The first list.
+-- @param t2 The second list.
+-- @treturn queue
+function cat(t1, t2)
+  local q = new()
+  local len = max(#t1, #t2)
+  for i = len, 1, -1 do
+    local j = len+1-i
+    local i1 = t1[i]
+    local i2 = t2[j]
+    if i1 ~= nil then
+      q:push_left(i1)
+    end
+    if i2 ~= nil then
+      q:push_right(i2)
+    end
+  end
+  return q
 end
 
 --- Pushes a value onto the front of the queue.

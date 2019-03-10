@@ -73,13 +73,7 @@ local function mutex_cache()
     })
 end
 
-local function remove_null(v)
-    if v == null then return nil else return v end
-end
-
-local function decode(str)
-    return map(remove_null, raw_decode(str))
-end
+local decode = raw_decode
 
 local next_key = re.compile[[
     key <- ident / numeral / quoted

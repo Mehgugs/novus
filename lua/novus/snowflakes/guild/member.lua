@@ -20,6 +20,8 @@ local pairs, ipairs = pairs, ipairs
 --start-module--
 local _ENV = snowflake "member"
 
+processor = processor or {}
+
 schema {
      "guild_id"
     ,"nick"
@@ -29,6 +31,10 @@ schema {
     ,"mute"
     ,"channel_id"
 }
+
+function processor.roles(roles)
+    return list.map(util.uint.touint, roles), "roles"
+end
 
 function new_from(state, payload, old)
     local user = payload.user
@@ -62,11 +68,10 @@ function new_from(state, payload, old)
         ,method
         ,guild_id
         ,payload.nick
-        ,payload.roles
+        ,processor.roles(payload.roles)
         ,payload.joined_at
         ,payload.deaf
         ,payload.mute
-        ,util.uint(payload.channel_id)
     }, _ENV)
 end
 
@@ -236,7 +241,7 @@ function properties.highest_role(member)
         local current
         for _, id in ipairs(member[6]) do
             local role = snowflakes.role.get_from(state, member[4], id)
-            if role[8] < position then
+            if role[8] > position then
                 position = role[8]
                 current = role
             end

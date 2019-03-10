@@ -93,8 +93,16 @@ function CHANNEL_UPDATE(client, shard, _, event)
         g = guild.get_from(client, event.guild_id)
     end
     local c = channel.get_from(client, util.uint(event.id))
-    channel.update_from(client, c, event)
-    return client.events.CHANNEL_UPDATE:emit(ctx(g, c))
+    if c.type ~= event.type then
+        local old = c.type
+        snowflake.destroy(c)
+        c = channel.new_from(client, util.inherit(c, event))
+        return client.events.CHANNEL_UPDATE:emit(ctx{g, c; before = old, after = c.type})
+    else
+        channel.update_from(client, c, event)
+        return client.events.CHANNEL_UPDATE:emit(ctx(g, c))
+    end
+
 end
 
 function CHANNEL_DELETE(client, shard, _, event)

@@ -61,6 +61,7 @@ local snowflake_map = {
     ,voice = 'guildvoicechannel'
     ,category = 'guildcategorychannel'
     ,group = 'groupchannel'
+    ,news  = 'guildnewschannel'
 }
 
 function get_from(state, channel_id)

@@ -18,7 +18,7 @@ local _ENV = {}
 --  list.map(function(x) return 2*x end, {1, 2, 3}) --> {2, 4, 6}
 function map(f, l, ...)
     local out = {}
-    for k, v in pairs(l) do
+    for k, v in ipairs(l) do
         out[k] = f(v, ...)
     end
     return out
@@ -135,5 +135,7 @@ function foldinc(f, t, ...)
     end
     return a
 end
+
+
 --end-module--
 return _ENV

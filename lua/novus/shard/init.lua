@@ -35,17 +35,11 @@ local tostring = tostring
 local null = json.null
 local map = list.map
 local min, max = math.min, math.max
+local pairs = pairs
 --start-module--
 local _ENV = interposable{}
 
-local function remove_null(v)
-    if v == null then return nil else return v end
-end
-
-local function decode(str)
-    return map(remove_null, raw_decode(str))
-end
-
+local decode = raw_decode
 
 local ZLIB_SUFFIX = '\x00\x00\xff\xff'
 local GATEWAY_DELAY = const.gateway.delay

@@ -30,6 +30,7 @@ local huge = math.huge
 local should_debug = _G.NOVUS_DEBUG or os.getenv"NOVUS_DEBUG"
 local debugger = debug.debug
 local require = require
+local encode = should_debug and require"pl.pretty".write or require"cjson".encode
 --start-module--
 local _ENV = interpose{clients = {}}
 
@@ -154,7 +155,13 @@ local function runner(client)
         client.begin = gettime()
         client.app = app or {}
         local limit = data.session_start_limit
-        util.info("TOKEN-%s has used %d/%d sessions.", token_nonce, limit.total - limit.remaining, limit.total)
+        if limit then
+          util.info("TOKEN-%s has used %d/%d sessions.", token_nonce, limit.total - limit.remaining, limit.total)
+        else
+          client.mutex:unlock()
+          util.fatal("Failed to retreive valid information from GET /gateway/bot $white;%s$error;", encode(data))
+          return
+        end
         if limit.remaining > 0 then
             local total_shards = data.shards
             client.gateway = data.url

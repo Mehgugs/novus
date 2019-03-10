@@ -26,6 +26,7 @@ local running = cqueues.running
 local snowflakes = snowflake.snowflakes
 local null = json.null
 local channeltype = enums.channeltype
+local should_debug = os.getenv"NOVUS_DEBUG"
 
 local role           = require"novus.snowflakes.guild.role"
 local emoji          = require"novus.snowflakes.guild.emoji"
@@ -103,6 +104,10 @@ schema{
     ,"joined_at"
     ,"large"
     ,"member_count"
+    ,"lazy"
+    ,"vanity_url_code"
+    ,"banner"
+    ,"description"
     ,"voice_states"
     ,"member_ids"
     ,"channel_ids"
@@ -220,6 +225,10 @@ local function new_from_available(state, payload)
         ,payload.joined_at
         ,payload.large
         ,payload.member_count
+        ,not not payload.lazy
+        ,payload.vanity_url_code
+        ,payload.banner
+        ,payload.description
     }),_ENV)
 
     if payload.voice_states then
@@ -246,6 +255,13 @@ local function new_from_available(state, payload)
     object.roles    = object.roles or view.new(state.cache.role, select_guild_snowflake, gid)
     object.emojis   = object.emojis  or view.new(state.cache.emoji, select_guild_snowflake, gid)
 
+    if should_debug then
+      for k, v in pairs(payload) do
+        if not schema[k] then
+          util.warn("%s has extra key %s (a %s) %s", object.id, k, type(v), v)
+        end
+      end
+    end
     return object
 end
 
