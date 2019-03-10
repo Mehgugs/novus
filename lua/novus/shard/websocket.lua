@@ -30,6 +30,7 @@ local utf8 = utf8 or require "compat53.utf8" -- luacheck: ignore 113
 local cqueues = require "cqueues"
 local monotime = cqueues.monotime
 local sleep = cqueues.sleep
+local promise = require"cqueues.promise"
 local ce = require "cqueues.errno"
 local lpeg = require "lpeg"
 local http_patts = require "lpeg_patterns.http"
@@ -182,10 +183,14 @@ local function build_close(code, message, mask)
 	}
 end
 
-local function read_again(socket, ...)
+local function should_retry(timer) if timer then return timer:status() == "pending" else return true end end
+
+local function read_again(deadline, socket, ...)
 		local tries = 0
-    local data, msg, code = socket:xread(...)
-		while tries < MAX_RA_TRIES and (not data or code == ce.ETIMEDOUT) do
+		local data, msg, code = socket:xread(...)
+		local timeout = deadline and deadline - monotime()
+		local timer = timeout and promise.new(sleep, timeout)
+		while should_retry(timer) and (not data or code == ce.ETIMEDOUT) do
 				tries = tries + 1
         sleep()
         data, msg, code = socket:xread(...)
@@ -291,12 +296,12 @@ local function read_frame(sock, deadline)
 	end
 
 	if frame.MASK then
-		local key = assert(read_again(sock, 4, "b", 0))
+		local key = assert(read_again(deadline, sock, 4, "b", 0))
 		frame.key = { key:byte(1, 4) }
 	end
 
 	do
-		local data = assert(read_again(sock, frame.length, "b", 0))
+		local data = assert(read_again(deadline, sock, frame.length, "b", 0))
 		if frame.MASK then
 			frame.data = apply_mask(data, frame.key)
 		else
