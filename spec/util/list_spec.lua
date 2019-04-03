@@ -21,12 +21,12 @@ describe('#list', function()
                 t
             )
         end)
-        it('can operate over objects too', function()
-            local t = {foo = 2}
-            local tt = {foo = 4}
-            local sqr = function(x) return x*x end
+        it('can operate over mixed tables, ignoring hash parts', function()
+            local t = {foo = "bar"; 1, 2, 3}
+            local tt ={2, 4, 6}
+            local by2 = function(x) return 2 * x end
             assert.are.same(
-                list.map(sqr, t),
+                list.map(by2, t),
                 tt
             )
         end)
