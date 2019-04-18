@@ -269,6 +269,15 @@ function wrap(client, ...)
     end
 end
 
+--- Sends a gateway command to all shards.
+-- @tparam client client
+-- @param ... The arguments to `shard.send`.
+function send(client, ...)
+    for _, s in pairs(client.shards) do
+        s.loop:wrap(shard.send, s, ...)
+    end
+end
+
 --end-module--
 return _ENV
 

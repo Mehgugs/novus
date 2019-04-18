@@ -9,7 +9,7 @@ description = {
      summary = 'A Discord API library written in lua 5.3, for lua 5.3.'
     ,homepage = "https://github.com/Mehgugs/novus"
     ,license = 'MIT'
-    ,maintainer = 'm4gicks@gmail.com'
+    ,maintainer = 'Magicks <m4gicks@gmail.com>'
     ,detailed =
 "Novus is a wrapper for the official Discord API.\
 It uses cqueues and lua-http to provide a minimal, yet featureful,\

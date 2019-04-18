@@ -136,6 +136,16 @@ function foldinc(f, t, ...)
     return a
 end
 
+function cat(l1, l2)
+  local out = {}
+  for _, v in ipairs(l1) do
+    insert(out, v)
+  end
+  for _, v in ipairs(l2) do
+    insert(out, v)
+  end
+  return out
+end
 
 --end-module--
 return _ENV

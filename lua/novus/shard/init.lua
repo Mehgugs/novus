@@ -43,7 +43,7 @@ local decode = raw_decode
 
 local ZLIB_SUFFIX = '\x00\x00\xff\xff'
 local GATEWAY_DELAY = const.gateway.delay
-local ops = util.reflect{
+ops = util.reflect{
   DISPATCH              = 0  -- ✅
 , HEARTBEAT             = 1  -- ✅
 , IDENTIFY              = 2  -- ✅
@@ -394,8 +394,8 @@ end
 
 function update_voice(state, guild_id, channel_id, self_mute, self_deaf)
     return send(state, VOICE_STATE_UPDATE, {
-        guild_id = guild_id,
-        channel_id = channel_id or null,
+        guild_id = util.uint.tostring(guild_id),
+        channel_id = channel_id and util.uint.tostring(channel_id) or null,
         self_mute = self_mute or false,
         self_deaf = self_deaf or false,
     })
