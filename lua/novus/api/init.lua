@@ -212,8 +212,8 @@ function request(state, method, endpoint, payload, query, files)
     local route = route_of(endpoint, method)
     local routex = state.routex[route]
 
-    state.global_lock:lock()
-    if routex then routex:lock() end
+    
+    if routex then routex:lock() else state.global_lock:lock() end
 
     local success, data, err, delay, global = xpcall(push, traceback, state, req, method, route, 0)
     if not success then
@@ -225,7 +225,6 @@ function request(state, method, endpoint, payload, query, files)
         if routex then routex:unlock() end
     else
         routex:unlock_after(delay)
-        state.global_lock:unlock()
     end
 
     return not err, data, err
@@ -235,7 +234,7 @@ function push(state, req, method,route, retries)
     local delay = 1 -- seconds
     local global = false -- whether the delay incurred is on the global limit
 
-    local headers , stream , eno = req:go()
+    local headers , stream , eno = req:go(60)
 
     if not headers and retries < const.api.max_retries then
         local rsec = util.rand(1, 2)
