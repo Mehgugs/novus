@@ -213,20 +213,15 @@ function request(state, method, endpoint, payload, query, files)
     local routex = state.routex[route]
 
     
-    if routex then routex:lock() else state.global_lock:lock() end
+    routex:lock()
 
     local success, data, err, delay, global = xpcall(push, traceback, state, req, method, route, 0)
     if not success then
         return util.fatal("api.push failed %q", tostring(data))
     end
 
-    if global then
-        state.global_lock:unlock_after(delay)
-        if routex then routex:unlock() end
-    else
-        routex:unlock_after(delay)
-    end
-
+    routex:unlock_after(delay)
+    
     return not err, data, err
 end
 
@@ -258,11 +253,11 @@ function push(state, req, method,route, retries)
         delay = max(dt, delay)
     end
 
-    if headers:get"x-ratelimit-global" then
-        util.info("Route %s:%s has been downgraded to global limiting.", method, route)
-        global = true
-        state.routex[route] = false -- downgrade the route
-    end
+    -- if headers:get"x-ratelimit-global" then
+        -- util.info("Route %s:%s has been downgraded to global limiting.", method, route)
+        -- global = true
+        -- state.routex[route] = false -- downgrade the route
+    -- end
 
     local raw = stream:get_body_as_string()
 
@@ -290,7 +285,6 @@ function push(state, req, method,route, retries)
             if retry then
                 util.warn("(%i, %q) :  retrying after %fsec : %s%s", code, reason[rawcode], delay, method, route)
                 cqueues.sleep(delay)
-                if global then state.global_lock:unlock() end
                 return push(state, req, method,route, retries+1)
             end
 
