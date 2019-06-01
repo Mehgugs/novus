@@ -242,7 +242,7 @@ function methods.remove_reaction(message, emoji, user)
     if typ and typ == snowflakes.emoji then
         emoji = emoji.nonce
     elseif typ and typ == snowflakes.reaction then
-        return methods.add_reaction(message, emoji.emoji, user)
+        return methods.remove_reaction(message, emoji.emoji, user)
     elseif type(emoji) ~= 'string' then
         return false
     end

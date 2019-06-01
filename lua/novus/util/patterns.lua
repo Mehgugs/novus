@@ -36,12 +36,12 @@ mentions = {}
 
 mentions.emoji = re.compile([[
     emoji <- {|'<:' emoji_name ':' %id '>' \type{`emoji`} |}
-    emoji_name <- {:name:(!':' [a-zA-Z_0-9])+:}
+    emoji_name <- {:name:[a-zA-Z_0-9]^+2:}
 ]], defs)
 
 mentions.animoji = re.compile([[
     animoji <- {|'<a:' emoji_name ':' %id '>' \type{`animoji`} |}
-    emoji_name <- {:name:(!':' [a-zA-Z_0-9-])+:}
+    emoji_name <- {:name:[a-zA-Z_0-9]^+2:}
 ]], defs)
 
 mentions.user = re.compile([[

@@ -62,7 +62,7 @@ function READY(client, shard, _, event)
 end
 
 function RESUMED(client, shard, _, event)
-    util.info("Shard-%s has resumed trace=%q", shard.options.id, concat(event._trace, ', '))
+    util.info("Shard-%s has resumed.", shard.options.id)
     return client.events.RESUMED:emit(ctx{shard = shard.options.id})
 end
 

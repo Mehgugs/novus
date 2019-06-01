@@ -291,7 +291,7 @@ function messages(state)
 end
 
 function HELLO(state, _, d)
-    util.info("discord said hello to Shard-%s trace=%q", state.options.id, concat(d._trace, ', '))
+    util.info("discord said hello to Shard-%s.", state.options.id)
     util.info("Shard-%s has a heartrate of %s.", state.options.id, util.Date.Interval(floor(d.heartbeat_interval/1e3)))
     start_heartbeat(state, d.heartbeat_interval/1e3)
 

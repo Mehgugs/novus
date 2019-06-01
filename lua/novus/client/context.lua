@@ -206,8 +206,8 @@ function context.properties.USER_REACTED(ctx)
     local em = ctx.client.events.MESSAGE_REACTION_ADD
     >> function(ntx)
         if  (snowflake.id(ntx.user) or ntx.reaction.user_id) == uid
-        and (snowflake.id(ntx.channel) or ntx.reaction.channel_id == chid)
-        and (snowflake.id(ntx.msg) or ntx.reaction.message_id == mid) then
+        and (snowflake.id(ntx.channel) or ntx.reaction.channel_id) == chid
+        and (snowflake.id(ntx.msg) or ntx.reaction.message_id) == mid then
             ntx:add_extra('reacted_with', ntx.reaction.nonce or snowflakes.reaction.properties.nonce(ntx.reaction))
             return ntx, true
         end

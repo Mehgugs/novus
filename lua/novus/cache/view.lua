@@ -136,6 +136,19 @@ function copy(t)
     return new(t, identity)
 end
 
+local function selector(_, tbl, props)
+    local out = {}
+    for i = 1, props.n do 
+        out[i] = props[i] ~= nil and tbl[props[i]] or nil
+    end 
+    out.n = props.n
+    return out
+end
+
+function select(view, ...)
+    return new(view, selector, pack(...))
+end
+
 __name = "view"
 
 --end-module--
