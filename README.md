@@ -1,3 +1,6 @@
+# Archive Notice #
+This project is no longer being maintained; I've decided to pull the low level goodness out into a separate library. In the future I may revisit this project's higher level ideas using the low level library as a base. 
+
 ## Novus
 [![Build Status](https://travis-ci.org/Mehgugs/novus.svg?branch=master)](https://travis-ci.org/Mehgugs/novus)
 [![CircleCI](https://circleci.com/gh/Mehgugs/novus/tree/master.svg?style=svg)](https://circleci.com/gh/Mehgugs/novus/tree/master)
